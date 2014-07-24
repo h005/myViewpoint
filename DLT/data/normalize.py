@@ -26,9 +26,9 @@ def update_coordinate(image_path):
 	fname, ext = os.path.splitext(basename)
 	txtfile = os.path.join(os.path.dirname(image_path), '%s_im.txt' % fname)
 	new_txtfile = os.path.join(os.path.dirname(image_path), '%s_im_norm.txt' % fname)
-	print  '%s --> %s' % (txtfile, new_txtfile)
 
 	if os.path.exists(txtfile):
+		print  '%s --> %s' % (txtfile, new_txtfile)
 		fp = open(txtfile, 'r')
 		tmp = open(new_txtfile, 'w')
 
