@@ -8,6 +8,13 @@
 
 /* Begin PBXBuildFile section */
 		FA52A2E0198128CF00EFB3DE /* Lugger_im_norm.txt in CopyFiles */ = {isa = PBXBuildFile; fileRef = FA52A2DF198128B100EFB3DE /* Lugger_im_norm.txt */; };
+		FA52A2EE1981426B00EFB3DE /* Bigben_im_norm.txt in CopyFiles */ = {isa = PBXBuildFile; fileRef = FA52A2E11981425600EFB3DE /* Bigben_im_norm.txt */; };
+		FA52A2EF1981426B00EFB3DE /* Capitol_im_norm.txt in CopyFiles */ = {isa = PBXBuildFile; fileRef = FA52A2E21981425600EFB3DE /* Capitol_im_norm.txt */; };
+		FA52A2F01981426B00EFB3DE /* Eiffel_im_norm.txt in CopyFiles */ = {isa = PBXBuildFile; fileRef = FA52A2E31981425600EFB3DE /* Eiffel_im_norm.txt */; };
+		FA52A2F11981426B00EFB3DE /* House_im_norm.txt in CopyFiles */ = {isa = PBXBuildFile; fileRef = FA52A2E41981425600EFB3DE /* House_im_norm.txt */; };
+		FA52A2F21981426B00EFB3DE /* JinMao_im_norm.txt in CopyFiles */ = {isa = PBXBuildFile; fileRef = FA52A2E51981425600EFB3DE /* JinMao_im_norm.txt */; };
+		FA52A2F31981426B00EFB3DE /* Oslo_im_norm.txt in CopyFiles */ = {isa = PBXBuildFile; fileRef = FA52A2E71981425600EFB3DE /* Oslo_im_norm.txt */; };
+		FA52A2F41981426B00EFB3DE /* triumph_im_norm.txt in CopyFiles */ = {isa = PBXBuildFile; fileRef = FA52A2ED1981425600EFB3DE /* triumph_im_norm.txt */; };
 		FA6486D9194AC8A70085DCFA /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FA6486D8194AC8A70085DCFA /* GLUT.framework */; };
 		FA6486DB194AC8B40085DCFA /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FA6486DA194AC8B40085DCFA /* OpenGL.framework */; };
 		FA733F9519800BF900AF6E86 /* glm.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FA733F8E19800BF900AF6E86 /* glm.cpp */; settings = {COMPILER_FLAGS = "-Wno-write-strings"; }; };
@@ -87,6 +94,13 @@
 			dstPath = data;
 			dstSubfolderSpec = 16;
 			files = (
+				FA52A2EE1981426B00EFB3DE /* Bigben_im_norm.txt in CopyFiles */,
+				FA52A2EF1981426B00EFB3DE /* Capitol_im_norm.txt in CopyFiles */,
+				FA52A2F01981426B00EFB3DE /* Eiffel_im_norm.txt in CopyFiles */,
+				FA52A2F11981426B00EFB3DE /* House_im_norm.txt in CopyFiles */,
+				FA52A2F21981426B00EFB3DE /* JinMao_im_norm.txt in CopyFiles */,
+				FA52A2F31981426B00EFB3DE /* Oslo_im_norm.txt in CopyFiles */,
+				FA52A2F41981426B00EFB3DE /* triumph_im_norm.txt in CopyFiles */,
 				FA52A2E0198128CF00EFB3DE /* Lugger_im_norm.txt in CopyFiles */,
 				FAF0DF7C1980B6A0001A2D07 /* al.mtl in CopyFiles */,
 				FAF0DF7D1980B6A0001A2D07 /* al.obj in CopyFiles */,
@@ -160,6 +174,17 @@
 
 /* Begin PBXFileReference section */
 		FA52A2DF198128B100EFB3DE /* Lugger_im_norm.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Lugger_im_norm.txt; sourceTree = "<group>"; };
+		FA52A2E11981425600EFB3DE /* Bigben_im_norm.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Bigben_im_norm.txt; sourceTree = "<group>"; };
+		FA52A2E21981425600EFB3DE /* Capitol_im_norm.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Capitol_im_norm.txt; sourceTree = "<group>"; };
+		FA52A2E31981425600EFB3DE /* Eiffel_im_norm.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Eiffel_im_norm.txt; sourceTree = "<group>"; };
+		FA52A2E41981425600EFB3DE /* House_im_norm.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = House_im_norm.txt; sourceTree = "<group>"; };
+		FA52A2E51981425600EFB3DE /* JinMao_im_norm.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = JinMao_im_norm.txt; sourceTree = "<group>"; };
+		FA52A2E71981425600EFB3DE /* Oslo_im_norm.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Oslo_im_norm.txt; sourceTree = "<group>"; };
+		FA52A2E91981425600EFB3DE /* BigBen_im.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = BigBen_im.txt; sourceTree = "<group>"; };
+		FA52A2EA1981425600EFB3DE /* BigBen_obj.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = BigBen_obj.txt; sourceTree = "<group>"; };
+		FA52A2EB1981425600EFB3DE /* House_im.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = House_im.txt; sourceTree = "<group>"; };
+		FA52A2EC1981425600EFB3DE /* House_obj.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = House_obj.txt; sourceTree = "<group>"; };
+		FA52A2ED1981425600EFB3DE /* triumph_im_norm.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = triumph_im_norm.txt; sourceTree = "<group>"; };
 		FA6486CC194AC87C0085DCFA /* openGL */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = openGL; sourceTree = BUILT_PRODUCTS_DIR; };
 		FA6486D8194AC8A70085DCFA /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = System/Library/Frameworks/GLUT.framework; sourceTree = SDKROOT; };
 		FA6486DA194AC8B40085DCFA /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
@@ -259,6 +284,17 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		FA52A2E81981425600EFB3DE /* temp */ = {
+			isa = PBXGroup;
+			children = (
+				FA52A2E91981425600EFB3DE /* BigBen_im.txt */,
+				FA52A2EA1981425600EFB3DE /* BigBen_obj.txt */,
+				FA52A2EB1981425600EFB3DE /* House_im.txt */,
+				FA52A2EC1981425600EFB3DE /* House_obj.txt */,
+			);
+			path = temp;
+			sourceTree = "<group>";
+		};
 		FA6486C3194AC87C0085DCFA = {
 			isa = PBXGroup;
 			children = (
@@ -303,6 +339,14 @@
 		FAF0DF2C1980B54B001A2D07 /* data */ = {
 			isa = PBXGroup;
 			children = (
+				FA52A2E11981425600EFB3DE /* Bigben_im_norm.txt */,
+				FA52A2E21981425600EFB3DE /* Capitol_im_norm.txt */,
+				FA52A2E31981425600EFB3DE /* Eiffel_im_norm.txt */,
+				FA52A2E41981425600EFB3DE /* House_im_norm.txt */,
+				FA52A2E51981425600EFB3DE /* JinMao_im_norm.txt */,
+				FA52A2E71981425600EFB3DE /* Oslo_im_norm.txt */,
+				FA52A2E81981425600EFB3DE /* temp */,
+				FA52A2ED1981425600EFB3DE /* triumph_im_norm.txt */,
 				FAF0DF2D1980B54B001A2D07 /* [原始文件] */,
 				FA52A2DF198128B100EFB3DE /* Lugger_im_norm.txt */,
 				FAF0DF331980B54B001A2D07 /* al.mtl */,

@@ -824,23 +824,23 @@ world_menu(int value)
     switch (value) {
     case 'b':
         name = "data/Bigben.ppm";
-		txt_name = "data/Bigben_im.txt";
+		txt_name = "data/Bigben_im_norm.txt";
         break;
     case 'h':
         name = "data/House.ppm";
-		txt_name = "data/House_im.txt";
+		txt_name = "data/House_im_norm.txt";
         break;
     case 'c':
         name = "data/Capitol.ppm";
-		txt_name = "data/Capitol_im.txt";
+		txt_name = "data/Capitol_im_norm.txt";
         break;
     case 'o':
         name = "data/Oslo.ppm";
-		txt_name = "data/Oslo_im.txt";
+		txt_name = "data/Oslo_im_norm.txt";
         break;
 	case 'm':
         name = "data/JinMao.ppm";
-		txt_name = "data/JinMao_im.txt";
+		txt_name = "data/JinMao_im_norm.txt";
         break;
 	case 'l':
         name = "data/Lugger.ppm";
@@ -848,11 +848,11 @@ world_menu(int value)
         break;
 	case 'e':
         name = "data/Eiffel.ppm";
-		txt_name = "data/Eiffel_im.txt";
+		txt_name = "data/Eiffel_im_norm.txt";
         break;
 	case 't':
         name = "data/triumph.ppm";
-		txt_name = "data/triumph_im.txt";
+		txt_name = "data/triumph_im_norm.txt";
         break;
     }
     
