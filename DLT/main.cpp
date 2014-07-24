@@ -543,8 +543,8 @@ main_reshape(int width,  int height)
     glLoadIdentity();
     
 #define GAP  25             /* gap between subwindows */
-    sub_width = (width-GAP*3)/2.0;
-    sub_height = (height-GAP*3)/2.0;
+    sub_width = (width - GAP * 3) / 2;
+    sub_height = sub_width;
     
     glutSetWindow(world);
     glutPositionWindow(GAP, GAP);
@@ -554,7 +554,7 @@ main_reshape(int width,  int height)
     glutReshapeWindow(sub_width, sub_height);
     glutSetWindow(command);
     glutPositionWindow(GAP, GAP+sub_height+GAP);
-    glutReshapeWindow(sub_width+GAP+sub_width, sub_height);
+    glutReshapeWindow(sub_width+GAP+sub_width, height - sub_height - GAP * 3);
 }
 
 void
