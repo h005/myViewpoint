@@ -441,9 +441,11 @@ bool loadTXT(char* filename, int Cords[10][2], int &count_click)
         perror(filename);
         return false;
     }
-	while(!feof(fp))
-    {
-        fscanf(fp,"%d %d",&Cords[count_click][0],&Cords[count_click][1]);
+    
+    // feof很不好用，很容易出现最后一行读两次的情况
+    // http://stackoverflow.com/questions/5431941/while-feof-file-is-always-wrong
+    // 这样处理之后，*_im_norm.txt文件的最后一行可以为空
+	while(fscanf(fp,"%d %d",&Cords[count_click][0],&Cords[count_click][1]) != EOF) {
         count_click++;
     }
 	for(int i = 0; i < count_click; i++)
@@ -460,9 +462,7 @@ bool loadTXT(char* filename, float Cords[10][3], int &count_click)
         perror(filename);
         return false;
     }
-	while(!feof(fp))
-    {
-        fscanf(fp,"%f %f %f",&Cords[count_click][0],&Cords[count_click][1],&Cords[count_click][2]);
+	while(fscanf(fp,"%f %f %f",&Cords[count_click][0],&Cords[count_click][1],&Cords[count_click][2]) != EOF) {
         count_click++;
     }
 	for(int i = 0; i < count_click; i++)
@@ -793,7 +793,7 @@ world_display(void)
             // 由于显示窗口有缩放和变形，imCords内存放的点使用的是图像坐标
             // 显示前先转化为窗口坐标
             GLint iX = imCords[i][0], iY = imCords[i][1];
-            GLint wX = iX * 1.0 * wWidth / 500, wY = iY * 1.0 * wHeight / 500;
+            GLint wX = iX * 1.0 * wWidth / iwidth, wY = iY * 1.0 * wHeight / iheight;
             
 			glColor3f(pointColor[i].red, pointColor[i].green, pointColor[i].blue);
 			glBegin(GL_TRIANGLE_FAN);
@@ -844,7 +844,7 @@ world_menu(int value)
         break;
 	case 'l':
         name = "data/Lugger.ppm";
-		txt_name = "data/Lugger_im.txt";
+		txt_name = "data/Lugger_im_norm.txt";
         break;
 	case 'e':
         name = "data/Eiffel.ppm";

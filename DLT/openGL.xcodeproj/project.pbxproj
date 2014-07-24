@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		FA52A2E0198128CF00EFB3DE /* Lugger_im_norm.txt in CopyFiles */ = {isa = PBXBuildFile; fileRef = FA52A2DF198128B100EFB3DE /* Lugger_im_norm.txt */; };
 		FA6486D9194AC8A70085DCFA /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FA6486D8194AC8A70085DCFA /* GLUT.framework */; };
 		FA6486DB194AC8B40085DCFA /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FA6486DA194AC8B40085DCFA /* OpenGL.framework */; };
 		FA733F9519800BF900AF6E86 /* glm.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FA733F8E19800BF900AF6E86 /* glm.cpp */; settings = {COMPILER_FLAGS = "-Wno-write-strings"; }; };
@@ -86,6 +87,7 @@
 			dstPath = data;
 			dstSubfolderSpec = 16;
 			files = (
+				FA52A2E0198128CF00EFB3DE /* Lugger_im_norm.txt in CopyFiles */,
 				FAF0DF7C1980B6A0001A2D07 /* al.mtl in CopyFiles */,
 				FAF0DF7D1980B6A0001A2D07 /* al.obj in CopyFiles */,
 				FAF0DF7E1980B6A0001A2D07 /* BigBen.mtl in CopyFiles */,
@@ -157,6 +159,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		FA52A2DF198128B100EFB3DE /* Lugger_im_norm.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Lugger_im_norm.txt; sourceTree = "<group>"; };
 		FA6486CC194AC87C0085DCFA /* openGL */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = openGL; sourceTree = BUILT_PRODUCTS_DIR; };
 		FA6486D8194AC8A70085DCFA /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = System/Library/Frameworks/GLUT.framework; sourceTree = SDKROOT; };
 		FA6486DA194AC8B40085DCFA /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
@@ -301,6 +304,7 @@
 			isa = PBXGroup;
 			children = (
 				FAF0DF2D1980B54B001A2D07 /* [原始文件] */,
+				FA52A2DF198128B100EFB3DE /* Lugger_im_norm.txt */,
 				FAF0DF331980B54B001A2D07 /* al.mtl */,
 				FAF0DF341980B54B001A2D07 /* al.obj */,
 				FAF0DF351980B54B001A2D07 /* BigBen.mtl */,
