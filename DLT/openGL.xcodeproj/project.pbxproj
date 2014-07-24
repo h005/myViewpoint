@@ -1,0 +1,563 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		FA6486D9194AC8A70085DCFA /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FA6486D8194AC8A70085DCFA /* GLUT.framework */; };
+		FA6486DB194AC8B40085DCFA /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FA6486DA194AC8B40085DCFA /* OpenGL.framework */; };
+		FA733F9519800BF900AF6E86 /* glm.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FA733F8E19800BF900AF6E86 /* glm.cpp */; settings = {COMPILER_FLAGS = "-Wno-write-strings"; }; };
+		FA733F9619800BF900AF6E86 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FA733F9119800BF900AF6E86 /* main.cpp */; settings = {COMPILER_FLAGS = "-Wno-write-strings"; }; };
+		FA733F9719800BF900AF6E86 /* matrix.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FA733F9219800BF900AF6E86 /* matrix.cpp */; settings = {COMPILER_FLAGS = "-Wno-write-strings"; }; };
+		FAF0DF7B1980B67A001A2D07 /* opengl.ppm in CopyFiles */ = {isa = PBXBuildFile; fileRef = FAF0DF621980B54B001A2D07 /* opengl.ppm */; };
+		FAF0DF7C1980B6A0001A2D07 /* al.mtl in CopyFiles */ = {isa = PBXBuildFile; fileRef = FAF0DF331980B54B001A2D07 /* al.mtl */; };
+		FAF0DF7D1980B6A0001A2D07 /* al.obj in CopyFiles */ = {isa = PBXBuildFile; fileRef = FAF0DF341980B54B001A2D07 /* al.obj */; };
+		FAF0DF7E1980B6A0001A2D07 /* BigBen.mtl in CopyFiles */ = {isa = PBXBuildFile; fileRef = FAF0DF351980B54B001A2D07 /* BigBen.mtl */; };
+		FAF0DF7F1980B6A0001A2D07 /* BigBen.obj in CopyFiles */ = {isa = PBXBuildFile; fileRef = FAF0DF361980B54B001A2D07 /* BigBen.obj */; };
+		FAF0DF801980B6A0001A2D07 /* Bigben.ppm in CopyFiles */ = {isa = PBXBuildFile; fileRef = FAF0DF371980B54B001A2D07 /* Bigben.ppm */; };
+		FAF0DF811980B6A0001A2D07 /* BigBen_im.txt in CopyFiles */ = {isa = PBXBuildFile; fileRef = FAF0DF381980B54B001A2D07 /* BigBen_im.txt */; };
+		FAF0DF821980B6A0001A2D07 /* BigBen_obj.txt in CopyFiles */ = {isa = PBXBuildFile; fileRef = FAF0DF391980B54B001A2D07 /* BigBen_obj.txt */; };
+		FAF0DF831980B6A0001A2D07 /* Capitol.ppm in CopyFiles */ = {isa = PBXBuildFile; fileRef = FAF0DF3A1980B54B001A2D07 /* Capitol.ppm */; };
+		FAF0DF841980B6A0001A2D07 /* Capitol_im.txt in CopyFiles */ = {isa = PBXBuildFile; fileRef = FAF0DF3B1980B54B001A2D07 /* Capitol_im.txt */; };
+		FAF0DF851980B6A0001A2D07 /* Capitol_obj.txt in CopyFiles */ = {isa = PBXBuildFile; fileRef = FAF0DF3C1980B54B001A2D07 /* Capitol_obj.txt */; };
+		FAF0DF861980B6A0001A2D07 /* checker.ppm in CopyFiles */ = {isa = PBXBuildFile; fileRef = FAF0DF3D1980B54B001A2D07 /* checker.ppm */; };
+		FAF0DF871980B6A0001A2D07 /* dolphins.mtl in CopyFiles */ = {isa = PBXBuildFile; fileRef = FAF0DF3E1980B54B001A2D07 /* dolphins.mtl */; };
+		FAF0DF881980B6A0001A2D07 /* dolphins.obj in CopyFiles */ = {isa = PBXBuildFile; fileRef = FAF0DF3F1980B54B001A2D07 /* dolphins.obj */; };
+		FAF0DF891980B6A0001A2D07 /* Eiffel.jpg in CopyFiles */ = {isa = PBXBuildFile; fileRef = FAF0DF401980B54B001A2D07 /* Eiffel.jpg */; };
+		FAF0DF8A1980B6A0001A2D07 /* Eiffel.ppm in CopyFiles */ = {isa = PBXBuildFile; fileRef = FAF0DF411980B54B001A2D07 /* Eiffel.ppm */; };
+		FAF0DF8B1980B6A0001A2D07 /* Eiffel_im.txt in CopyFiles */ = {isa = PBXBuildFile; fileRef = FAF0DF421980B54B001A2D07 /* Eiffel_im.txt */; };
+		FAF0DF8C1980B6A0001A2D07 /* Eiffel_obj.txt in CopyFiles */ = {isa = PBXBuildFile; fileRef = FAF0DF431980B54B001A2D07 /* Eiffel_obj.txt */; };
+		FAF0DF8D1980B6A0001A2D07 /* EiffelTower.mtl in CopyFiles */ = {isa = PBXBuildFile; fileRef = FAF0DF441980B54B001A2D07 /* EiffelTower.mtl */; };
+		FAF0DF8E1980B6A0001A2D07 /* EiffelTower.obj in CopyFiles */ = {isa = PBXBuildFile; fileRef = FAF0DF451980B54B001A2D07 /* EiffelTower.obj */; };
+		FAF0DF8F1980B6A0001A2D07 /* f-16.mtl in CopyFiles */ = {isa = PBXBuildFile; fileRef = FAF0DF461980B54B001A2D07 /* f-16.mtl */; };
+		FAF0DF901980B6A0001A2D07 /* f-16.obj in CopyFiles */ = {isa = PBXBuildFile; fileRef = FAF0DF471980B54B001A2D07 /* f-16.obj */; };
+		FAF0DF911980B6A0001A2D07 /* fishermen.ppm in CopyFiles */ = {isa = PBXBuildFile; fileRef = FAF0DF481980B54B001A2D07 /* fishermen.ppm */; };
+		FAF0DF921980B6A0001A2D07 /* flowers.mtl in CopyFiles */ = {isa = PBXBuildFile; fileRef = FAF0DF491980B54B001A2D07 /* flowers.mtl */; };
+		FAF0DF931980B6A0001A2D07 /* flowers.obj in CopyFiles */ = {isa = PBXBuildFile; fileRef = FAF0DF4A1980B54B001A2D07 /* flowers.obj */; };
+		FAF0DF941980B6A0001A2D07 /* Guggenheim.mtl in CopyFiles */ = {isa = PBXBuildFile; fileRef = FAF0DF4B1980B54B001A2D07 /* Guggenheim.mtl */; };
+		FAF0DF951980B6A0001A2D07 /* Guggenheim.obj in CopyFiles */ = {isa = PBXBuildFile; fileRef = FAF0DF4C1980B54B001A2D07 /* Guggenheim.obj */; };
+		FAF0DF961980B6A0001A2D07 /* House.mtl in CopyFiles */ = {isa = PBXBuildFile; fileRef = FAF0DF4D1980B54B001A2D07 /* House.mtl */; };
+		FAF0DF971980B6A0001A2D07 /* House.obj in CopyFiles */ = {isa = PBXBuildFile; fileRef = FAF0DF4E1980B54B001A2D07 /* House.obj */; };
+		FAF0DF981980B6A0001A2D07 /* House.ppm in CopyFiles */ = {isa = PBXBuildFile; fileRef = FAF0DF4F1980B54B001A2D07 /* House.ppm */; };
+		FAF0DF991980B6A0001A2D07 /* House_im.txt in CopyFiles */ = {isa = PBXBuildFile; fileRef = FAF0DF501980B54B001A2D07 /* House_im.txt */; };
+		FAF0DF9A1980B6A0001A2D07 /* House_obj.txt in CopyFiles */ = {isa = PBXBuildFile; fileRef = FAF0DF511980B54B001A2D07 /* House_obj.txt */; };
+		FAF0DF9B1980B6A0001A2D07 /* JinMao.jpg in CopyFiles */ = {isa = PBXBuildFile; fileRef = FAF0DF521980B54B001A2D07 /* JinMao.jpg */; };
+		FAF0DF9C1980B6A0001A2D07 /* JinMao.ppm in CopyFiles */ = {isa = PBXBuildFile; fileRef = FAF0DF531980B54B001A2D07 /* JinMao.ppm */; };
+		FAF0DF9D1980B6A0001A2D07 /* JinMao_im.txt in CopyFiles */ = {isa = PBXBuildFile; fileRef = FAF0DF541980B54B001A2D07 /* JinMao_im.txt */; };
+		FAF0DF9E1980B6A0001A2D07 /* JinMao_obj.txt in CopyFiles */ = {isa = PBXBuildFile; fileRef = FAF0DF551980B54B001A2D07 /* JinMao_obj.txt */; };
+		FAF0DF9F1980B6A0001A2D07 /* JinMaoTower.mtl in CopyFiles */ = {isa = PBXBuildFile; fileRef = FAF0DF561980B54B001A2D07 /* JinMaoTower.mtl */; };
+		FAF0DFA01980B6A0001A2D07 /* JinMaoTower.obj in CopyFiles */ = {isa = PBXBuildFile; fileRef = FAF0DF571980B54B001A2D07 /* JinMaoTower.obj */; };
+		FAF0DFA11980B6A0001A2D07 /* Lugger.jpg in CopyFiles */ = {isa = PBXBuildFile; fileRef = FAF0DF581980B54B001A2D07 /* Lugger.jpg */; };
+		FAF0DFA21980B6A0001A2D07 /* Lugger.mtl in CopyFiles */ = {isa = PBXBuildFile; fileRef = FAF0DF591980B54B001A2D07 /* Lugger.mtl */; };
+		FAF0DFA31980B6A0001A2D07 /* Lugger.obj in CopyFiles */ = {isa = PBXBuildFile; fileRef = FAF0DF5A1980B54B001A2D07 /* Lugger.obj */; };
+		FAF0DFA41980B6A0001A2D07 /* Lugger.ppm in CopyFiles */ = {isa = PBXBuildFile; fileRef = FAF0DF5B1980B54B001A2D07 /* Lugger.ppm */; };
+		FAF0DFA51980B6A0001A2D07 /* Lugger_im.txt in CopyFiles */ = {isa = PBXBuildFile; fileRef = FAF0DF5C1980B54B001A2D07 /* Lugger_im.txt */; };
+		FAF0DFA61980B6A0001A2D07 /* Lugger_obj.txt in CopyFiles */ = {isa = PBXBuildFile; fileRef = FAF0DF5D1980B54B001A2D07 /* Lugger_obj.txt */; };
+		FAF0DFA71980B6A0001A2D07 /* marble.ppm in CopyFiles */ = {isa = PBXBuildFile; fileRef = FAF0DF5E1980B54B001A2D07 /* marble.ppm */; };
+		FAF0DFA81980B6A0001A2D07 /* Missouri_State_Capitol.mtl in CopyFiles */ = {isa = PBXBuildFile; fileRef = FAF0DF5F1980B54B001A2D07 /* Missouri_State_Capitol.mtl */; };
+		FAF0DFA91980B6A0001A2D07 /* MissouriCapitol.ppm in CopyFiles */ = {isa = PBXBuildFile; fileRef = FAF0DF601980B54B001A2D07 /* MissouriCapitol.ppm */; };
+		FAF0DFAA1980B6A0001A2D07 /* MissStateCapitol.obj in CopyFiles */ = {isa = PBXBuildFile; fileRef = FAF0DF611980B54B001A2D07 /* MissStateCapitol.obj */; };
+		FAF0DFAB1980B6A0001A2D07 /* Oslo.ppm in CopyFiles */ = {isa = PBXBuildFile; fileRef = FAF0DF631980B54B001A2D07 /* Oslo.ppm */; };
+		FAF0DFAC1980B6A0001A2D07 /* Oslo_GovtBuilding.obj in CopyFiles */ = {isa = PBXBuildFile; fileRef = FAF0DF641980B54B001A2D07 /* Oslo_GovtBuilding.obj */; };
+		FAF0DFAD1980B6A0001A2D07 /* Oslo_GovtBuilding_Intact.mtl in CopyFiles */ = {isa = PBXBuildFile; fileRef = FAF0DF651980B54B001A2D07 /* Oslo_GovtBuilding_Intact.mtl */; };
+		FAF0DFAE1980B6A0001A2D07 /* Oslo_im.txt in CopyFiles */ = {isa = PBXBuildFile; fileRef = FAF0DF661980B54B001A2D07 /* Oslo_im.txt */; };
+		FAF0DFAF1980B6A0001A2D07 /* Oslo_obj.txt in CopyFiles */ = {isa = PBXBuildFile; fileRef = FAF0DF671980B54B001A2D07 /* Oslo_obj.txt */; };
+		FAF0DFB01980B6A0001A2D07 /* porsche.mtl in CopyFiles */ = {isa = PBXBuildFile; fileRef = FAF0DF681980B54B001A2D07 /* porsche.mtl */; };
+		FAF0DFB11980B6A0001A2D07 /* porsche.obj in CopyFiles */ = {isa = PBXBuildFile; fileRef = FAF0DF691980B54B001A2D07 /* porsche.obj */; };
+		FAF0DFB21980B6A0001A2D07 /* rose+vase.mtl in CopyFiles */ = {isa = PBXBuildFile; fileRef = FAF0DF6A1980B54B001A2D07 /* rose+vase.mtl */; };
+		FAF0DFB31980B6A0001A2D07 /* rose+vase.obj in CopyFiles */ = {isa = PBXBuildFile; fileRef = FAF0DF6B1980B54B001A2D07 /* rose+vase.obj */; };
+		FAF0DFB41980B6A0001A2D07 /* soccerball.mtl in CopyFiles */ = {isa = PBXBuildFile; fileRef = FAF0DF6C1980B54B001A2D07 /* soccerball.mtl */; };
+		FAF0DFB51980B6A0001A2D07 /* soccerball.obj in CopyFiles */ = {isa = PBXBuildFile; fileRef = FAF0DF6D1980B54B001A2D07 /* soccerball.obj */; };
+		FAF0DFB61980B6A0001A2D07 /* train.ppm in CopyFiles */ = {isa = PBXBuildFile; fileRef = FAF0DF731980B54B001A2D07 /* train.ppm */; };
+		FAF0DFB71980B6A0001A2D07 /* triumph.mtl in CopyFiles */ = {isa = PBXBuildFile; fileRef = FAF0DF741980B54B001A2D07 /* triumph.mtl */; };
+		FAF0DFB81980B6A0001A2D07 /* triumph.obj in CopyFiles */ = {isa = PBXBuildFile; fileRef = FAF0DF751980B54B001A2D07 /* triumph.obj */; };
+		FAF0DFB91980B6A0001A2D07 /* triumph.ppm in CopyFiles */ = {isa = PBXBuildFile; fileRef = FAF0DF761980B54B001A2D07 /* triumph.ppm */; };
+		FAF0DFBA1980B6A0001A2D07 /* triumph_im.txt in CopyFiles */ = {isa = PBXBuildFile; fileRef = FAF0DF771980B54B001A2D07 /* triumph_im.txt */; };
+		FAF0DFBB1980B6A0001A2D07 /* triumph_obj.txt in CopyFiles */ = {isa = PBXBuildFile; fileRef = FAF0DF781980B54B001A2D07 /* triumph_obj.txt */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		FAF0DF7A1980B659001A2D07 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = data;
+			dstSubfolderSpec = 16;
+			files = (
+				FAF0DF7C1980B6A0001A2D07 /* al.mtl in CopyFiles */,
+				FAF0DF7D1980B6A0001A2D07 /* al.obj in CopyFiles */,
+				FAF0DF7E1980B6A0001A2D07 /* BigBen.mtl in CopyFiles */,
+				FAF0DF7F1980B6A0001A2D07 /* BigBen.obj in CopyFiles */,
+				FAF0DF801980B6A0001A2D07 /* Bigben.ppm in CopyFiles */,
+				FAF0DF811980B6A0001A2D07 /* BigBen_im.txt in CopyFiles */,
+				FAF0DF821980B6A0001A2D07 /* BigBen_obj.txt in CopyFiles */,
+				FAF0DF831980B6A0001A2D07 /* Capitol.ppm in CopyFiles */,
+				FAF0DF841980B6A0001A2D07 /* Capitol_im.txt in CopyFiles */,
+				FAF0DF851980B6A0001A2D07 /* Capitol_obj.txt in CopyFiles */,
+				FAF0DF861980B6A0001A2D07 /* checker.ppm in CopyFiles */,
+				FAF0DF871980B6A0001A2D07 /* dolphins.mtl in CopyFiles */,
+				FAF0DF881980B6A0001A2D07 /* dolphins.obj in CopyFiles */,
+				FAF0DF891980B6A0001A2D07 /* Eiffel.jpg in CopyFiles */,
+				FAF0DF8A1980B6A0001A2D07 /* Eiffel.ppm in CopyFiles */,
+				FAF0DF8B1980B6A0001A2D07 /* Eiffel_im.txt in CopyFiles */,
+				FAF0DF8C1980B6A0001A2D07 /* Eiffel_obj.txt in CopyFiles */,
+				FAF0DF8D1980B6A0001A2D07 /* EiffelTower.mtl in CopyFiles */,
+				FAF0DF8E1980B6A0001A2D07 /* EiffelTower.obj in CopyFiles */,
+				FAF0DF8F1980B6A0001A2D07 /* f-16.mtl in CopyFiles */,
+				FAF0DF901980B6A0001A2D07 /* f-16.obj in CopyFiles */,
+				FAF0DF911980B6A0001A2D07 /* fishermen.ppm in CopyFiles */,
+				FAF0DF921980B6A0001A2D07 /* flowers.mtl in CopyFiles */,
+				FAF0DF931980B6A0001A2D07 /* flowers.obj in CopyFiles */,
+				FAF0DF941980B6A0001A2D07 /* Guggenheim.mtl in CopyFiles */,
+				FAF0DF951980B6A0001A2D07 /* Guggenheim.obj in CopyFiles */,
+				FAF0DF961980B6A0001A2D07 /* House.mtl in CopyFiles */,
+				FAF0DF971980B6A0001A2D07 /* House.obj in CopyFiles */,
+				FAF0DF981980B6A0001A2D07 /* House.ppm in CopyFiles */,
+				FAF0DF991980B6A0001A2D07 /* House_im.txt in CopyFiles */,
+				FAF0DF9A1980B6A0001A2D07 /* House_obj.txt in CopyFiles */,
+				FAF0DF9B1980B6A0001A2D07 /* JinMao.jpg in CopyFiles */,
+				FAF0DF9C1980B6A0001A2D07 /* JinMao.ppm in CopyFiles */,
+				FAF0DF9D1980B6A0001A2D07 /* JinMao_im.txt in CopyFiles */,
+				FAF0DF9E1980B6A0001A2D07 /* JinMao_obj.txt in CopyFiles */,
+				FAF0DF9F1980B6A0001A2D07 /* JinMaoTower.mtl in CopyFiles */,
+				FAF0DFA01980B6A0001A2D07 /* JinMaoTower.obj in CopyFiles */,
+				FAF0DFA11980B6A0001A2D07 /* Lugger.jpg in CopyFiles */,
+				FAF0DFA21980B6A0001A2D07 /* Lugger.mtl in CopyFiles */,
+				FAF0DFA31980B6A0001A2D07 /* Lugger.obj in CopyFiles */,
+				FAF0DFA41980B6A0001A2D07 /* Lugger.ppm in CopyFiles */,
+				FAF0DFA51980B6A0001A2D07 /* Lugger_im.txt in CopyFiles */,
+				FAF0DFA61980B6A0001A2D07 /* Lugger_obj.txt in CopyFiles */,
+				FAF0DFA71980B6A0001A2D07 /* marble.ppm in CopyFiles */,
+				FAF0DFA81980B6A0001A2D07 /* Missouri_State_Capitol.mtl in CopyFiles */,
+				FAF0DFA91980B6A0001A2D07 /* MissouriCapitol.ppm in CopyFiles */,
+				FAF0DFAA1980B6A0001A2D07 /* MissStateCapitol.obj in CopyFiles */,
+				FAF0DFAB1980B6A0001A2D07 /* Oslo.ppm in CopyFiles */,
+				FAF0DFAC1980B6A0001A2D07 /* Oslo_GovtBuilding.obj in CopyFiles */,
+				FAF0DFAD1980B6A0001A2D07 /* Oslo_GovtBuilding_Intact.mtl in CopyFiles */,
+				FAF0DFAE1980B6A0001A2D07 /* Oslo_im.txt in CopyFiles */,
+				FAF0DFAF1980B6A0001A2D07 /* Oslo_obj.txt in CopyFiles */,
+				FAF0DFB01980B6A0001A2D07 /* porsche.mtl in CopyFiles */,
+				FAF0DFB11980B6A0001A2D07 /* porsche.obj in CopyFiles */,
+				FAF0DFB21980B6A0001A2D07 /* rose+vase.mtl in CopyFiles */,
+				FAF0DFB31980B6A0001A2D07 /* rose+vase.obj in CopyFiles */,
+				FAF0DFB41980B6A0001A2D07 /* soccerball.mtl in CopyFiles */,
+				FAF0DFB51980B6A0001A2D07 /* soccerball.obj in CopyFiles */,
+				FAF0DFB61980B6A0001A2D07 /* train.ppm in CopyFiles */,
+				FAF0DFB71980B6A0001A2D07 /* triumph.mtl in CopyFiles */,
+				FAF0DFB81980B6A0001A2D07 /* triumph.obj in CopyFiles */,
+				FAF0DFB91980B6A0001A2D07 /* triumph.ppm in CopyFiles */,
+				FAF0DFBA1980B6A0001A2D07 /* triumph_im.txt in CopyFiles */,
+				FAF0DFBB1980B6A0001A2D07 /* triumph_obj.txt in CopyFiles */,
+				FAF0DF7B1980B67A001A2D07 /* opengl.ppm in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		FA6486CC194AC87C0085DCFA /* openGL */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = openGL; sourceTree = BUILT_PRODUCTS_DIR; };
+		FA6486D8194AC8A70085DCFA /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = System/Library/Frameworks/GLUT.framework; sourceTree = SDKROOT; };
+		FA6486DA194AC8B40085DCFA /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
+		FA733F8E19800BF900AF6E86 /* glm.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = glm.cpp; sourceTree = "<group>"; };
+		FA733F8F19800BF900AF6E86 /* glm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = glm.h; sourceTree = "<group>"; };
+		FA733F9019800BF900AF6E86 /* im.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = im.txt; sourceTree = "<group>"; };
+		FA733F9119800BF900AF6E86 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		FA733F9219800BF900AF6E86 /* matrix.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = matrix.cpp; sourceTree = "<group>"; };
+		FA733F9319800BF900AF6E86 /* matrix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = matrix.h; sourceTree = "<group>"; };
+		FA733F9419800BF900AF6E86 /* obj.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = obj.txt; sourceTree = "<group>"; };
+		FAF0DF2E1980B54B001A2D07 /* 2011120116523140118.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = 2011120116523140118.jpg; sourceTree = "<group>"; };
+		FAF0DF2F1980B54B001A2D07 /* AP_of_Missouri_State_Capitol_Building.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = AP_of_Missouri_State_Capitol_Building.jpg; sourceTree = "<group>"; };
+		FAF0DF301980B54B001A2D07 /* House.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = House.bmp; sourceTree = "<group>"; };
+		FAF0DF311980B54B001A2D07 /* Lugger.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = Lugger.jpg; sourceTree = "<group>"; };
+		FAF0DF321980B54B001A2D07 /* MissouriCapitol.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = MissouriCapitol.jpg; sourceTree = "<group>"; };
+		FAF0DF331980B54B001A2D07 /* al.mtl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = al.mtl; sourceTree = "<group>"; };
+		FAF0DF341980B54B001A2D07 /* al.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = al.obj; sourceTree = "<group>"; };
+		FAF0DF351980B54B001A2D07 /* BigBen.mtl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = BigBen.mtl; sourceTree = "<group>"; };
+		FAF0DF361980B54B001A2D07 /* BigBen.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = BigBen.obj; sourceTree = "<group>"; };
+		FAF0DF371980B54B001A2D07 /* Bigben.ppm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Bigben.ppm; sourceTree = "<group>"; };
+		FAF0DF381980B54B001A2D07 /* BigBen_im.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = BigBen_im.txt; sourceTree = "<group>"; };
+		FAF0DF391980B54B001A2D07 /* BigBen_obj.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = BigBen_obj.txt; sourceTree = "<group>"; };
+		FAF0DF3A1980B54B001A2D07 /* Capitol.ppm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Capitol.ppm; sourceTree = "<group>"; };
+		FAF0DF3B1980B54B001A2D07 /* Capitol_im.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Capitol_im.txt; sourceTree = "<group>"; };
+		FAF0DF3C1980B54B001A2D07 /* Capitol_obj.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Capitol_obj.txt; sourceTree = "<group>"; };
+		FAF0DF3D1980B54B001A2D07 /* checker.ppm */ = {isa = PBXFileReference; lastKnownFileType = file; path = checker.ppm; sourceTree = "<group>"; };
+		FAF0DF3E1980B54B001A2D07 /* dolphins.mtl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = dolphins.mtl; sourceTree = "<group>"; };
+		FAF0DF3F1980B54B001A2D07 /* dolphins.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = dolphins.obj; sourceTree = "<group>"; };
+		FAF0DF401980B54B001A2D07 /* Eiffel.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = Eiffel.jpg; sourceTree = "<group>"; };
+		FAF0DF411980B54B001A2D07 /* Eiffel.ppm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Eiffel.ppm; sourceTree = "<group>"; };
+		FAF0DF421980B54B001A2D07 /* Eiffel_im.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Eiffel_im.txt; sourceTree = "<group>"; };
+		FAF0DF431980B54B001A2D07 /* Eiffel_obj.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Eiffel_obj.txt; sourceTree = "<group>"; };
+		FAF0DF441980B54B001A2D07 /* EiffelTower.mtl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = EiffelTower.mtl; sourceTree = "<group>"; };
+		FAF0DF451980B54B001A2D07 /* EiffelTower.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = EiffelTower.obj; sourceTree = "<group>"; };
+		FAF0DF461980B54B001A2D07 /* f-16.mtl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "f-16.mtl"; sourceTree = "<group>"; };
+		FAF0DF471980B54B001A2D07 /* f-16.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "f-16.obj"; sourceTree = "<group>"; };
+		FAF0DF481980B54B001A2D07 /* fishermen.ppm */ = {isa = PBXFileReference; lastKnownFileType = file; path = fishermen.ppm; sourceTree = "<group>"; };
+		FAF0DF491980B54B001A2D07 /* flowers.mtl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = flowers.mtl; sourceTree = "<group>"; };
+		FAF0DF4A1980B54B001A2D07 /* flowers.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = flowers.obj; sourceTree = "<group>"; };
+		FAF0DF4B1980B54B001A2D07 /* Guggenheim.mtl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Guggenheim.mtl; sourceTree = "<group>"; };
+		FAF0DF4C1980B54B001A2D07 /* Guggenheim.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Guggenheim.obj; sourceTree = "<group>"; };
+		FAF0DF4D1980B54B001A2D07 /* House.mtl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = House.mtl; sourceTree = "<group>"; };
+		FAF0DF4E1980B54B001A2D07 /* House.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = House.obj; sourceTree = "<group>"; };
+		FAF0DF4F1980B54B001A2D07 /* House.ppm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = House.ppm; sourceTree = "<group>"; };
+		FAF0DF501980B54B001A2D07 /* House_im.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = House_im.txt; sourceTree = "<group>"; };
+		FAF0DF511980B54B001A2D07 /* House_obj.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = House_obj.txt; sourceTree = "<group>"; };
+		FAF0DF521980B54B001A2D07 /* JinMao.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = JinMao.jpg; sourceTree = "<group>"; };
+		FAF0DF531980B54B001A2D07 /* JinMao.ppm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = JinMao.ppm; sourceTree = "<group>"; };
+		FAF0DF541980B54B001A2D07 /* JinMao_im.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = JinMao_im.txt; sourceTree = "<group>"; };
+		FAF0DF551980B54B001A2D07 /* JinMao_obj.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = JinMao_obj.txt; sourceTree = "<group>"; };
+		FAF0DF561980B54B001A2D07 /* JinMaoTower.mtl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = JinMaoTower.mtl; sourceTree = "<group>"; };
+		FAF0DF571980B54B001A2D07 /* JinMaoTower.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = JinMaoTower.obj; sourceTree = "<group>"; };
+		FAF0DF581980B54B001A2D07 /* Lugger.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = Lugger.jpg; sourceTree = "<group>"; };
+		FAF0DF591980B54B001A2D07 /* Lugger.mtl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Lugger.mtl; sourceTree = "<group>"; };
+		FAF0DF5A1980B54B001A2D07 /* Lugger.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Lugger.obj; sourceTree = "<group>"; };
+		FAF0DF5B1980B54B001A2D07 /* Lugger.ppm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Lugger.ppm; sourceTree = "<group>"; };
+		FAF0DF5C1980B54B001A2D07 /* Lugger_im.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Lugger_im.txt; sourceTree = "<group>"; };
+		FAF0DF5D1980B54B001A2D07 /* Lugger_obj.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Lugger_obj.txt; sourceTree = "<group>"; };
+		FAF0DF5E1980B54B001A2D07 /* marble.ppm */ = {isa = PBXFileReference; lastKnownFileType = file; path = marble.ppm; sourceTree = "<group>"; };
+		FAF0DF5F1980B54B001A2D07 /* Missouri_State_Capitol.mtl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Missouri_State_Capitol.mtl; sourceTree = "<group>"; };
+		FAF0DF601980B54B001A2D07 /* MissouriCapitol.ppm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = MissouriCapitol.ppm; sourceTree = "<group>"; };
+		FAF0DF611980B54B001A2D07 /* MissStateCapitol.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = MissStateCapitol.obj; sourceTree = "<group>"; };
+		FAF0DF621980B54B001A2D07 /* opengl.ppm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = opengl.ppm; sourceTree = "<group>"; };
+		FAF0DF631980B54B001A2D07 /* Oslo.ppm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Oslo.ppm; sourceTree = "<group>"; };
+		FAF0DF641980B54B001A2D07 /* Oslo_GovtBuilding.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Oslo_GovtBuilding.obj; sourceTree = "<group>"; };
+		FAF0DF651980B54B001A2D07 /* Oslo_GovtBuilding_Intact.mtl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Oslo_GovtBuilding_Intact.mtl; sourceTree = "<group>"; };
+		FAF0DF661980B54B001A2D07 /* Oslo_im.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Oslo_im.txt; sourceTree = "<group>"; };
+		FAF0DF671980B54B001A2D07 /* Oslo_obj.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Oslo_obj.txt; sourceTree = "<group>"; };
+		FAF0DF681980B54B001A2D07 /* porsche.mtl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = porsche.mtl; sourceTree = "<group>"; };
+		FAF0DF691980B54B001A2D07 /* porsche.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = porsche.obj; sourceTree = "<group>"; };
+		FAF0DF6A1980B54B001A2D07 /* rose+vase.mtl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "rose+vase.mtl"; sourceTree = "<group>"; };
+		FAF0DF6B1980B54B001A2D07 /* rose+vase.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "rose+vase.obj"; sourceTree = "<group>"; };
+		FAF0DF6C1980B54B001A2D07 /* soccerball.mtl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = soccerball.mtl; sourceTree = "<group>"; };
+		FAF0DF6D1980B54B001A2D07 /* soccerball.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = soccerball.obj; sourceTree = "<group>"; };
+		FAF0DF6F1980B54B001A2D07 /* BigBen_im.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = BigBen_im.txt; sourceTree = "<group>"; };
+		FAF0DF701980B54B001A2D07 /* BigBen_obj.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = BigBen_obj.txt; sourceTree = "<group>"; };
+		FAF0DF711980B54B001A2D07 /* House_im.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = House_im.txt; sourceTree = "<group>"; };
+		FAF0DF721980B54B001A2D07 /* House_obj.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = House_obj.txt; sourceTree = "<group>"; };
+		FAF0DF731980B54B001A2D07 /* train.ppm */ = {isa = PBXFileReference; lastKnownFileType = file; path = train.ppm; sourceTree = "<group>"; };
+		FAF0DF741980B54B001A2D07 /* triumph.mtl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = triumph.mtl; sourceTree = "<group>"; };
+		FAF0DF751980B54B001A2D07 /* triumph.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = triumph.obj; sourceTree = "<group>"; };
+		FAF0DF761980B54B001A2D07 /* triumph.ppm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = triumph.ppm; sourceTree = "<group>"; };
+		FAF0DF771980B54B001A2D07 /* triumph_im.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = triumph_im.txt; sourceTree = "<group>"; };
+		FAF0DF781980B54B001A2D07 /* triumph_obj.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = triumph_obj.txt; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		FA6486C9194AC87C0085DCFA /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FA6486DB194AC8B40085DCFA /* OpenGL.framework in Frameworks */,
+				FA6486D9194AC8A70085DCFA /* GLUT.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		FA6486C3194AC87C0085DCFA = {
+			isa = PBXGroup;
+			children = (
+				FA733F9919800C1D00AF6E86 /* model */,
+				FA733F9819800C0400AF6E86 /* code */,
+				FA6486DA194AC8B40085DCFA /* OpenGL.framework */,
+				FA6486D8194AC8A70085DCFA /* GLUT.framework */,
+				FA6486CD194AC87C0085DCFA /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		FA6486CD194AC87C0085DCFA /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				FA6486CC194AC87C0085DCFA /* openGL */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		FA733F9819800C0400AF6E86 /* code */ = {
+			isa = PBXGroup;
+			children = (
+				FA733F8E19800BF900AF6E86 /* glm.cpp */,
+				FA733F8F19800BF900AF6E86 /* glm.h */,
+				FA733F9119800BF900AF6E86 /* main.cpp */,
+				FA733F9219800BF900AF6E86 /* matrix.cpp */,
+				FA733F9319800BF900AF6E86 /* matrix.h */,
+			);
+			name = code;
+			sourceTree = "<group>";
+		};
+		FA733F9919800C1D00AF6E86 /* model */ = {
+			isa = PBXGroup;
+			children = (
+				FAF0DF2C1980B54B001A2D07 /* data */,
+				FA733F9019800BF900AF6E86 /* im.txt */,
+				FA733F9419800BF900AF6E86 /* obj.txt */,
+			);
+			name = model;
+			sourceTree = "<group>";
+		};
+		FAF0DF2C1980B54B001A2D07 /* data */ = {
+			isa = PBXGroup;
+			children = (
+				FAF0DF2D1980B54B001A2D07 /* [原始文件] */,
+				FAF0DF331980B54B001A2D07 /* al.mtl */,
+				FAF0DF341980B54B001A2D07 /* al.obj */,
+				FAF0DF351980B54B001A2D07 /* BigBen.mtl */,
+				FAF0DF361980B54B001A2D07 /* BigBen.obj */,
+				FAF0DF371980B54B001A2D07 /* Bigben.ppm */,
+				FAF0DF381980B54B001A2D07 /* BigBen_im.txt */,
+				FAF0DF391980B54B001A2D07 /* BigBen_obj.txt */,
+				FAF0DF3A1980B54B001A2D07 /* Capitol.ppm */,
+				FAF0DF3B1980B54B001A2D07 /* Capitol_im.txt */,
+				FAF0DF3C1980B54B001A2D07 /* Capitol_obj.txt */,
+				FAF0DF3D1980B54B001A2D07 /* checker.ppm */,
+				FAF0DF3E1980B54B001A2D07 /* dolphins.mtl */,
+				FAF0DF3F1980B54B001A2D07 /* dolphins.obj */,
+				FAF0DF401980B54B001A2D07 /* Eiffel.jpg */,
+				FAF0DF411980B54B001A2D07 /* Eiffel.ppm */,
+				FAF0DF421980B54B001A2D07 /* Eiffel_im.txt */,
+				FAF0DF431980B54B001A2D07 /* Eiffel_obj.txt */,
+				FAF0DF441980B54B001A2D07 /* EiffelTower.mtl */,
+				FAF0DF451980B54B001A2D07 /* EiffelTower.obj */,
+				FAF0DF461980B54B001A2D07 /* f-16.mtl */,
+				FAF0DF471980B54B001A2D07 /* f-16.obj */,
+				FAF0DF481980B54B001A2D07 /* fishermen.ppm */,
+				FAF0DF491980B54B001A2D07 /* flowers.mtl */,
+				FAF0DF4A1980B54B001A2D07 /* flowers.obj */,
+				FAF0DF4B1980B54B001A2D07 /* Guggenheim.mtl */,
+				FAF0DF4C1980B54B001A2D07 /* Guggenheim.obj */,
+				FAF0DF4D1980B54B001A2D07 /* House.mtl */,
+				FAF0DF4E1980B54B001A2D07 /* House.obj */,
+				FAF0DF4F1980B54B001A2D07 /* House.ppm */,
+				FAF0DF501980B54B001A2D07 /* House_im.txt */,
+				FAF0DF511980B54B001A2D07 /* House_obj.txt */,
+				FAF0DF521980B54B001A2D07 /* JinMao.jpg */,
+				FAF0DF531980B54B001A2D07 /* JinMao.ppm */,
+				FAF0DF541980B54B001A2D07 /* JinMao_im.txt */,
+				FAF0DF551980B54B001A2D07 /* JinMao_obj.txt */,
+				FAF0DF561980B54B001A2D07 /* JinMaoTower.mtl */,
+				FAF0DF571980B54B001A2D07 /* JinMaoTower.obj */,
+				FAF0DF581980B54B001A2D07 /* Lugger.jpg */,
+				FAF0DF591980B54B001A2D07 /* Lugger.mtl */,
+				FAF0DF5A1980B54B001A2D07 /* Lugger.obj */,
+				FAF0DF5B1980B54B001A2D07 /* Lugger.ppm */,
+				FAF0DF5C1980B54B001A2D07 /* Lugger_im.txt */,
+				FAF0DF5D1980B54B001A2D07 /* Lugger_obj.txt */,
+				FAF0DF5E1980B54B001A2D07 /* marble.ppm */,
+				FAF0DF5F1980B54B001A2D07 /* Missouri_State_Capitol.mtl */,
+				FAF0DF601980B54B001A2D07 /* MissouriCapitol.ppm */,
+				FAF0DF611980B54B001A2D07 /* MissStateCapitol.obj */,
+				FAF0DF621980B54B001A2D07 /* opengl.ppm */,
+				FAF0DF631980B54B001A2D07 /* Oslo.ppm */,
+				FAF0DF641980B54B001A2D07 /* Oslo_GovtBuilding.obj */,
+				FAF0DF651980B54B001A2D07 /* Oslo_GovtBuilding_Intact.mtl */,
+				FAF0DF661980B54B001A2D07 /* Oslo_im.txt */,
+				FAF0DF671980B54B001A2D07 /* Oslo_obj.txt */,
+				FAF0DF681980B54B001A2D07 /* porsche.mtl */,
+				FAF0DF691980B54B001A2D07 /* porsche.obj */,
+				FAF0DF6A1980B54B001A2D07 /* rose+vase.mtl */,
+				FAF0DF6B1980B54B001A2D07 /* rose+vase.obj */,
+				FAF0DF6C1980B54B001A2D07 /* soccerball.mtl */,
+				FAF0DF6D1980B54B001A2D07 /* soccerball.obj */,
+				FAF0DF6E1980B54B001A2D07 /* temp */,
+				FAF0DF731980B54B001A2D07 /* train.ppm */,
+				FAF0DF741980B54B001A2D07 /* triumph.mtl */,
+				FAF0DF751980B54B001A2D07 /* triumph.obj */,
+				FAF0DF761980B54B001A2D07 /* triumph.ppm */,
+				FAF0DF771980B54B001A2D07 /* triumph_im.txt */,
+				FAF0DF781980B54B001A2D07 /* triumph_obj.txt */,
+			);
+			path = data;
+			sourceTree = "<group>";
+		};
+		FAF0DF2D1980B54B001A2D07 /* [原始文件] */ = {
+			isa = PBXGroup;
+			children = (
+				FAF0DF2E1980B54B001A2D07 /* 2011120116523140118.jpg */,
+				FAF0DF2F1980B54B001A2D07 /* AP_of_Missouri_State_Capitol_Building.jpg */,
+				FAF0DF301980B54B001A2D07 /* House.bmp */,
+				FAF0DF311980B54B001A2D07 /* Lugger.jpg */,
+				FAF0DF321980B54B001A2D07 /* MissouriCapitol.jpg */,
+			);
+			path = "[原始文件]";
+			sourceTree = "<group>";
+		};
+		FAF0DF6E1980B54B001A2D07 /* temp */ = {
+			isa = PBXGroup;
+			children = (
+				FAF0DF6F1980B54B001A2D07 /* BigBen_im.txt */,
+				FAF0DF701980B54B001A2D07 /* BigBen_obj.txt */,
+				FAF0DF711980B54B001A2D07 /* House_im.txt */,
+				FAF0DF721980B54B001A2D07 /* House_obj.txt */,
+			);
+			path = temp;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		FA6486CB194AC87C0085DCFA /* openGL */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = FA6486D5194AC87C0085DCFA /* Build configuration list for PBXNativeTarget "openGL" */;
+			buildPhases = (
+				FA6486C8194AC87C0085DCFA /* Sources */,
+				FA6486C9194AC87C0085DCFA /* Frameworks */,
+				FAF0DF7A1980B659001A2D07 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = openGL;
+			productName = openGL;
+			productReference = FA6486CC194AC87C0085DCFA /* openGL */;
+			productType = "com.apple.product-type.tool";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		FA6486C4194AC87C0085DCFA /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0500;
+				ORGANIZATIONNAME = zwz;
+			};
+			buildConfigurationList = FA6486C7194AC87C0085DCFA /* Build configuration list for PBXProject "openGL" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = FA6486C3194AC87C0085DCFA;
+			productRefGroup = FA6486CD194AC87C0085DCFA /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				FA6486CB194AC87C0085DCFA /* openGL */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		FA6486C8194AC87C0085DCFA /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FA733F9719800BF900AF6E86 /* matrix.cpp in Sources */,
+				FA733F9519800BF900AF6E86 /* glm.cpp in Sources */,
+				FA733F9619800BF900AF6E86 /* main.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		FA6486D3194AC87C0085DCFA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		FA6486D4194AC87C0085DCFA /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		FA6486D6194AC87C0085DCFA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		FA6486D7194AC87C0085DCFA /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		FA6486C7194AC87C0085DCFA /* Build configuration list for PBXProject "openGL" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FA6486D3194AC87C0085DCFA /* Debug */,
+				FA6486D4194AC87C0085DCFA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		FA6486D5194AC87C0085DCFA /* Build configuration list for PBXNativeTarget "openGL" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FA6486D6194AC87C0085DCFA /* Debug */,
+				FA6486D7194AC87C0085DCFA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = FA6486C4194AC87C0085DCFA /* Project object */;
+}
