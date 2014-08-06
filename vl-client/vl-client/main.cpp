@@ -62,6 +62,7 @@ static void constructMatchPairs(const char *queryImagePath, const char *trainIma
 			assert(false);
 		}
 
+		// 保存keypoints
 		for (int i = 0; i < queryFeats.size(); i++) {
 			singleFeature *sf = queryFeats[i];
 			KeyPoint kp;
@@ -77,6 +78,7 @@ static void constructMatchPairs(const char *queryImagePath, const char *trainIma
 			tKeyPoints.push_back(kp);
 		}
 
+		// 将描述符中的特征整理到特征矩阵中
 		// 注意和Mat(Size(.., ..), ..)的区别，它们的行列顺序不同
 		query = Mat::zeros(queryFeats.size(), ORIGINAL_DIM, CV_32F);
 		for (int i = 0; i < query.rows; i++) {
@@ -154,7 +156,7 @@ static void explore_match(const Mat &qImg, const Mat &tImg, const std::vector<Pa
 
 int main()
 {
-	char *queryImg = "lugger2.ppm", *trainImg = "lugger1.jpg";
+	char *queryImg = "lugger1.jpg", *trainImg = "lugger2.ppm";
 	std::vector<Pair> pairHarris;
 	constructMatchPairs(queryImg, trainImg, DETECT_HESSIAN_AFFINE, pairHarris);
 
