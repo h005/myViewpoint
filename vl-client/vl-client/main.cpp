@@ -1,8 +1,10 @@
 ﻿#include <iostream>
+#include <stdint.h>
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
-#include <opencv2\flann\flann.hpp>
-#include <stdint.h>
+#include <opencv2/flann/flann.hpp>
+#include <opencv2/features2d/features2d.hpp>
+#include <opencv2/nonfree/nonfree.hpp>
 
 extern "C" {
 #include <vl/generic.h>
@@ -13,6 +15,16 @@ extern "C" {
 
 using namespace cv;
 using namespace std;
+
+// 将两幅图像横向拼接在一起
+static void combineImage(const Mat &qImg, const Mat &tImg, Mat &output) {
+	Mat panel(std::max<int>(qImg.rows, tImg.rows), qImg.cols + tImg.cols, qImg.type());
+	panel.setTo(0);
+	qImg.copyTo(panel(Rect(0, 0, qImg.cols, qImg.rows)));
+	tImg.copyTo(panel(Rect(qImg.cols, 0, tImg.cols, tImg.rows)));
+
+	output = panel;
+}
 
 // 使用给定的特征，对图像进行匹配
 static void constructMatchPairs(const char *queryImagePath, const char *trainImagePath, detectTypes type, std::vector<Pair> &pairList) {
@@ -52,6 +64,29 @@ static void constructMatchPairs(const char *queryImagePath, const char *trainIma
 		}
 	}
 
+	/*Mat qImg = imread(queryImagePath, 0);
+	Mat tImg = imread(trainImagePath, 0); 
+
+	SIFT siftDetector;
+
+	vector<KeyPoint> qKeyPoints;
+	Mat query;
+	siftDetector(qImg, cv::noArray(), qKeyPoints, query);
+	vector<KeyPoint> tKeyPoints;
+	Mat train;
+	siftDetector(tImg, cv::noArray(), tKeyPoints, train);
+
+	{
+		Mat q;
+		drawKeypoints(qImg, qKeyPoints, q);
+		Mat t;
+		drawKeypoints(tImg, tKeyPoints, t);
+		Mat h;
+		combineImage(q, t, h);
+		imshow("keypoints", h);
+	}*/
+
+
 	// 使用KDTree作特征的匹配
 	// KdTree with 5 random trees
 	cv::flann::KDTreeIndexParams indexParams(5);
@@ -67,6 +102,11 @@ static void constructMatchPairs(const char *queryImagePath, const char *trainIma
 			int ai = row;
 			int bi = indices.at<int>(row, 0);
 			singleFeature *fa = queryFeats[ai], *fb = trainFeats[bi];
+			/*KeyPoint ka = qKeyPoints[ai], kb = tKeyPoints[bi];
+			p.a.x = ka.pt.x;
+			p.a.y = ka.pt.y;
+			p.b.x = kb.pt.x;
+			p.b.y = kb.pt.y;*/
 			p.a = fa->c;
 			p.b = fb->c;
 			pairList.push_back(p);
@@ -76,10 +116,8 @@ static void constructMatchPairs(const char *queryImagePath, const char *trainIma
 
 // 将匹配点在图像中显示出来
 static void explore_match(const Mat &qImg, const Mat &tImg, const std::vector<Pair> &pairList) {
-	Mat panel(std::max<int>(qImg.rows, tImg.rows), qImg.cols + tImg.cols, qImg.type());
-	panel.setTo(0);
-	qImg.copyTo(panel(Rect(0, 0, qImg.cols, qImg.rows)));
-	tImg.copyTo(panel(Rect(qImg.cols, 0, tImg.cols, tImg.rows)));
+	Mat panel;
+	combineImage(qImg, tImg, panel);
 
 	for (size_t i = 0; i < pairList.size(); i++) {
 		Pair p = pairList[i];
