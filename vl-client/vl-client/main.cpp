@@ -29,53 +29,73 @@ static void combineImage(const Mat &qImg, const Mat &tImg, Mat &output) {
 // 使用给定的特征，对图像进行匹配
 static void constructMatchPairs(const char *queryImagePath, const char *trainImagePath, detectTypes type, std::vector<Pair> &pairList) {
 	pairList.clear();
-
-	std::vector<singleFeature *> queryFeats;
-	std::vector<singleFeature *> trainFeats;
-
-	// 根据选定的特征类型提取两幅图片的特征
-	switch (type) {
-	case DETECT_HARRIS_AFFINE:
-	case DETECT_HESSIAN_AFFINE:
-		generateFeats(queryImagePath, type, queryFeats);
-		generateFeats(trainImagePath, type, trainFeats);
-		break;
-	case DETECT_SIFT:
-		generateSIFTFeats(queryImagePath, queryFeats);
-		generateSIFTFeats(trainImagePath, trainFeats);
-		break;
-	default:
-		assert(false);
-	}
-
-	// 注意和Mat(Size(.., ..), ..)的区别，它们的行列顺序不同
-	Mat query(queryFeats.size(), ORIGINAL_DIM, CV_32F);
-	for (int i = 0; i < query.rows; i++) {
-		singleFeature *sf = queryFeats[i];
-		for (int j = 0; j < query.cols; j++) {
-			query.at<float>(i, j) = (float)sf->descriptor[j];
-		}
-	}
-	Mat train(trainFeats.size(), ORIGINAL_DIM, CV_32F);
-	for (int i = 0; i < train.rows; i++) {
-		singleFeature *sf = trainFeats[i];
-		for (int j = 0; j < train.cols; j++) {
-			train.at<float>(i, j) = (float)sf->descriptor[j];
-		}
-	}
-
-	/*Mat qImg = imread(queryImagePath, 0);
-	Mat tImg = imread(trainImagePath, 0); 
-
-	SIFT siftDetector;
+	Mat qImg = imread(queryImagePath, 0);
+	Mat tImg = imread(trainImagePath, 0);
 
 	vector<KeyPoint> qKeyPoints;
-	Mat query;
-	siftDetector(qImg, cv::noArray(), qKeyPoints, query);
 	vector<KeyPoint> tKeyPoints;
+	Mat query;
 	Mat train;
-	siftDetector(tImg, cv::noArray(), tKeyPoints, train);
 
+	if (type == DETECT_USING_OPENCV_SIFT) {
+		// 使用opencv中的SIFT
+		SIFT siftDetector;
+		siftDetector(qImg, cv::noArray(), qKeyPoints, query);
+		siftDetector(tImg, cv::noArray(), tKeyPoints, train);
+	}
+	else {
+		// 
+		std::vector<singleFeature *> queryFeats;
+		std::vector<singleFeature *> trainFeats;
+
+		switch (type) {
+		case DETECT_HARRIS_AFFINE:
+		case DETECT_HESSIAN_AFFINE:
+			generateFeats(queryImagePath, type, queryFeats);
+			generateFeats(trainImagePath, type, trainFeats);
+			break;
+		case DETECT_SIFT:
+			generateSIFTFeats(queryImagePath, queryFeats);
+			generateSIFTFeats(trainImagePath, trainFeats);
+			break;
+		default:
+			assert(false);
+		}
+
+		for (int i = 0; i < queryFeats.size(); i++) {
+			singleFeature *sf = queryFeats[i];
+			KeyPoint kp;
+			kp.pt.x = sf->c.x;
+			kp.pt.y = sf->c.y;
+			qKeyPoints.push_back(kp);
+		}
+		for (int i = 0; i < trainFeats.size(); i++) {
+			singleFeature *sf = trainFeats[i];
+			KeyPoint kp;
+			kp.pt.x = sf->c.x;
+			kp.pt.y = sf->c.y;
+			tKeyPoints.push_back(kp);
+		}
+
+		// 注意和Mat(Size(.., ..), ..)的区别，它们的行列顺序不同
+		query = Mat::zeros(queryFeats.size(), ORIGINAL_DIM, CV_32F);
+		for (int i = 0; i < query.rows; i++) {
+			singleFeature *sf = queryFeats[i];
+			for (int j = 0; j < query.cols; j++) {
+				query.at<float>(i, j) = (float)sf->descriptor[j];
+			}
+		}
+		train = Mat::zeros(trainFeats.size(), ORIGINAL_DIM, CV_32F);
+		for (int i = 0; i < train.rows; i++) {
+			singleFeature *sf = trainFeats[i];
+			for (int j = 0; j < train.cols; j++) {
+				train.at<float>(i, j) = (float)sf->descriptor[j];
+			}
+		}
+
+	}
+
+	// 在图上绘制出输出keypoints
 	{
 		Mat q;
 		drawKeypoints(qImg, qKeyPoints, q);
@@ -84,8 +104,7 @@ static void constructMatchPairs(const char *queryImagePath, const char *trainIma
 		Mat h;
 		combineImage(q, t, h);
 		imshow("keypoints", h);
-	}*/
-
+	}
 
 	// 使用KDTree作特征的匹配
 	// KdTree with 5 random trees
@@ -98,17 +117,14 @@ static void constructMatchPairs(const char *queryImagePath, const char *trainIma
 	for (int row = 0; row < indices.rows; row++){
 		assert(indices.cols == 2);
 		if (dists.at<float>(row, 0) < 0.75 * dists.at<float>(row, 1)) {
+			int ai = row, bi = indices.at<int>(row, 0);
+			KeyPoint ka = qKeyPoints[ai], kb = tKeyPoints[bi];
+
 			Pair p;
-			int ai = row;
-			int bi = indices.at<int>(row, 0);
-			singleFeature *fa = queryFeats[ai], *fb = trainFeats[bi];
-			/*KeyPoint ka = qKeyPoints[ai], kb = tKeyPoints[bi];
 			p.a.x = ka.pt.x;
 			p.a.y = ka.pt.y;
 			p.b.x = kb.pt.x;
-			p.b.y = kb.pt.y;*/
-			p.a = fa->c;
-			p.b = fb->c;
+			p.b.y = kb.pt.y;
 			pairList.push_back(p);
 		}
 	}
@@ -140,7 +156,7 @@ int main()
 {
 	char *queryImg = "lugger2.ppm", *trainImg = "lugger1.jpg";
 	std::vector<Pair> pairHarris;
-	constructMatchPairs(queryImg, trainImg, DETECT_SIFT, pairHarris);
+	constructMatchPairs(queryImg, trainImg, DETECT_HESSIAN_AFFINE, pairHarris);
 
 	Mat qImg = imread(queryImg), tImg = imread(trainImg);
 	explore_match(qImg, tImg, pairHarris);
