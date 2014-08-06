@@ -42,8 +42,12 @@ static void constructMatchPairs(const char *queryImagePath, const char *trainIma
 		SIFT siftDetector;
 		siftDetector(qImg, cv::noArray(), qKeyPoints, query);
 		siftDetector(tImg, cv::noArray(), tKeyPoints, train);
-	}
-	else {
+	} else if (type == DETECT_USING_OPENCV_SURF) {
+		// 使用opencv中的SURF
+		SURF surfDetector;
+		surfDetector(qImg, cv::noArray(), qKeyPoints, query);
+		surfDetector(tImg, cv::noArray(), tKeyPoints, train);
+	} else {
 		// 
 		std::vector<singleFeature *> queryFeats;
 		std::vector<singleFeature *> trainFeats;
@@ -156,9 +160,9 @@ static void explore_match(const Mat &qImg, const Mat &tImg, const std::vector<Pa
 
 int main()
 {
-	char *queryImg = "lugger1.jpg", *trainImg = "lugger2.ppm";
+	char *queryImg = "lugger2.ppm", *trainImg = "lugger1.jpg";
 	std::vector<Pair> pairHarris;
-	constructMatchPairs(queryImg, trainImg, DETECT_HESSIAN_AFFINE, pairHarris);
+	constructMatchPairs(queryImg, trainImg, DETECT_HARRIS_AFFINE, pairHarris);
 
 	Mat qImg = imread(queryImg), tImg = imread(trainImg);
 	explore_match(qImg, tImg, pairHarris);
