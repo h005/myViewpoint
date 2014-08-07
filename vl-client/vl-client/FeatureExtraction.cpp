@@ -184,7 +184,6 @@ void generateSIFTFeats(const char* fileName, std::vector<singleFeature *> &feats
 		featsList.clear();
 	}
 
-	// 读取图像，并将结果归一化放在浮点数组中
 	IplImage *img = cvLoadImage(fileName, 0);
 
 	int i, j, k;

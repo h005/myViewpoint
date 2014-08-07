@@ -1,5 +1,8 @@
 ﻿#include <iostream>
 #include <stdint.h>
+
+#define _USE_MATH_DEFINES
+#include <math.h>
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/flann/flann.hpp>
@@ -15,6 +18,11 @@ extern "C" {
 
 using namespace cv;
 using namespace std;
+
+static inline int convertRadianToDegree(double rad) {
+	int deg = (int)(rad / M_PI * 180);
+	return deg % 360;
+}
 
 // 将两幅图像横向拼接在一起
 static void combineImage(const Mat &qImg, const Mat &tImg, Mat &output) {
@@ -72,6 +80,8 @@ static void constructMatchPairs(const char *queryImagePath, const char *trainIma
 			KeyPoint kp;
 			kp.pt.x = sf->c.x;
 			kp.pt.y = sf->c.y;
+			kp.angle = convertRadianToDegree(sf->oritation);
+			kp.size = sf->scale;
 			qKeyPoints.push_back(kp);
 		}
 		for (int i = 0; i < trainFeats.size(); i++) {
@@ -79,6 +89,8 @@ static void constructMatchPairs(const char *queryImagePath, const char *trainIma
 			KeyPoint kp;
 			kp.pt.x = sf->c.x;
 			kp.pt.y = sf->c.y;
+			kp.angle = convertRadianToDegree(sf->oritation);
+			kp.size = sf->scale;
 			tKeyPoints.push_back(kp);
 		}
 
@@ -104,9 +116,9 @@ static void constructMatchPairs(const char *queryImagePath, const char *trainIma
 	// 在图上绘制出输出keypoints
 	{
 		Mat q;
-		drawKeypoints(qImg, qKeyPoints, q);
+		drawKeypoints(qImg, qKeyPoints, q, Scalar::all(-1), DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
 		Mat t;
-		drawKeypoints(tImg, tKeyPoints, t);
+		drawKeypoints(tImg, tKeyPoints, t, Scalar::all(-1), DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
 		Mat h;
 		combineImage(q, t, h);
 		imshow("keypoints", h);
@@ -162,7 +174,7 @@ int main()
 {
 	char *queryImg = "lugger2.ppm", *trainImg = "lugger1.jpg";
 	std::vector<Pair> pairHarris;
-	constructMatchPairs(queryImg, trainImg, DETECT_HARRIS_AFFINE, pairHarris);
+	constructMatchPairs(queryImg, trainImg, DETECT_SIFT, pairHarris);
 
 	Mat qImg = imread(queryImg), tImg = imread(trainImg);
 	explore_match(qImg, tImg, pairHarris);
