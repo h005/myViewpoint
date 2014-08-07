@@ -24,6 +24,33 @@ static inline int convertRadianToDegree(double rad) {
 	return deg % 360;
 }
 
+// 将小明的提取的特征点转化成openCV中的KeyPoint格式
+static void convertSingleFeatureToKeyPoint(const vector<singleFeature *> &feats, vector<KeyPoint> &keyPoints) {
+	for (int i = 0; i < feats.size(); i++) {
+		singleFeature *sf = feats[i];
+		KeyPoint kp;
+		kp.pt.x = sf->c.x;
+		kp.pt.y = sf->c.y;
+		kp.angle = convertRadianToDegree(sf->oritation);
+		kp.size = (sf->scale >= 6) ? sf->scale : 6;
+		keyPoints.push_back(kp);
+	}
+}
+
+// 将小明的提取的特征描述符转化成openCV中的Mat格式
+static void convertSingleFeatureToMat(const vector<singleFeature *> &feats, int descriptorDim, Mat &out) {
+	// 将描述符中的特征整理到特征矩阵中
+	// 注意和Mat(Size(.., ..), ..)的区别，它们的行列顺序不同
+	Mat query = Mat::zeros(feats.size(), descriptorDim, CV_32F);
+	for (int i = 0; i < query.rows; i++) {
+		singleFeature *sf = feats[i];
+		for (int j = 0; j < query.cols; j++) {
+			query.at<float>(i, j) = (float)sf->descriptor[j];
+		}
+	}
+	out = query;
+}
+
 // 将两幅图像横向拼接在一起
 static void combineImage(const Mat &qImg, const Mat &tImg, Mat &output) {
 	Mat panel(std::max<int>(qImg.rows, tImg.rows), qImg.cols + tImg.cols, qImg.type());
@@ -66,7 +93,7 @@ static void constructMatchPairs(const char *queryImagePath, const char *trainIma
 			generateFeats(queryImagePath, type, queryFeats);
 			generateFeats(trainImagePath, type, trainFeats);
 			break;
-		case DETECT_SIFT:
+		case DETECT_VLFEAT_SIFT:
 			generateSIFTFeats(queryImagePath, queryFeats);
 			generateSIFTFeats(trainImagePath, trainFeats);
 			break;
@@ -74,43 +101,12 @@ static void constructMatchPairs(const char *queryImagePath, const char *trainIma
 			assert(false);
 		}
 
-		// 保存keypoints
-		for (int i = 0; i < queryFeats.size(); i++) {
-			singleFeature *sf = queryFeats[i];
-			KeyPoint kp;
-			kp.pt.x = sf->c.x;
-			kp.pt.y = sf->c.y;
-			kp.angle = convertRadianToDegree(sf->oritation);
-			kp.size = sf->scale;
-			qKeyPoints.push_back(kp);
-		}
-		for (int i = 0; i < trainFeats.size(); i++) {
-			singleFeature *sf = trainFeats[i];
-			KeyPoint kp;
-			kp.pt.x = sf->c.x;
-			kp.pt.y = sf->c.y;
-			kp.angle = convertRadianToDegree(sf->oritation);
-			kp.size = sf->scale;
-			tKeyPoints.push_back(kp);
-		}
-
-		// 将描述符中的特征整理到特征矩阵中
-		// 注意和Mat(Size(.., ..), ..)的区别，它们的行列顺序不同
-		query = Mat::zeros(queryFeats.size(), ORIGINAL_DIM, CV_32F);
-		for (int i = 0; i < query.rows; i++) {
-			singleFeature *sf = queryFeats[i];
-			for (int j = 0; j < query.cols; j++) {
-				query.at<float>(i, j) = (float)sf->descriptor[j];
-			}
-		}
-		train = Mat::zeros(trainFeats.size(), ORIGINAL_DIM, CV_32F);
-		for (int i = 0; i < train.rows; i++) {
-			singleFeature *sf = trainFeats[i];
-			for (int j = 0; j < train.cols; j++) {
-				train.at<float>(i, j) = (float)sf->descriptor[j];
-			}
-		}
-
+		// 转化为KeyPoint类型
+		convertSingleFeatureToKeyPoint(queryFeats, qKeyPoints);
+		convertSingleFeatureToKeyPoint(trainFeats, tKeyPoints);
+		// 将特征描述符转化为Mat类型
+		convertSingleFeatureToMat(queryFeats, ORIGINAL_DIM, query);
+		convertSingleFeatureToMat(trainFeats, ORIGINAL_DIM, train);
 	}
 
 	// 在图上绘制出输出keypoints
@@ -167,14 +163,14 @@ static void explore_match(const Mat &qImg, const Mat &tImg, const std::vector<Pa
 
 		line(panel, p1, p2, color, 1, CV_AA);
 	}
-	imshow("aaa", panel);
+	//imshow("aaa", panel);
 }
 
 int main()
 {
 	char *queryImg = "lugger2.ppm", *trainImg = "lugger1.jpg";
 	std::vector<Pair> pairHarris;
-	constructMatchPairs(queryImg, trainImg, DETECT_SIFT, pairHarris);
+	constructMatchPairs(queryImg, trainImg, DETECT_VLFEAT_SIFT, pairHarris);
 
 	Mat qImg = imread(queryImg), tImg = imread(trainImg);
 	explore_match(qImg, tImg, pairHarris);
