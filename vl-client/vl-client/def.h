@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <vector>
+#include <opencv2/core/core.hpp>
 
 #define ORIGINAL_DIM		128
 #define LEVELS_PER_OCTIVE	3
@@ -47,8 +48,4 @@ struct singleManifold
 	std::vector<singleFeature*> feaList;
 	std::vector<int> frameIndexList;
 	std::vector<int> foundTypeList;
-};
-
-struct Pair {
-	coordinate a, b;
 };

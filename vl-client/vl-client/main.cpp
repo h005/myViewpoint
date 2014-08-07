@@ -64,8 +64,7 @@ static void combineImage(const Mat &qImg, const Mat &tImg, Mat &output) {
 }
 
 // 使用给定的特征，对图像进行匹配
-static void constructMatchPairs(const char *queryImagePath, const char *trainImagePath, detectTypes type, std::vector<Pair> &pairList) {
-	pairList.clear();
+static void constructMatchPairs(const char *queryImagePath, const char *trainImagePath, detectTypes type, vector<KeyPoint> &qMatchPoints, vector<KeyPoint> &tMatchPoints, char *windowName = NULL) {
 	Mat qImg = imread(queryImagePath, 0);
 	Mat tImg = imread(trainImagePath, 0);
 
@@ -112,14 +111,14 @@ static void constructMatchPairs(const char *queryImagePath, const char *trainIma
 	}
 
 	// 在图上绘制出输出keypoints
-	{
+	if (windowName) {
 		Mat q;
 		drawKeypoints(qImg, qKeyPoints, q, Scalar::all(-1), DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
 		Mat t;
 		drawKeypoints(tImg, tKeyPoints, t, Scalar::all(-1), DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
 		Mat h;
 		combineImage(q, t, h);
-		imshow("keypoints", h);
+		imshow(windowName, h);
 	}
 
 	// 使用KDTree作特征的匹配
@@ -130,34 +129,31 @@ static void constructMatchPairs(const char *queryImagePath, const char *trainIma
 	Mat dists;
 	kdtree.knnSearch(query, indices, dists, 2, cv::flann::SearchParams(64));
 
+	qMatchPoints.clear();
+	tMatchPoints.clear();
 	for (int row = 0; row < indices.rows; row++){
 		assert(indices.cols == 2);
 		if (dists.at<float>(row, 0) < 0.75 * dists.at<float>(row, 1)) {
 			int ai = row, bi = indices.at<int>(row, 0);
 			KeyPoint ka = qKeyPoints[ai], kb = tKeyPoints[bi];
-
-			Pair p;
-			p.a.x = ka.pt.x;
-			p.a.y = ka.pt.y;
-			p.b.x = kb.pt.x;
-			p.b.y = kb.pt.y;
-			pairList.push_back(p);
+			qMatchPoints.push_back(ka);
+			tMatchPoints.push_back(kb);
 		}
 	}
+
+	assert(qMatchPoints.size() == tMatchPoints.size());
 }
 
 // 将匹配点在图像中显示出来
-static void explore_match(const Mat &qImg, const Mat &tImg, const std::vector<Pair> &pairList) {
+static void explore_match(const Mat &qImg, const Mat &tImg, const vector<KeyPoint> &qMatchPoints, const vector<KeyPoint> &tMatchPoints) {
+	assert(qMatchPoints.size() == tMatchPoints.size());
+
 	Mat panel;
 	combineImage(qImg, tImg, panel);
 
-	for (size_t i = 0; i < pairList.size(); i++) {
-		Pair p = pairList[i];
-		Point2i p1, p2;
-		p1.x = (int)p.a.x;
-		p1.y = (int)p.a.y;
-		p2.x = (int)p.b.x + qImg.cols;
-		p2.y = (int)p.b.y;
+	for (size_t i = 0; i < qMatchPoints.size(); i++) {
+		Point2i p1 = qMatchPoints[i].pt, p2 = tMatchPoints[i].pt;
+		p2.x += qImg.cols;
 
 		Scalar color(0, 255, 0);
 		circle(panel, p1, 2, color, -1);
@@ -171,12 +167,44 @@ static void explore_match(const Mat &qImg, const Mat &tImg, const std::vector<Pa
 int main()
 {
 	char *queryImg = "lugger2.ppm", *trainImg = "lugger1.jpg";
-	std::vector<Pair> pairHarris;
-	constructMatchPairs(queryImg, trainImg, DETECT_HARRIS_AFFINE, pairHarris);
-
 	Mat qImg = imread(queryImg), tImg = imread(trainImg);
-	explore_match(qImg, tImg, pairHarris);
 
+	vector<KeyPoint> qKeyPoints, tKeyPoints;
+
+	{
+		vector<KeyPoint> qHarrisPoints, tHarrisPoints;
+		constructMatchPairs(queryImg, trainImg, DETECT_HARRIS_AFFINE, qHarrisPoints, tHarrisPoints);
+		qKeyPoints.insert(qKeyPoints.end(), qHarrisPoints.begin(), qHarrisPoints.end());
+		tKeyPoints.insert(tKeyPoints.end(), tHarrisPoints.begin(), tHarrisPoints.end());
+		//explore_match(qImg, tImg, qHarrisPoints, tHarrisPoints);
+	}
+
+	{
+		vector<KeyPoint> qHessianPoints, tHessianPoints;
+		constructMatchPairs(queryImg, trainImg, DETECT_HESSIAN_AFFINE, qHessianPoints, tHessianPoints);
+		qKeyPoints.insert(qKeyPoints.end(), qHessianPoints.begin(), qHessianPoints.end());
+		tKeyPoints.insert(tKeyPoints.end(), tHessianPoints.begin(), tHessianPoints.end());
+		//explore_match(qImg, tImg, qHessianPoints, tHessianPoints);
+	}
+
+	{
+		vector<KeyPoint> qSIFTPoints, tSIFTPoints;
+		constructMatchPairs(queryImg, trainImg, DETECT_USING_OPENCV_SIFT, qSIFTPoints, tSIFTPoints);
+		qKeyPoints.insert(qKeyPoints.end(), qSIFTPoints.begin(), qSIFTPoints.end());
+		tKeyPoints.insert(tKeyPoints.end(), tSIFTPoints.begin(), tSIFTPoints.end());
+		//explore_match(qImg, tImg, qSIFTPoints, tSIFTPoints);
+	}
+
+	{
+		vector<KeyPoint> qSURFPoints, tSURFPoints;
+		constructMatchPairs(queryImg, trainImg, DETECT_USING_OPENCV_SURF, qSURFPoints, tSURFPoints);
+		qKeyPoints.insert(qKeyPoints.end(), qSURFPoints.begin(), qSURFPoints.end());
+		tKeyPoints.insert(tKeyPoints.end(), tSURFPoints.begin(), tSURFPoints.end());
+		//explore_match(qImg, tImg, qSURFPoints, tSURFPoints);
+	}
+
+	explore_match(qImg, tImg, qKeyPoints, tKeyPoints);
+	
 	waitKey();
 	destroyAllWindows();
 
