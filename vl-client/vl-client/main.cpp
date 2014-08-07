@@ -92,12 +92,12 @@ static void constructMatchPairs(const char *queryImagePath, const char *trainIma
 		switch (type) {
 		case DETECT_HARRIS_AFFINE:
 		case DETECT_HESSIAN_AFFINE:
-			generateFeats(queryImagePath, type, queryFeats);
-			generateFeats(trainImagePath, type, trainFeats);
+			generateFeats(qImg, type, queryFeats);
+			generateFeats(tImg, type, trainFeats);
 			break;
 		case DETECT_VLFEAT_SIFT:
-			generateSIFTFeats(queryImagePath, queryFeats);
-			generateSIFTFeats(trainImagePath, trainFeats);
+			generateSIFTFeats(qImg, queryFeats);
+			generateSIFTFeats(tImg, trainFeats);
 			break;
 		default:
 			assert(false);
@@ -165,14 +165,14 @@ static void explore_match(const Mat &qImg, const Mat &tImg, const std::vector<Pa
 
 		line(panel, p1, p2, color, 1, CV_AA);
 	}
-	//imshow("aaa", panel);
+	imshow("aaa", panel);
 }
 
 int main()
 {
 	char *queryImg = "lugger2.ppm", *trainImg = "lugger1.jpg";
 	std::vector<Pair> pairHarris;
-	constructMatchPairs(queryImg, trainImg, DETECT_VLFEAT_SIFT, pairHarris);
+	constructMatchPairs(queryImg, trainImg, DETECT_HARRIS_AFFINE, pairHarris);
 
 	Mat qImg = imread(queryImg), tImg = imread(trainImg);
 	explore_match(qImg, tImg, pairHarris);

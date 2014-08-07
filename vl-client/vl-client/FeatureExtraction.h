@@ -1,8 +1,8 @@
 ﻿#pragma
 
 #include <vector>
-
+#include <opencv2/core/core.hpp>
 #include "def.h"
 
-void generateFeats(const char* fileName, detectTypes detectTypeNum, std::vector<singleFeature *> &featsList);
-void generateSIFTFeats(const char* fileName, std::vector<singleFeature *> &featsList);
+void generateFeats(cv::Mat &img, detectTypes detectTypeNum, std::vector<singleFeature *> &featsList);
+void generateSIFTFeats(cv::Mat &img, std::vector<singleFeature *> &featsList);

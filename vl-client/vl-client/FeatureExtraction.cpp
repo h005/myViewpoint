@@ -63,7 +63,7 @@ static void flip_descriptor(float *dst, float const *src)
 	}
 }
 
-void generateFeats(const char* fileName, detectTypes detectTypeNum, std::vector<singleFeature *> &featsList)
+void generateFeats(Mat &img, detectTypes detectTypeNum, std::vector<singleFeature *> &featsList)
 {
 	// 释放并清空列表中已有的元素
 	if (featsList.size() != 0)
@@ -74,14 +74,16 @@ void generateFeats(const char* fileName, detectTypes detectTypeNum, std::vector<
 	}
 
 	// 读取图像，并将结果归一化放在浮点数组中
-	IplImage *Image = cvLoadImage(fileName, 0);
-	float *ImageData = new float[Image->height * Image->width];
+	// 注意：
+	// 这里需要将图像转化为列优先存储
+	Size imageSize = img.size();
+	float *ImageData = new float[imageSize.height * imageSize.width];
 	int k = 0;
-	for (int i = 0; i < Image->height; i++)
+	for (int j = 0; j < imageSize.width; j++)
 	{
-		for (int j = 0; j < Image->width; j++)
+		for (int i = 0; i < imageSize.height; i++)
 		{
-			ImageData[j*Image->height + i] = (float)(((uchar*)(Image->imageData))[k++]) / 255.0;
+			ImageData[i + j * imageSize.height] = (float)(img.at<uchar>(i, j)) / 255.0;
 		}
 	}
 
@@ -99,7 +101,7 @@ void generateFeats(const char* fileName, detectTypes detectTypeNum, std::vector<
 
 	vl_covdet_set_peak_threshold(covd, peakThreshold);
 	//vl_covdet_set_edge_threshold(covd, edgeThreshold) ;
-	vl_covdet_put_image(covd, ImageData, Image->height, Image->width);
+	vl_covdet_put_image(covd, ImageData, imageSize.height, imageSize.width);
 	vl_covdet_detect(covd);
 	vl_covdet_drop_features_outside(covd, 2);
 	vl_covdet_extract_orientations(covd);
@@ -163,7 +165,7 @@ void generateFeats(const char* fileName, detectTypes detectTypeNum, std::vector<
 		else
 			delete sf;
 	}
-	cvReleaseImage(&Image);
+
 	delete[]ImageData;
 	delete[]desc;
 	//delete feature ;
@@ -173,7 +175,7 @@ void generateFeats(const char* fileName, detectTypes detectTypeNum, std::vector<
 	if (patch) free(patch);
 }
 
-void generateSIFTFeats(const char* fileName, std::vector<singleFeature *> &featsList)
+void generateSIFTFeats(Mat &img, std::vector<singleFeature *> &featsList)
 {
 
 	// 释放并清空列表中已有的元素
@@ -184,19 +186,20 @@ void generateSIFTFeats(const char* fileName, std::vector<singleFeature *> &feats
 		featsList.clear();
 	}
 
-	IplImage *img = cvLoadImage(fileName, 0);
-
 	int i, j, k;
-	int tmp = img->width;
-	if (img->height < tmp)	tmp = img->height;
+	Size imageSize = img.size();
+	int tmp = std::max<int>(imageSize.width, imageSize.height);
 	double o = log((double)tmp) / log(2.0);
 
 	VlSiftFilt* filter;
-	filter = vl_sift_new(img->width, img->height, (int)(o + 0.5), LEVELS_PER_OCTIVE, MIN_OCTIVE_INDEX);
+	filter = vl_sift_new(imageSize.width, imageSize.height, (int)(o + 0.5), LEVELS_PER_OCTIVE, MIN_OCTIVE_INDEX);
 
-	vl_sift_pix* tmpData = new vl_sift_pix[(img->width) * (img->height)];
-	for (i = 0; i < (img->width) * (img->height); i++)
-		tmpData[i] = (vl_sift_pix)(((uchar*)(img->imageData))[i]);
+	vl_sift_pix* tmpData = new vl_sift_pix[imageSize.height * imageSize.width];
+	for (int i = 0; i < imageSize.height; i++) {
+		for (int j = 0; j < imageSize.width; j++) {
+			tmpData[i * imageSize.width + j] = img.at<uchar>(i, j);
+		}
+	}
 
 	vl_sift_pix* descTmp;
 
