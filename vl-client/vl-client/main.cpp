@@ -21,7 +21,9 @@ using namespace std;
 
 static inline int convertRadianToDegree(double rad) {
 	int deg = (int)(rad / M_PI * 180);
-	return deg % 360;
+
+	// 对于负数和越界进行特殊处理，确保结果在[0, 360)中
+	return (deg % 360 + 360) % 360;
 }
 
 // 将小明的提取的特征点转化成openCV中的KeyPoint格式
