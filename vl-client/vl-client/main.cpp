@@ -119,7 +119,7 @@ static void constructMatchPairs(const char *queryImagePath, const char *trainIma
 		drawKeypoints(tImg, tKeyPoints, t, Scalar::all(-1), DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
 		Mat h;
 		combineImage(q, t, h);
-		imshow(windowName, h);
+		imwrite(windowName, h);
 	}
 
 	// 使用KDTree作特征的匹配
@@ -176,7 +176,7 @@ int main()
 
 	{
 		vector<KeyPoint> qHarrisPoints, tHarrisPoints;
-		constructMatchPairs(queryImg, trainImg, DETECT_HARRIS_AFFINE, qHarrisPoints, tHarrisPoints);
+		constructMatchPairs(queryImg, trainImg, DETECT_HARRIS_AFFINE, qHarrisPoints, tHarrisPoints, "Harris.png");
 		qKeyPoints.insert(qKeyPoints.end(), qHarrisPoints.begin(), qHarrisPoints.end());
 		tKeyPoints.insert(tKeyPoints.end(), tHarrisPoints.begin(), tHarrisPoints.end());
 		//explore_match(qImg, tImg, qHarrisPoints, tHarrisPoints);
@@ -184,7 +184,7 @@ int main()
 
 	{
 		vector<KeyPoint> qHessianPoints, tHessianPoints;
-		constructMatchPairs(queryImg, trainImg, DETECT_HESSIAN_AFFINE, qHessianPoints, tHessianPoints);
+		constructMatchPairs(queryImg, trainImg, DETECT_HESSIAN_AFFINE, qHessianPoints, tHessianPoints, "Hessian.png");
 		printf("%d %d\n", qHessianPoints.size(), tHessianPoints.size());
 		qKeyPoints.insert(qKeyPoints.end(), qHessianPoints.begin(), qHessianPoints.end());
 		tKeyPoints.insert(tKeyPoints.end(), tHessianPoints.begin(), tHessianPoints.end());
@@ -193,7 +193,7 @@ int main()
 
 	{
 		vector<KeyPoint> qSIFTPoints, tSIFTPoints;
-		constructMatchPairs(queryImg, trainImg, DETECT_USING_OPENCV_SIFT, qSIFTPoints, tSIFTPoints);
+		constructMatchPairs(queryImg, trainImg, DETECT_USING_OPENCV_SIFT, qSIFTPoints, tSIFTPoints, "SIFT.png");
 		qKeyPoints.insert(qKeyPoints.end(), qSIFTPoints.begin(), qSIFTPoints.end());
 		tKeyPoints.insert(tKeyPoints.end(), tSIFTPoints.begin(), tSIFTPoints.end());
 		//explore_match(qImg, tImg, qSIFTPoints, tSIFTPoints);
@@ -201,7 +201,7 @@ int main()
 
 	{
 		vector<KeyPoint> qSURFPoints, tSURFPoints;
-		constructMatchPairs(queryImg, trainImg, DETECT_USING_OPENCV_SURF, qSURFPoints, tSURFPoints);
+		constructMatchPairs(queryImg, trainImg, DETECT_USING_OPENCV_SURF, qSURFPoints, tSURFPoints, "SURF.png");
 		qKeyPoints.insert(qKeyPoints.end(), qSURFPoints.begin(), qSURFPoints.end());
 		tKeyPoints.insert(tKeyPoints.end(), tSURFPoints.begin(), tSURFPoints.end());
 		//explore_match(qImg, tImg, qSURFPoints, tSURFPoints);
