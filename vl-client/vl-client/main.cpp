@@ -3,11 +3,7 @@
 
 #define _USE_MATH_DEFINES
 #include <math.h>
-#include <opencv2/core/core.hpp>
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2/flann/flann.hpp>
-#include <opencv2/features2d/features2d.hpp>
-#include <opencv2/calib3d/calib3d.hpp>
+#include <opencv2/opencv.hpp>
 #include <opencv2/nonfree/nonfree.hpp>
 
 extern "C" {
@@ -228,6 +224,11 @@ int main()
 	}
 	explore_match(qImg, tImg, qFilteredKeyPoints, tFilteredKeyPoints, "Ransaced");
 	
+	cout << H << endl;
+	Mat output(qImg.size(), qImg.type());
+	warpPerspective(qImg, output, H, output.size());
+	imshow("warpPerspective", output);
+
 	waitKey();
 	destroyAllWindows();
 
