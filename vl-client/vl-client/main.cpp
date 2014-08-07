@@ -7,6 +7,7 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/flann/flann.hpp>
 #include <opencv2/features2d/features2d.hpp>
+#include <opencv2/calib3d/calib3d.hpp>
 #include <opencv2/nonfree/nonfree.hpp>
 
 extern "C" {
@@ -145,23 +146,25 @@ static void constructMatchPairs(const char *queryImagePath, const char *trainIma
 }
 
 // 将匹配点在图像中显示出来
-static void explore_match(const Mat &qImg, const Mat &tImg, const vector<KeyPoint> &qMatchPoints, const vector<KeyPoint> &tMatchPoints) {
-	assert(qMatchPoints.size() == tMatchPoints.size());
+static void explore_match(const Mat &qImg, const Mat &tImg, const vector<KeyPoint> &qMatchPoints, const vector<KeyPoint> &tMatchPoints, char *windowName) {
+	if (windowName) {
+		assert(qMatchPoints.size() == tMatchPoints.size());
 
-	Mat panel;
-	combineImage(qImg, tImg, panel);
+		Mat panel;
+		combineImage(qImg, tImg, panel);
 
-	for (size_t i = 0; i < qMatchPoints.size(); i++) {
-		Point2i p1 = qMatchPoints[i].pt, p2 = tMatchPoints[i].pt;
-		p2.x += qImg.cols;
+		for (size_t i = 0; i < qMatchPoints.size(); i++) {
+			Point2i p1 = qMatchPoints[i].pt, p2 = tMatchPoints[i].pt;
+			p2.x += qImg.cols;
 
-		Scalar color(0, 255, 0);
-		circle(panel, p1, 2, color, -1);
-		circle(panel, p2, 2, color, -1);
+			Scalar color(0, 255, 0);
+			circle(panel, p1, 2, color, -1);
+			circle(panel, p2, 2, color, -1);
 
-		line(panel, p1, p2, color, 1, CV_AA);
+			line(panel, p1, p2, color, 1, CV_AA);
+		}
+		imshow(windowName, panel);
 	}
-	imshow("aaa", panel);
 }
 
 int main()
@@ -182,6 +185,7 @@ int main()
 	{
 		vector<KeyPoint> qHessianPoints, tHessianPoints;
 		constructMatchPairs(queryImg, trainImg, DETECT_HESSIAN_AFFINE, qHessianPoints, tHessianPoints);
+		printf("%d %d\n", qHessianPoints.size(), tHessianPoints.size());
 		qKeyPoints.insert(qKeyPoints.end(), qHessianPoints.begin(), qHessianPoints.end());
 		tKeyPoints.insert(tKeyPoints.end(), tHessianPoints.begin(), tHessianPoints.end());
 		//explore_match(qImg, tImg, qHessianPoints, tHessianPoints);
@@ -203,7 +207,26 @@ int main()
 		//explore_match(qImg, tImg, qSURFPoints, tSURFPoints);
 	}
 
-	explore_match(qImg, tImg, qKeyPoints, tKeyPoints);
+	explore_match(qImg, tImg, qKeyPoints, tKeyPoints, "original");
+	printf("%d %d\n", qKeyPoints.size(), tKeyPoints.size());
+
+	vector<Point2f> qPoints, tPoints;
+	for (int i = 0; i < qKeyPoints.size(); i++) {
+		qPoints.push_back(qKeyPoints[i].pt);
+		tPoints.push_back(tKeyPoints[i].pt);
+	}
+
+	Mat mask;
+	Mat H = findHomography(qPoints, tPoints, CV_RANSAC, 3, mask);
+
+	vector<KeyPoint> qFilteredKeyPoints, tFilteredKeyPoints;
+	for (int i = 0; i < mask.rows; i++) {
+		if (mask.at<uchar>(i, 0)) {
+			qFilteredKeyPoints.push_back(qKeyPoints[i]);
+			tFilteredKeyPoints.push_back(tKeyPoints[i]);
+		}
+	}
+	explore_match(qImg, tImg, qFilteredKeyPoints, tFilteredKeyPoints, "Ransaced");
 	
 	waitKey();
 	destroyAllWindows();
