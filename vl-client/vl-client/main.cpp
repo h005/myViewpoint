@@ -165,7 +165,7 @@ static void explore_match(const Mat &qImg, const Mat &tImg, const vector<KeyPoin
 
 int main()
 {
-	char *queryImg = "lugger2.ppm", *trainImg = "lugger1.jpg";
+	char *queryImg = "lugger2.ppm", *trainImg = "lugger1.png";
 	Mat qImg = imread(queryImg), tImg = imread(trainImg);
 
 	vector<KeyPoint> qKeyPoints, tKeyPoints;
