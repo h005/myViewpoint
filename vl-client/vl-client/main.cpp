@@ -142,8 +142,8 @@ static void constructMatchPairs(const char *queryImagePath, const char *trainIma
 }
 
 // 将匹配点在图像中显示出来
-static void explore_match(const Mat &qImg, const Mat &tImg, const vector<KeyPoint> &qMatchPoints, const vector<KeyPoint> &tMatchPoints, char *windowName) {
-	if (windowName) {
+static void explore_match(const Mat &qImg, const Mat &tImg, const vector<KeyPoint> &qMatchPoints, const vector<KeyPoint> &tMatchPoints, char *fileName) {
+	if (fileName) {
 		assert(qMatchPoints.size() == tMatchPoints.size());
 
 		Mat panel;
@@ -159,7 +159,7 @@ static void explore_match(const Mat &qImg, const Mat &tImg, const vector<KeyPoin
 
 			line(panel, p1, p2, color, 1, CV_AA);
 		}
-		imshow(windowName, panel);
+		imwrite(fileName, panel);
 	}
 }
 
@@ -175,7 +175,7 @@ int main()
 		constructMatchPairs(queryImg, trainImg, DETECT_HARRIS_AFFINE, qHarrisPoints, tHarrisPoints, "Harris.png");
 		qKeyPoints.insert(qKeyPoints.end(), qHarrisPoints.begin(), qHarrisPoints.end());
 		tKeyPoints.insert(tKeyPoints.end(), tHarrisPoints.begin(), tHarrisPoints.end());
-		//explore_match(qImg, tImg, qHarrisPoints, tHarrisPoints);
+		explore_match(qImg, tImg, qHarrisPoints, tHarrisPoints, "Harris_match.png");
 	}
 
 	{
@@ -184,7 +184,7 @@ int main()
 		printf("%d %d\n", qHessianPoints.size(), tHessianPoints.size());
 		qKeyPoints.insert(qKeyPoints.end(), qHessianPoints.begin(), qHessianPoints.end());
 		tKeyPoints.insert(tKeyPoints.end(), tHessianPoints.begin(), tHessianPoints.end());
-		//explore_match(qImg, tImg, qHessianPoints, tHessianPoints);
+		explore_match(qImg, tImg, qHessianPoints, tHessianPoints, "Hessian_match.png");
 	}
 
 	{
@@ -192,7 +192,7 @@ int main()
 		constructMatchPairs(queryImg, trainImg, DETECT_USING_OPENCV_SIFT, qSIFTPoints, tSIFTPoints, "SIFT.png");
 		qKeyPoints.insert(qKeyPoints.end(), qSIFTPoints.begin(), qSIFTPoints.end());
 		tKeyPoints.insert(tKeyPoints.end(), tSIFTPoints.begin(), tSIFTPoints.end());
-		//explore_match(qImg, tImg, qSIFTPoints, tSIFTPoints);
+		explore_match(qImg, tImg, qSIFTPoints, tSIFTPoints, "SIFT_match.png");
 	}
 
 	{
@@ -200,10 +200,10 @@ int main()
 		constructMatchPairs(queryImg, trainImg, DETECT_USING_OPENCV_SURF, qSURFPoints, tSURFPoints, "SURF.png");
 		qKeyPoints.insert(qKeyPoints.end(), qSURFPoints.begin(), qSURFPoints.end());
 		tKeyPoints.insert(tKeyPoints.end(), tSURFPoints.begin(), tSURFPoints.end());
-		//explore_match(qImg, tImg, qSURFPoints, tSURFPoints);
+		explore_match(qImg, tImg, qSURFPoints, tSURFPoints, "SURF_match.png");
 	}
 
-	explore_match(qImg, tImg, qKeyPoints, tKeyPoints, "original");
+	explore_match(qImg, tImg, qKeyPoints, tKeyPoints, "all_match.png");
 	printf("%d %d\n", qKeyPoints.size(), tKeyPoints.size());
 
 	vector<Point2f> qPoints, tPoints;
@@ -222,7 +222,7 @@ int main()
 			tFilteredKeyPoints.push_back(tKeyPoints[i]);
 		}
 	}
-	explore_match(qImg, tImg, qFilteredKeyPoints, tFilteredKeyPoints, "Ransaced");
+	explore_match(qImg, tImg, qFilteredKeyPoints, tFilteredKeyPoints, "Ransaced.png");
 	
 	cout << H << endl;
 	Mat output(qImg.size(), qImg.type());
