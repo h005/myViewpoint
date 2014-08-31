@@ -526,14 +526,15 @@ void DLT()
     };
      */
     // lugger
-    double homography[] = {
+
+    /*double homography[] = {
         3.05626111e-01, 1.82391908e-02, 8.89773139e+00,
         -6.54682280e-01, 4.71682550e-01, 3.27711491e+02,
         -1.22366240e-03, 1.41183965e-04, 1.00000000e+00
     };
     double LTmp[12];
     memcpy(LTmp, L, sizeof(L));
-    MultMatrix(homography, LTmp, L, 3, 3, 4);
+    MultMatrix(homography, LTmp, L, 3, 3, 4);*/
     
 	x = 1/sqrt(dot(L+8,L+8,3));
 	u0 = x*x*dot(L,L+8,3);
