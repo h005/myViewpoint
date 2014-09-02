@@ -16,6 +16,7 @@
 #include <fstream>
 #include "glm.h"
 #include "matrix.h"
+#include <opencv2\opencv.hpp>
 using namespace std;
 
 typedef struct _cell {
@@ -565,18 +566,55 @@ void normalize_2D(int original[][NDIM], float processed[][NDIM], size_t n, float
 
 void DDLT() {
 	assert((imClick == objClick) && (imClick >= 6)); //必须保证图像与模型对应点数相同且>=6个
-	float *cords3d = new float[imClick * 2];
-	float *cords2d = new float[imClick * 3];
+	float *cords3d = new float[imClick * 3];
+	float *cords2d = new float[imClick * 2];
 	float param2d[3], param3d[4];
 
 	normalize_2D(imCords, (float (*)[2])cords2d, imClick, param2d);
 	normalize_3D(objCords,(float (*)[3])cords3d, imClick, param3d);
 
+	printf("%f %f %f\n", param2d[0], param2d[1], param2d[2]);
+	printf("%f %f %f %f\n", param3d[0], param3d[1], param3d[2], param3d[3]);
+	for (int i = 0; i < imClick; i++) {
+		printf("%f %f %f %f %f\n", cords3d[i * 3 + 0], cords3d[i * 3 + 1], cords3d[i * 3 + 2], cords2d[i * 2 + 0], cords2d[i * 2 + 1]);
+	}
+
 	float *M = new float[3 * imClick * (9 + imClick)];
+	for (int i = 0; i < 3 * imClick; i++) {
+		for (int j = 0; j < 9 + imClick; j++) {
+			M[i * (9 + imClick) + j] = 0;
+		}
+	}
+	for (int i = 0; i < imClick; i++) {
+		for (int j = 0; j < 9; j++) {
+			M[(3 * i + j / 3) * (9 + imClick) + j] = cords3d[i * 3 + j % 3];
+		}
+		M[(3 * i + 0) * (9 + imClick) + (9 + i)] = -cords2d[i * 2 + 0];
+		M[(3 * i + 1) * (9 + imClick) + (9 + i)] = -cords2d[i * 2 + 1];
+		M[(3 * i + 2) * (9 + imClick) + (9 + i)] = -1;
+	}
+
+	for (int i = 0; i < 3 * imClick; i++) {
+		for (int j = 0; j < 9 + imClick; j++) {
+			if (abs(M[i * (9 + imClick) + j]) < 0.000001) {
+				printf("0");
+			} else {
+				printf("x");
+			}
+		}
+		printf("\n");
+	}
+
+	cv::Mat A;
+
+	delete M;
+	delete cords2d;
+	delete cords3d;
 }
 
 void DLT()
 {	
+	DDLT();
 	assert((imClick == objClick)&&(imClick >= 6)); //必须保证图像与模型对应点数相同且>=6个
 	double a1[12] = {0}, a2[12] = {0};
 	double* A = new double[2*imClick*12];  
