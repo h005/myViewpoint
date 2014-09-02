@@ -565,6 +565,8 @@ void normalize_2D(int original[][NDIM], float processed[][NDIM], size_t n, float
 #undef NDIM
 
 void DDLT() {
+	// DLT using SVD
+	// Reference: http://www.maths.lth.se/matematiklth/personal/calle/datorseende13/pres/forelas3.pdf
 	assert((imClick == objClick) && (imClick >= 6)); //必须保证图像与模型对应点数相同且>=6个
 	float *cords3d = new float[imClick * 3];
 	float *cords2d = new float[imClick * 2];
@@ -579,24 +581,31 @@ void DDLT() {
 		printf("%f %f %f %f %f\n", cords3d[i * 3 + 0], cords3d[i * 3 + 1], cords3d[i * 3 + 2], cords2d[i * 2 + 0], cords2d[i * 2 + 1]);
 	}
 
-	float *M = new float[3 * imClick * (9 + imClick)];
+	float *M = new float[3 * imClick * (12 + imClick)];
 	for (int i = 0; i < 3 * imClick; i++) {
-		for (int j = 0; j < 9 + imClick; j++) {
-			M[i * (9 + imClick) + j] = 0;
+		for (int j = 0; j < 12 + imClick; j++) {
+			M[i * (12 + imClick) + j] = 0;
 		}
 	}
 	for (int i = 0; i < imClick; i++) {
-		for (int j = 0; j < 9; j++) {
-			M[(3 * i + j / 3) * (9 + imClick) + j] = cords3d[i * 3 + j % 3];
+		for (int j = 0; j < 12; j++) {
+			if (j % 4 == 3) {
+				// 3D齐次坐标中的最后一维
+				M[(3 * i + j / 4) * (12 + imClick) + j] = 1;
+			} else {
+				// 3D齐次坐标的前三维
+				M[(3 * i + j / 4) * (12 + imClick) + j] = cords3d[i * 3 + j % 4];
+			}
+			
 		}
-		M[(3 * i + 0) * (9 + imClick) + (9 + i)] = -cords2d[i * 2 + 0];
-		M[(3 * i + 1) * (9 + imClick) + (9 + i)] = -cords2d[i * 2 + 1];
-		M[(3 * i + 2) * (9 + imClick) + (9 + i)] = -1;
+		M[(3 * i + 0) * (12 + imClick) + (12 + i)] = -cords2d[i * 2 + 0];
+		M[(3 * i + 1) * (12 + imClick) + (12 + i)] = -cords2d[i * 2 + 1];
+		M[(3 * i + 2) * (12 + imClick) + (12 + i)] = -1;
 	}
 
 	for (int i = 0; i < 3 * imClick; i++) {
-		for (int j = 0; j < 9 + imClick; j++) {
-			if (abs(M[i * (9 + imClick) + j]) < 0.000001) {
+		for (int j = 0; j < 12 + imClick; j++) {
+			if (abs(M[i * (12 + imClick) + j]) < 0.000001) {
 				printf("0");
 			} else {
 				printf("x");
@@ -605,7 +614,27 @@ void DDLT() {
 		printf("\n");
 	}
 
-	cv::Mat A;
+	cv::Mat A(3 * imClick, 12 + imClick, CV_32F);
+	for (int i = 0; i < A.rows; i++) {
+		for (int j = 0; j < A.cols; j++) {
+			A.at<float>(i, j) = M[i * (imClick + 12) + j];
+		}
+	}
+
+	// 执行SVD分解
+	cv::SVD thissvd(A, cv::SVD::FULL_UV);
+	cv::Mat U = thissvd.u;
+	cv::Mat S = thissvd.w;
+	cv::Mat VT = thissvd.vt;
+	cv::Mat v = VT.row(S.rows - 1);
+
+	std::cout << "SV: " << S.t() << std::endl;
+	std::cout << "v: " << v << std::endl;
+	cv::Mat z = A * v.t();
+	std::cout << sqrt(z.dot(z)) << std::endl;
+
+	std::cout << v(cv::Range(0, 1), cv::Range(0, 12)).reshape(0, 3) << std::endl;
+	
 
 	delete M;
 	delete cords2d;
