@@ -614,15 +614,15 @@ void DDLT() {
 		printf("\n");
 	}
 
-	cv::Mat A(3 * imClick, 12 + imClick, CV_32F);
-	for (int i = 0; i < A.rows; i++) {
+	cv::Mat MM(3 * imClick, 12 + imClick, CV_32F);
+	for (int i = 0; i < MM.rows; i++) {
 		for (int j = 0; j < A.cols; j++) {
-			A.at<float>(i, j) = M[i * (imClick + 12) + j];
+			MM.at<float>(i, j) = M[i * (imClick + 12) + j];
 		}
 	}
 
 	// 执行SVD分解
-	cv::SVD thissvd(A, cv::SVD::FULL_UV);
+	cv::SVD thissvd(MM, cv::SVD::FULL_UV);
 	cv::Mat U = thissvd.u;
 	cv::Mat S = thissvd.w;
 	cv::Mat VT = thissvd.vt;
@@ -630,11 +630,12 @@ void DDLT() {
 
 	std::cout << "SV: " << S.t() << std::endl;
 	std::cout << "v: " << v << std::endl;
-	cv::Mat z = A * v.t();
+	cv::Mat z = MM * v.t();
 	std::cout << sqrt(z.dot(z)) << std::endl;
 
-	std::cout << v(cv::Range(0, 1), cv::Range(0, 12)).reshape(0, 3) << std::endl;
 	
+	cv::Mat A = v(cv::Range(0, 1), cv::Range(0, 12)).reshape(0, 3);
+	std::cout << A << std::endl;
 
 	delete M;
 	delete cords2d;
