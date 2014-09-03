@@ -693,6 +693,9 @@ void SVDDLT() {
 	delete cords2d;
 	delete cords3d;
 
+	/*cv::Mat fake = cv::Mat::eye(4, 4, CV_32F);
+	fake.at<float>(1, 1) = -1;
+	Rotate = fake * Rotate;*/
 	for (int i = 0; i < 4; i++) {
 		for (int j = 0; j < 4; j++) {
 			rotation[i * 4 + j] = Rotate.at<float>(i, j);
