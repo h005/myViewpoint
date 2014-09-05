@@ -16,7 +16,7 @@
 #include <fstream>
 #include "glm.h"
 #include "matrix.h"
-#include <opencv2\opencv.hpp>
+#include <opencv2/opencv.hpp>
 using namespace std;
 
 typedef struct _cell {
