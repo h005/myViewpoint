@@ -678,16 +678,27 @@ void SVDDLT() {
 	cv::Mat t1 = A1 - b * R2 - c * R3;
 	float a = cv::norm(t1, cv::NORM_L2);
 	cv::Mat R1 = t1 / a;
-
+    
 	std::cout << R1.dot(R2) << std::endl;
 	std::cout << A3 << f << R3 << std::endl;
 
-	cv::Mat Rotate = cv::Mat::zeros(4, 4, CV_32F);
-	Rotate(cv::Range(0, 1), cv::Range(0, 3)) = R1.t();
-	Rotate(cv::Range(1, 2), cv::Range(0, 3)) = R2.t();
-	Rotate(cv::Range(2, 3), cv::Range(0, 3)) = R3.t();
-	Rotate.at<float>(3, 3) = 1;
-	std::cout << Rotate << std::endl;
+	cv::Mat modelView = cv::Mat::zeros(4, 4, CV_32F);
+	modelView(cv::Range(0, 1), cv::Range(0, 3)) = R1.t();
+	modelView(cv::Range(1, 2), cv::Range(0, 3)) = R2.t();
+	modelView(cv::Range(2, 3), cv::Range(0, 3)) = R3.t();
+	modelView.at<float>(3, 3) = 1;
+    
+    cv::Mat K = cv::Mat::zeros(3, 3, CV_32F);
+    K.at<float>(0, 0) = a;
+    K.at<float>(0, 1) = b;
+    K.at<float>(0, 2) = c;
+    K.at<float>(1, 1) = d;
+    K.at<float>(1, 2) = e;
+    K.at<float>(2, 2) = f;
+    
+    cv::Mat A4 = P(cv::Range(0, 3), cv::Range(3, 4));
+    cv::Mat T = K.inv() * A4;
+    T.copyTo(modelView(cv::Range(0, 3), cv::Range(3, 4)));
 	
 	// 清理空间
 	delete cords2d;
@@ -698,7 +709,7 @@ void SVDDLT() {
 	Rotate = fake * Rotate;*/
 	for (int i = 0; i < 4; i++) {
 		for (int j = 0; j < 4; j++) {
-			rotation[i * 4 + j] = Rotate.at<float>(i, j);
+			rotation[i * 4 + j] = modelView.at<float>(i, j);
 		}
 	}
 }
@@ -1190,15 +1201,17 @@ void
 screen_display(void)
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	
+    
 	flag_rotation = imClick&&objClick;
 	if(flag_rotation&&isRota)
 	{
-		GLdouble x[16] = {-1.0,0,0,0,
-	                                 0,-1.0,0,0,
-	                                 0,0,1.0,0,
-	                                 0,0,0,1.0};
-		glMultMatrixd(x);
+//		GLdouble x[16] = {-1.0,0,0,0,
+//	                                 0,-1.0,0,0,
+//	                                 0,0,1.0,0,
+//	                                 0,0,0,1.0};
+//		glMultMatrixd(x);
+        glMatrixMode(GL_MODELVIEW);
+        glLoadIdentity();
 		DLT();
 		glMultMatrixd(rotation);
 	}
