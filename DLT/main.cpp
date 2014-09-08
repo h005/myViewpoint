@@ -1215,8 +1215,8 @@ screen_display(void)
 		DLT();
 		glMultMatrixd(rotation);
 	}
-	glRotatef(spin_y, 1.0, 0.0, 0.0);
-    glRotatef(spin_x, 0.0, 1.0, 0.0);
+//	glRotatef(spin_y, 1.0, 0.0, 0.0);
+//    glRotatef(spin_x, 0.0, 1.0, 0.0);
 	
 	drawmodel();
 	//画交互的点
