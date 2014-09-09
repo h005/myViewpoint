@@ -642,13 +642,11 @@ void SVDDLT() {
 	NR.at<float>(1, 3) = -param3d[1];
 	NR.at<float>(2, 3) = -param3d[2];
 	NR *= param3d[3];
-	std::cout << NR << std::endl;
 
 	cv::Mat NL = cv::Mat::eye(3, 3, CV_32F);
 	NL.at<float>(0, 2) = -param3d[0];
 	NL.at<float>(1, 2) = -param3d[1];
 	NL *= param2d[2];
-	std::cout << NL << std::endl;
 
 	// λ(NL * x) = P * (NR * X)
 	cv::Mat P = v(cv::Range(0, 1), cv::Range(0, 12)).reshape(0, 3);
@@ -659,7 +657,6 @@ void SVDDLT() {
 
 	// 求解旋转矩阵
 	cv::Mat A = P(cv::Range(0, 3), cv::Range(0, 3));
-	std::cout << A << std::endl;
 	cv::Mat A1 = A.row(0).t();
 	cv::Mat A2 = A.row(1).t();
 	cv::Mat A3 = A.row(2).t();
@@ -678,9 +675,6 @@ void SVDDLT() {
 	cv::Mat t1 = A1 - b * R2 - c * R3;
 	float a = cv::norm(t1, cv::NORM_L2);
 	cv::Mat R1 = t1 / a;
-    
-	std::cout << R1.dot(R2) << std::endl;
-	std::cout << A3 << f << R3 << std::endl;
 
 	cv::Mat modelView = cv::Mat::zeros(4, 4, CV_32F);
 	modelView(cv::Range(0, 1), cv::Range(0, 3)) = R1.t();
@@ -1214,6 +1208,27 @@ screen_display(void)
         glLoadIdentity();
 		DLT();
 		glMultMatrixd(rotation);
+        
+        GLfloat v[16];
+        
+        glGetFloatv(GL_MODELVIEW_MATRIX, v);
+        for (int i = 0; i < 4; i++) {
+            for (int  j = 0; j < 4; j++) {
+                printf("%f ", v[i * 4 + j]);
+            }
+            printf("\n");
+        }
+        printf("\n");
+        
+        glGetFloatv(GL_PROJECTION_MATRIX, v);
+        for (int i = 0; i < 4; i++) {
+            for (int  j = 0; j < 4; j++) {
+                printf("%f ", v[i * 4 + j]);
+            }
+            printf("\n");
+        }
+        printf("\n");
+        
 	}
 //	glRotatef(spin_y, 1.0, 0.0, 0.0);
 //    glRotatef(spin_x, 0.0, 1.0, 0.0);
