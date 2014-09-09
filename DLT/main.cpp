@@ -1208,6 +1208,9 @@ screen_display(void)
         glLoadIdentity();
 		DLT();
 		glMultMatrixd(rotation);
+
+		glMatrixMode(GL_PROJECTION);
+		glLoadIdentity();
         
         GLfloat v[16];
         
