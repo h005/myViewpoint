@@ -629,7 +629,7 @@ void SVDDLT() {
 	std::cout << "SV: " << S.t() << std::endl;
 	std::cout << "v: " << v << std::endl;
 	cv::Mat z = M * v.t();
-	std::cout << sqrt(z.dot(z)) << std::endl;
+	std::cout << "LSR: " << cv::norm(z, cv::NORM_L2) << std::endl;
 
 	// 教程中使用的公式是
 	// λx = PX，但是里面的x和X都是正规化后的，我们需要找到真实的P'
@@ -642,11 +642,13 @@ void SVDDLT() {
 	NR.at<float>(1, 3) = -param3d[1];
 	NR.at<float>(2, 3) = -param3d[2];
 	NR *= param3d[3];
+	NR.at<float>(3, 3) = 1;
 
 	cv::Mat NL = cv::Mat::eye(3, 3, CV_32F);
-	NL.at<float>(0, 2) = -param3d[0];
-	NL.at<float>(1, 2) = -param3d[1];
+	NL.at<float>(0, 2) = -param2d[0];
+	NL.at<float>(1, 2) = -param2d[1];
 	NL *= param2d[2];
+	NL.at<float>(2, 2) = 1;
 
 	// λ(NL * x) = P * (NR * X)
 	cv::Mat P = v(cv::Range(0, 1), cv::Range(0, 12)).reshape(0, 3);
@@ -656,7 +658,7 @@ void SVDDLT() {
 	P = NL.inv() * P * NR;
 
 	// 求解旋转矩阵
-	cv::Mat A = P(cv::Range(0, 3), cv::Range(0, 3));
+	cv::Mat A = P(cv::Range::all(), cv::Range(0, 3));
 	cv::Mat A1 = A.row(0).t();
 	cv::Mat A2 = A.row(1).t();
 	cv::Mat A3 = A.row(2).t();
@@ -690,7 +692,7 @@ void SVDDLT() {
     K.at<float>(1, 2) = e;
     K.at<float>(2, 2) = f;
     
-    cv::Mat A4 = P(cv::Range(0, 3), cv::Range(3, 4));
+    cv::Mat A4 = P(cv::Range::all(), cv::Range(3, 4));
     cv::Mat T = K.inv() * A4;
     T.copyTo(modelView(cv::Range(0, 3), cv::Range(3, 4)));
 	
@@ -698,13 +700,29 @@ void SVDDLT() {
 	delete cords2d;
 	delete cords3d;
 
-	/*cv::Mat fake = cv::Mat::eye(4, 4, CV_32F);
-	fake.at<float>(1, 1) = -1;
-	Rotate = fake * Rotate;*/
+	/*cv::Mat tmp = cv::Mat::eye(4, 4, CV_32F);
+	tmp.at<float>(2, 2) = -1;
+	modelView *= tmp;*/
+	cout << modelView << endl;
 	for (int i = 0; i < 4; i++) {
 		for (int j = 0; j < 4; j++) {
-			rotation[i * 4 + j] = modelView.at<float>(i, j);
+			rotation[j * 4 + i] = modelView.at<float>(i, j);
 		}
+	}
+
+	for (int i = 0; i < imClick; i++) {
+		cv::Mat objHomogeneous = cv::Mat(4, 1, CV_32F);
+		objHomogeneous.at<float>(0, 0) = objCords[i][0];
+		objHomogeneous.at<float>(1, 0) = objCords[i][1];
+		objHomogeneous.at<float>(2, 0) = objCords[i][2];
+		objHomogeneous.at<float>(3, 0) = 1;
+
+		cv::Mat imHomogeneous = cv::Mat(3, 1, CV_32F);
+		imHomogeneous.at<float>(0, 0) = imCords[i][0];
+		imHomogeneous.at<float>(1, 0) = imCords[i][1];
+		imHomogeneous.at<float>(2, 0) = 1;
+
+		cout << K * modelView(cv::Range(0, 3), cv::Range::all()) * objHomogeneous  << imHomogeneous * v.at<float>(0, 12 + i) << endl;
 	}
 }
 
