@@ -710,19 +710,26 @@ void SVDDLT() {
 		}
 	}
 
-	for (int i = 0; i < imClick; i++) {
-		cv::Mat objHomogeneous = cv::Mat(4, 1, CV_32F);
-		objHomogeneous.at<float>(0, 0) = objCords[i][0];
-		objHomogeneous.at<float>(1, 0) = objCords[i][1];
-		objHomogeneous.at<float>(2, 0) = objCords[i][2];
-		objHomogeneous.at<float>(3, 0) = 1;
+	if (true) {
+		printf("Apply transforamtion to objCords:\n");
+		for (int i = 0; i < imClick; i++) {
+			cv::Mat objHomogeneous = cv::Mat(4, 1, CV_32F);
+			objHomogeneous.at<float>(0, 0) = objCords[i][0];
+			objHomogeneous.at<float>(1, 0) = objCords[i][1];
+			objHomogeneous.at<float>(2, 0) = objCords[i][2];
+			objHomogeneous.at<float>(3, 0) = 1;
 
-		cv::Mat imHomogeneous = cv::Mat(3, 1, CV_32F);
-		imHomogeneous.at<float>(0, 0) = imCords[i][0];
-		imHomogeneous.at<float>(1, 0) = imCords[i][1];
-		imHomogeneous.at<float>(2, 0) = 1;
+			cv::Mat imHomogeneous = cv::Mat(3, 1, CV_32F);
+			imHomogeneous.at<float>(0, 0) = imCords[i][0];
+			imHomogeneous.at<float>(1, 0) = imCords[i][1];
+			imHomogeneous.at<float>(2, 0) = 1;
 
-		cout << K * modelView(cv::Range(0, 3), cv::Range::all()) * objHomogeneous  << imHomogeneous * v.at<float>(0, 12 + i) << endl;
+			cv::Mat a = K * modelView(cv::Range(0, 3), cv::Range::all()) * objHomogeneous;
+			cv::Mat b = imHomogeneous * v.at<float>(0, 12 + i);
+			cv::Mat c;
+			cv::hconcat(a, b, c);
+			cout << c << endl;
+		}
 	}
 }
 
