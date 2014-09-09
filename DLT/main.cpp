@@ -600,19 +600,6 @@ void SVDDLT() {
 		M.at<float>(3 * i + 2, 12 + i) = -1;
 	}
 
-	for (int i = 0; i < 3 * imClick; i++) {
-		for (int j = 0; j < 12 + imClick; j++) {
-			if (abs(M.at<float>(i, j)) < 0.000001) {
-				printf("0");
-			} else {
-				printf("x");
-			}
-		}
-		printf("\n");
-	}
-
-	
-
 	// 执行SVD分解
 	cv::SVD thissvd(M, cv::SVD::FULL_UV);
 	cv::Mat U = thissvd.u;
@@ -695,22 +682,8 @@ void SVDDLT() {
     cv::Mat A4 = P(cv::Range::all(), cv::Range(3, 4));
     cv::Mat T = K.inv() * A4;
     T.copyTo(modelView(cv::Range(0, 3), cv::Range(3, 4)));
-	
-	// 清理空间
-	delete cords2d;
-	delete cords3d;
 
-	/*cv::Mat tmp = cv::Mat::eye(4, 4, CV_32F);
-	tmp.at<float>(2, 2) = -1;
-	modelView *= tmp;*/
-	cout << modelView << endl;
-	for (int i = 0; i < 4; i++) {
-		for (int j = 0; j < 4; j++) {
-			rotation[j * 4 + i] = modelView.at<float>(i, j);
-		}
-	}
-
-	if (true) {
+	if (false) {
 		printf("Apply transforamtion to objCords:\n");
 		for (int i = 0; i < imClick; i++) {
 			cv::Mat objHomogeneous = cv::Mat(4, 1, CV_32F);
@@ -729,6 +702,20 @@ void SVDDLT() {
 			cv::Mat c;
 			cv::hconcat(a, b, c);
 			cout << c << endl;
+		}
+	}
+	
+	// 清理空间
+	delete cords2d;
+	delete cords3d;
+
+	/*cv::Mat tmp = cv::Mat::eye(4, 4, CV_32F);
+	tmp.at<float>(2, 2) = -1;
+	modelView *= tmp;*/
+	cout << "modelView: " << endl << modelView << endl;
+	for (int i = 0; i < 4; i++) {
+		for (int j = 0; j < 4; j++) {
+			rotation[j * 4 + i] = modelView.at<float>(i, j);
 		}
 	}
 }
@@ -1216,6 +1203,19 @@ screen_reshape(int width, int height)
     glEnable(GL_LIGHT0);
 }
 
+void printFloatv(int mode, char *title) {
+	GLfloat v[16];
+	printf("%s\n", title);
+	glGetFloatv(mode, v);
+	for (int i = 0; i < 4; i++) {
+		for (int j = 0; j < 4; j++) {
+			printf("%f ", v[j * 4 + i]);
+		}
+		printf("\n");
+	}
+	printf("\n");
+}
+
 void
 screen_display(void)
 {
@@ -1235,32 +1235,14 @@ screen_display(void)
 		glMultMatrixd(rotation);
 
 		glMatrixMode(GL_PROJECTION);
-		glLoadIdentity();
-        
-        GLfloat v[16];
-        
-        glGetFloatv(GL_MODELVIEW_MATRIX, v);
-        for (int i = 0; i < 4; i++) {
-            for (int  j = 0; j < 4; j++) {
-                printf("%f ", v[i * 4 + j]);
-            }
-            printf("\n");
-        }
-        printf("\n");
-        
-        glGetFloatv(GL_PROJECTION_MATRIX, v);
-        for (int i = 0; i < 4; i++) {
-            for (int  j = 0; j < 4; j++) {
-                printf("%f ", v[i * 4 + j]);
-            }
-            printf("\n");
-        }
-        printf("\n");
-        
+		glLoadIdentity(); 
 	}
 //	glRotatef(spin_y, 1.0, 0.0, 0.0);
 //    glRotatef(spin_x, 0.0, 1.0, 0.0);
-	
+
+	printFloatv(GL_MODELVIEW_MATRIX, "GL_MODELVIEW_MATRIX");
+	printFloatv(GL_PROJECTION_MATRIX, "GL_PROJECTION_MATRIX");
+
 	drawmodel();
 	//画交互的点
 	if(objClick)
