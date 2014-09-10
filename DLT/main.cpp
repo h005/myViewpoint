@@ -709,103 +709,29 @@ void SVDDLT() {
 	delete cords2d;
 	delete cords3d;
 
-	/*cv::Mat tmp = cv::Mat::eye(4, 4, CV_32F);
-	tmp.at<float>(2, 2) = -1;
-	modelView *= tmp;*/
-	cout << "modelView: " << endl << modelView << endl;
-	for (int i = 0; i < 4; i++) {
-		for (int j = 0; j < 4; j++) {
-			rotation[j * 4 + i] = modelView.at<float>(i, j);
-		}
-	}
-}
+	// 在相机坐标系下选择相机点和其方向上的一个点
+	// PA = (0, 0, 0), PB = (0, 0, 1)
+	cv::Mat PA = cv::Mat::zeros(4, 1, CV_32F);
+	PA.at<float>(3, 0) = 1;
+	cv::Mat PB = cv::Mat::zeros(4, 1, CV_32F);
+	PB.at<float>(2, 0) = 1;
+	PB.at<float>(3, 0) = 1;
+	// 相机坐标系下，相机头部的方向（向量）
+	cv::Mat UpDir = cv::Mat::zeros(4, 1, CV_32F);
+	UpDir.at<float>(1, 0) = 1;
 
-void DLT()
-{	
-	SVDDLT();
-	return;
-	assert((imClick == objClick)&&(imClick >= 6)); //必须保证图像与模型对应点数相同且>=6个
-	double a1[12] = {0}, a2[12] = {0};
-	double* A = new double[2*imClick*12];  
-	double* B = new double[2*imClick];
-	double* C = new double[2*imClick*11];  
-	double* CT = new double[11*2*imClick];        //C的转置
-	double CTC[11*11] = {0};
-	double CTB[11*1] = {0};
-	double L[12] = {0};
-	a1[3] = 1;a2[7] = 1;L[11] = 1.0; //必须的初始化
-	for(int i = 0; i < imClick; i++)
-	{
-		a1[0] = objCords[i][0]; a2[4] = objCords[i][0]; 
-		a1[1] = objCords[i][1]; a2[5] = objCords[i][1];
-		a1[2] = objCords[i][2]; a2[6] = objCords[i][2];
-		
-		a1[8]   = -1*objCords[i][0] * imCords[i][0]; a2[8]   = -1*objCords[i][0] * imCords[i][1];
-		a1[9]   = -1*objCords[i][1] * imCords[i][0]; a2[9]   = -1*objCords[i][1] * imCords[i][1];
-		a1[10] = -1*objCords[i][2] * imCords[i][0]; a2[10] = -1*objCords[i][2] * imCords[i][1];
-		a1[11] = -1*imCords[i][0];                           a2[11] = -1*imCords[i][1];
+	// 求取它们在世界坐标系下的表示
+	PA = modelView.inv() * PA;
+	PB = modelView.inv() * PB;
+	UpDir = modelView.inv() * UpDir;
+	PA /= PA.at<float>(3, 0);
+	PB /= PB.at<float>(3, 0);
 
-		memcpy((A+(2*i)*12),a1,12*sizeof(double));
-		memcpy((A+(2*i+1)*12),a2,12*sizeof(double));
-
-		memcpy(C+(2*i)*11,a1,11*sizeof(double));
-		memcpy(C+(2*i+1)*11,a2,11*sizeof(double));
-		B[2*i] = a1[11];
-		B[2*i+1] = a2[11];
-	}
-	//l = -1 * (CT*C)^-1 * CT * B;
-	TranMatrix(C,CT,2*imClick,11);
-	MultMatrix(CT,C,CTC,11,2*imClick,11);
-	MultMatrix(CT,B,CTB,11,2*imClick,1);
-	InverMatrix(CTC,11);
-	MultMatrix(CTC,CTB,L,11,11,1);
-	delete[] A;
-	delete[] B;
-	delete[] C;
-	delete[] CT;
-
-	double x = 0, u0 = 0, v0 = 0, ax = 0, ay = 0;
-	double C1[3] = {0}, C2[3] = {0}; 
-	double rota[16] = {0};
-	rota[15] = 1.0;
-    
-    /*
-    double homography[] = {
-        4.40109366e-01, 3.92442352e-02, -3.84876052e+01,
-        -7.10370840e-01, 5.32673161e-01, 3.85453016e+02,
-        -1.13286420e-03, 1.93790472e-04, 1.00000000e+00
-    };
-     */
-    // lugger
-
-    /*double homography[] = {
-        3.05626111e-01, 1.82391908e-02, 8.89773139e+00,
-        -6.54682280e-01, 4.71682550e-01, 3.27711491e+02,
-        -1.22366240e-03, 1.41183965e-04, 1.00000000e+00
-    };
-    double LTmp[12];
-    memcpy(LTmp, L, sizeof(L));
-    MultMatrix(homography, LTmp, L, 3, 3, 4);*/
-    
-	x = 1/sqrt(dot(L+8,L+8,3));
-	u0 = x*x*dot(L,L+8,3);
-	v0 = x*x*dot(L+4,L+8,3);
-	cross(L,L+8,C1);
-	cross(L+4,L+8,C2);
-	ax = x*x*sqrt(dot(C1,C1,3));
-	ay = x*x*sqrt(dot(C2,C2,3));
-
-	SubMatrix(L,L+8,rota,u0,ax/x,1,3);
-	SubMatrix(L+4,L+8,rota+4,v0,ay/x,1,3);
-	SubMatrix(L+8,L+8,rota+8,0,1/x,1,3);
-
-	TranMatrix(rota,rotation,4,4);
-	for (int i = 0; i < 4; i++) {
-		for (int j = 0; j < 4; j++) {
-			printf("%f ", rotation[i * 4 + j]);
-		}
-		printf("\n");
-	}
+	// 在物体坐标系（世界坐标系）中摆放照相机和它的朝向
+	gluLookAt(
+		PA.at<float>(0, 0), PA.at<float>(1, 0), PA.at<float>(2, 0),
+		PB.at<float>(0, 0), PB.at<float>(1, 0), PB.at<float>(2, 0),
+		UpDir.at<float>(0, 0), UpDir.at<float>(1, 0), UpDir.at<float>(2, 0));
 }
 
 void
@@ -1224,21 +1150,10 @@ screen_display(void)
 	flag_rotation = imClick&&objClick;
 	if(flag_rotation&&isRota)
 	{
-//		GLdouble x[16] = {-1.0,0,0,0,
-//	                                 0,-1.0,0,0,
-//	                                 0,0,1.0,0,
-//	                                 0,0,0,1.0};
-//		glMultMatrixd(x);
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
-		DLT();
-		glMultMatrixd(rotation);
-
-		glMatrixMode(GL_PROJECTION);
-		glLoadIdentity(); 
+		SVDDLT();
 	}
-//	glRotatef(spin_y, 1.0, 0.0, 0.0);
-//    glRotatef(spin_x, 0.0, 1.0, 0.0);
 
 	printFloatv(GL_MODELVIEW_MATRIX, "GL_MODELVIEW_MATRIX");
 	printFloatv(GL_PROJECTION_MATRIX, "GL_PROJECTION_MATRIX");
