@@ -1,4 +1,18 @@
-#include <GL/glut.h>
+﻿#include <GL/glut.h>
+#include <stdio.h>
+
+void printFloatv(int mode, char *title) {
+	GLfloat v[16];
+	printf("%s\n", title);
+	glGetFloatv(mode, v);
+	for (int i = 0; i < 4; i++) {
+		for (int j = 0; j < 4; j++) {
+			printf("%f ", v[j * 4 + i]);
+		}
+		printf("\n");
+	}
+	printf("\n");
+}
 
 void init(void)
 {
@@ -12,8 +26,12 @@ void display(void)
 	glColor3f(1.0, 1.0, 1.0);
 	glLoadIdentity();             /* clear the matrix */
 	/* viewing transformation  */
-	gluLookAt(0.0, 0.0, 5.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+	gluLookAt(0.0, 0.0, 10.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+	// 等价于
+	//glTranslatef(0, 0, -5);
+	printFloatv(GL_MODELVIEW_MATRIX, "GL_MODELVIEW_MATRIX");
 	glScalef(1.0, 2.0, 1.0);      /* modeling transformation */
+	printFloatv(GL_MODELVIEW_MATRIX, "GL_MODELVIEW_MATRIX");
 	glutWireCube(1.0);
 	glFlush();
 }
