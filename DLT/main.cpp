@@ -187,6 +187,7 @@ bool flag_rotation = false;       //是否使用旋转矩阵
 bool isRota = false;
 //
 GLvoid *font_style = GLUT_BITMAP_TIMES_ROMAN_10;
+void printFloatv(int mode, char *title);
 
 void
 setfont(char* name, int size)
@@ -727,11 +728,24 @@ void SVDDLT() {
 	PA /= PA.at<float>(3, 0);
 	PB /= PB.at<float>(3, 0);
 
+
+	K /= K.at<float>(2, 2);
+	glMatrixMode(GL_PROJECTION);
+	gluPerspective(60, 1, 0.001, 10);
+	printFloatv(GL_PROJECTION_MATRIX, "GP");
+	cout << K << endl;
+
 	// 在物体坐标系（世界坐标系）中摆放照相机和它的朝向
+	glMatrixMode(GL_MODELVIEW);
 	gluLookAt(
 		PA.at<float>(0, 0), PA.at<float>(1, 0), PA.at<float>(2, 0),
 		PB.at<float>(0, 0), PB.at<float>(1, 0), PB.at<float>(2, 0),
 		UpDir.at<float>(0, 0), UpDir.at<float>(1, 0), UpDir.at<float>(2, 0));
+
+	printFloatv(GL_MODELVIEW_MATRIX, "MM");
+	cout << modelView << endl;
+
+	
 }
 
 void
@@ -1152,6 +1166,8 @@ screen_display(void)
 	{
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
+		glMatrixMode(GL_PROJECTION);
+		glLoadIdentity();
 		SVDDLT();
 	}
 
