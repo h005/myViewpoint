@@ -141,9 +141,11 @@ GLenum env = GL_MODULATE;
 GLenum wraps = GL_REPEAT;
 GLenum wrapt = GL_REPEAT;
 
+void redisplay_command();
 void redisplay_screen();
 void redisplay_world();
 void redisplay_all(void);
+
 GLdouble projection[16], modelview[16], inverse[16];
 GLuint window, world, screen, command;
 GLuint Width = 1000,Height = 1000;
@@ -157,7 +159,6 @@ int objClick = 0;
 ofstream outImfile("im.txt");   //存图像坐标
 ofstream outObjfile("obj.txt");//存模型坐标
 char str[80];
-bool flag_rotation = false;       //是否使用旋转矩阵
 //
 GLvoid *font_style = GLUT_BITMAP_TIMES_ROMAN_10;
 
@@ -323,19 +324,6 @@ invert(GLdouble src[16], GLdouble inverse[16])
         }
     }
     return GL_TRUE;
-}
-
-float
-normalize(float* v)
-{
-    float length;
-    
-    length = sqrt(v[0]*v[0] + v[1]*v[1] + v[2]*v[2]);
-    v[0] /= length;
-    v[1] /= length;
-    v[2] /= length;
-    
-    return length;
 }
 
 void
@@ -1129,7 +1117,10 @@ command_motion(int x, int y)
     cell_update(&lookat[8], old_y-y);
     
     old_y = y;
-    redisplay_all();
+    
+	// 不要用redisplay_all()，会降低滑动性能
+	redisplay_screen();
+	redisplay_command();
 }
 
 void
@@ -1151,12 +1142,15 @@ void redisplay_screen() {
 	glutPostRedisplay();
 }
 
+void redisplay_command() {
+	glutSetWindow(command);
+	glutPostRedisplay();
+}
+
 void
 redisplay_all(void)
 {
-    glutSetWindow(command);
-    glutPostRedisplay();
-
+	redisplay_command();
 	redisplay_screen();
 	redisplay_world();
 }
