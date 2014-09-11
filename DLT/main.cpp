@@ -146,7 +146,6 @@ void redisplay_screen();
 void redisplay_world();
 void redisplay_all(void);
 
-GLdouble projection[16], modelview[16], inverse[16];
 GLuint window, world, screen, command;
 GLuint Width = 1000,Height = 1000;
 GLuint sub_width = Width/2, sub_height = Height/2;
@@ -253,77 +252,6 @@ drawmodel(void)
     }
     
     glmDraw(pmodel, GLM_SMOOTH | GLM_MATERIAL);
-}
-
-void
-iidentity(GLdouble m[16])
-{
-    m[0+4*0] = 1; m[0+4*1] = 0; m[0+4*2] = 0; m[0+4*3] = 0;
-    m[1+4*0] = 0; m[1+4*1] = 1; m[1+4*2] = 0; m[1+4*3] = 0;
-    m[2+4*0] = 0; m[2+4*1] = 0; m[2+4*2] = 1; m[2+4*3] = 0;
-    m[3+4*0] = 0; m[3+4*1] = 0; m[3+4*2] = 0; m[3+4*3] = 1;
-}
-
-GLboolean
-invert(GLdouble src[16], GLdouble inverse[16])
-{
-    double t;
-    int i, j, k, swap;
-    GLdouble tmp[4][4];
-    
-    iidentity(inverse);
-    
-    for (i = 0; i < 4; i++) {
-        for (j = 0; j < 4; j++) {
-            tmp[i][j] = src[i*4+j];
-        }
-    }
-    
-    for (i = 0; i < 4; i++) {
-        /* look for largest element in column. */
-        swap = i;
-        for (j = i + 1; j < 4; j++) {
-            if (fabs(tmp[j][i]) > fabs(tmp[i][i])) {
-                swap = j;
-            }
-        }
-        
-        if (swap != i) {
-            /* swap rows. */
-            for (k = 0; k < 4; k++) {
-                t = tmp[i][k];
-                tmp[i][k] = tmp[swap][k];
-                tmp[swap][k] = t;
-                
-                t = inverse[i*4+k];
-                inverse[i*4+k] = inverse[swap*4+k];
-                inverse[swap*4+k] = t;
-            }
-        }
-        
-        if (tmp[i][i] == 0) {
-        /* no non-zero pivot.  the matrix is singular, which
-           shouldn't happen.  This means the user gave us a bad
-            matrix. */
-            return GL_FALSE;
-        }
-        
-        t = tmp[i][i];
-        for (k = 0; k < 4; k++) {
-            tmp[i][k] /= t;
-            inverse[i*4+k] /= t;
-        }
-        for (j = 0; j < 4; j++) {
-            if (j != i) {
-                t = tmp[j][i];
-                for (k = 0; k < 4; k++) {
-                    tmp[j][k] -= tmp[i][k]*t;
-                    inverse[j*4+k] -= inverse[i*4+k]*t;
-                }
-            }
-        }
-    }
-    return GL_TRUE;
 }
 
 void
@@ -815,14 +743,12 @@ screen_reshape(int width, int height)
     glLoadIdentity();
 	gluPerspective(perspective[0].value, perspective[1].value,
 		perspective[2].value, perspective[3].value);
-    glGetDoublev(GL_PROJECTION_MATRIX, projection);
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     gluLookAt(lookat[0].value, lookat[1].value, lookat[2].value,
         lookat[3].value, lookat[4].value, lookat[5].value,
         lookat[6].value, lookat[7].value, lookat[8].value);
-    glGetDoublev(GL_MODELVIEW_MATRIX, modelview);
 
     glClearColor(0.2, 0.2, 0.2, 0.0);
     glEnable(GL_DEPTH_TEST);
