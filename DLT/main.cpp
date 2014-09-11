@@ -185,7 +185,6 @@ int objClick = 0;
 ofstream outImfile("im.txt");   //存图像坐标
 ofstream outObjfile("obj.txt");//存模型坐标
 char str[80];
-GLdouble rotation[16];            //旋转矩阵
 bool flag_rotation = false;       //是否使用旋转矩阵
 bool isRota = false;
 //
@@ -283,50 +282,6 @@ drawmodel(void)
     }
     
     glmDraw(pmodel, GLM_SMOOTH | GLM_MATERIAL);
-}
-
-void
-drawaxes(void)
-{
-    glColor3ub(255, 0, 0);
-    glBegin(GL_LINE_STRIP);
-    glVertex3f(0.0, 0.0, 0.0);
-    glVertex3f(1.0, 0.0, 0.0);
-    glVertex3f(0.75, 0.25, 0.0);
-    glVertex3f(0.75, -0.25, 0.0);
-    glVertex3f(1.0, 0.0, 0.0);
-    glVertex3f(0.75, 0.0, 0.25);
-    glVertex3f(0.75, 0.0, -0.25);
-    glVertex3f(1.0, 0.0, 0.0);
-    glEnd();
-    glBegin(GL_LINE_STRIP);
-    glVertex3f(0.0, 0.0, 0.0);
-    glVertex3f(0.0, 1.0, 0.0);
-    glVertex3f(0.0, 0.75, 0.25);
-    glVertex3f(0.0, 0.75, -0.25);
-    glVertex3f(0.0, 1.0, 0.0);
-    glVertex3f(0.25, 0.75, 0.0);
-    glVertex3f(-0.25, 0.75, 0.0);
-    glVertex3f(0.0, 1.0, 0.0);
-    glEnd();
-    glBegin(GL_LINE_STRIP);
-    glVertex3f(0.0, 0.0, 0.0);
-    glVertex3f(0.0, 0.0, 1.0);
-    glVertex3f(0.25, 0.0, 0.75);
-    glVertex3f(-0.25, 0.0, 0.75);
-    glVertex3f(0.0, 0.0, 1.0);
-    glVertex3f(0.0, 0.25, 0.75);
-    glVertex3f(0.0, -0.25, 0.75);
-    glVertex3f(0.0, 0.0, 1.0);
-    glEnd();
-    
-    glColor3ub(255, 255, 0);
-    glRasterPos3f(1.1, 0.0, 0.0);
-    glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, 'x');
-    glRasterPos3f(0.0, 1.1, 0.0);
-    glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, 'y');
-    glRasterPos3f(0.0, 0.0, 1.1);
-    glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, 'z');
 }
 
 void
@@ -787,93 +742,6 @@ int oldx, oldy;
 void
 world_display(void)
 {
-    //GLfloat light_pos[] = { 0.0, 0.0, 1.0, 0.0 };
-    //double length;
-    //float l[3];
-    //
-    //l[0] = lookat[3].value - lookat[0].value; 
-    //l[1] = lookat[4].value - lookat[1].value; 
-    //l[2] = lookat[5].value - lookat[2].value;
-    //length = normalize(l);
-    //
-    //invert(modelview, inverse);
-    //
-    //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    //
-    //if (world_draw) {
-    //    glEnable(GL_LIGHTING);
-    //    glPushMatrix();
-    //    glMultMatrixd(inverse);
-    //    glLightfv(GL_LIGHT0, GL_POSITION, light_pos);
-    //    glPopMatrix();
-    //    drawmodel();
-    //    glDisable(GL_LIGHTING);
-    //}
-    //
-    //glPushMatrix();
-    //
-    //glMultMatrixd(inverse);
-    //
-    //glLightfv(GL_LIGHT0, GL_POSITION, light_pos);
-    //
-    ///* draw the axis and eye vector */
-    //glPushMatrix();
-    //glColor3ub(0, 0, 255);
-    //glBegin(GL_LINE_STRIP);
-    //glVertex3f(0.0, 0.0, 0.0);
-    //glVertex3f(0.0, 0.0, -1.0*length);
-    //glVertex3f(0.1, 0.0, -0.9*length);
-    //glVertex3f(-0.1, 0.0, -0.9*length);
-    //glVertex3f(0.0, 0.0, -1.0*length);
-    //glVertex3f(0.0, 0.1, -0.9*length);
-    //glVertex3f(0.0, -0.1, -0.9*length);
-    //glVertex3f(0.0, 0.0, -1.0*length);
-    //glEnd();
-    //glColor3ub(255, 255, 0);
-    //glRasterPos3f(0.0, 0.0, -1.1*length);
-    //glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, 'e');
-    //glColor3ub(255, 0, 0);
-    //glScalef(0.4, 0.4, 0.4);
-    //drawaxes();
-    //glPopMatrix();
-    //
-    //invert(projection, inverse);
-    //glMultMatrixd(inverse);
-    //
-    ///* draw the viewing frustum */
-    //glColor3f(0.2, 0.2, 0.2);
-    //glBegin(GL_QUADS);
-    //glVertex3i(1, 1, 1);
-    //glVertex3i(-1, 1, 1);
-    //glVertex3i(-1, -1, 1);
-    //glVertex3i(1, -1, 1);
-    //glEnd();
-    //
-    //glColor3ub(128, 196, 128);
-    //glBegin(GL_LINES);
-    //glVertex3i(1, 1, -1);
-    //glVertex3i(1, 1, 1);
-    //glVertex3i(-1, 1, -1);
-    //glVertex3i(-1, 1, 1);
-    //glVertex3i(-1, -1, -1);
-    //glVertex3i(-1, -1, 1);
-    //glVertex3i(1, -1, -1);
-    //glVertex3i(1, -1, 1);
-    //glEnd();
-    //
-    //glEnable(GL_BLEND);
-    //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    //glColor4f(0.2, 0.2, 0.4, 0.5);
-    //glBegin(GL_QUADS);
-    //glVertex3i(1, 1, -1);
-    //glVertex3i(-1, 1, -1);
-    //glVertex3i(-1, -1, -1);
-    //glVertex3i(1, -1, -1);
-    //glEnd();
-    //glDisable(GL_BLEND);
-    //
-    //glPopMatrix();
-    //glutSwapBuffers();
 	texture();
 	glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
@@ -940,13 +808,7 @@ world_display(void)
 void
 world_menu(int value)
 {
-    /*switch (value) {
-    case 'm':
-        world_draw = !world_draw;
-        break;
-    }
-    redisplay_all();*/
-	    char* name = 0;
+	char* name = 0;
     char* txt_name = 0;
 	isRota = value <= 0; //更新isRota
     switch (value) {
