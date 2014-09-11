@@ -141,6 +141,8 @@ GLenum env = GL_MODULATE;
 GLenum wraps = GL_REPEAT;
 GLenum wrapt = GL_REPEAT;
 
+void redisplay_screen();
+void redisplay_world();
 void redisplay_all(void);
 GLdouble projection[16], modelview[16], inverse[16];
 GLuint window, world, screen, command;
@@ -159,7 +161,6 @@ bool flag_rotation = false;       //是否使用旋转矩阵
 bool isRota = false;
 //
 GLvoid *font_style = GLUT_BITMAP_TIMES_ROMAN_10;
-void printFloatv(int mode, char *title);
 
 void
 setfont(char* name, int size)
@@ -565,14 +566,19 @@ void SVDDLT() {
 	PB /= PB.at<float>(3, 0);
 
 	// 在物体坐标系（世界坐标系）中摆放照相机和它的朝向
-	glMatrixMode(GL_MODELVIEW);
-	gluLookAt(
-		PA.at<float>(0, 0), PA.at<float>(1, 0), PA.at<float>(2, 0),
-		PB.at<float>(0, 0), PB.at<float>(1, 0), PB.at<float>(2, 0),
-		UpDir.at<float>(0, 0), UpDir.at<float>(1, 0), UpDir.at<float>(2, 0));
-
-	printFloatv(GL_MODELVIEW_MATRIX, "MM");
-	cout << "modelView" << endl << modelView << endl;
+	for (int i = 0; i < 9; i++) {
+		switch (i / 3) {
+		case 0:
+			lookat[i].value = PA.at<float>(i % 3, 0);
+			break;
+		case 1:
+			lookat[i].value = PB.at<float>(i % 3, 0);
+			break;
+		case 2:
+			lookat[i].value = UpDir.at<float>(i % 3, 0);
+			break;
+		}
+	}
 }
 
 void
@@ -618,20 +624,29 @@ main_keyboard(unsigned char key, int x, int y)
 {
     switch (key) {
 	case 'c':
-        isRota = true;
+		SVDDLT();
         break;
     case 'r':
 		isRota = false;
         perspective[0].value = 60.0;
         perspective[1].value = 1.0;
-        perspective[2].value = 1.0;
+        perspective[2].value = 0.1;
         perspective[3].value = 10.0;
+		lookat[0].value = 0.0;
+		lookat[1].value = 0.0;
+		lookat[2].value = 2.0;
+		lookat[3].value = 0.0;
+		lookat[4].value = 0.0;
+		lookat[5].value = 0.0;
+		lookat[6].value = 0.0;
+		lookat[7].value = 1.0;
+		lookat[8].value = 0.0;
         break;
     case 27:
         exit(0);
     }
-    
-    redisplay_all();
+
+	redisplay_all();
 }
 
 void
@@ -834,14 +849,6 @@ void
 screen_display(void)
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    
-	flag_rotation = imClick&&objClick;
-	if(flag_rotation&&isRota)
-	{
-        glMatrixMode(GL_MODELVIEW);
-        glLoadIdentity();
-		SVDDLT();
-	}
 
 	printFloatv(GL_MODELVIEW_MATRIX, "GL_MODELVIEW_MATRIX");
 	printFloatv(GL_PROJECTION_MATRIX, "GL_PROJECTION_MATRIX");
@@ -1147,16 +1154,26 @@ command_menu(int value)
 }
 
 void
+redisplay_world() {
+	glutSetWindow(world);
+	world_reshape(sub_width, sub_height);
+	glutPostRedisplay();
+}
+
+void redisplay_screen() {
+	glutSetWindow(screen);
+	screen_reshape(sub_width, sub_height);
+	glutPostRedisplay();
+}
+
+void
 redisplay_all(void)
 {
     glutSetWindow(command);
     glutPostRedisplay();
-    glutSetWindow(world);
-    world_reshape(sub_width, sub_height);
-    glutPostRedisplay();
-    glutSetWindow(screen);
-    screen_reshape(sub_width, sub_height);
-    glutPostRedisplay();
+
+	redisplay_screen();
+	redisplay_world();
 }
 
 int
@@ -1222,7 +1239,7 @@ main(int argc, char** argv)
     glutAddMenuEntry("Projection", 0);
     glutAddMenuEntry("[r]  Reset parameters", 'r');
     glutAddMenuEntry("", 0);
-	glutAddMenuEntry("[c]  rotation", 'c');
+	glutAddMenuEntry("[c]  Update Lookat() using DLT", 'c');
 	glutAddMenuEntry("", 0);
     glutAddMenuEntry("Quit", 27);
     glutAttachMenu(GLUT_RIGHT_BUTTON);
