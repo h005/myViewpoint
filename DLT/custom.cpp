@@ -1,8 +1,22 @@
 ﻿#include <iostream>
 #include <math.h>
+#include <gl/glut.h>
 #include "custom.h"
 
 using namespace std;
+
+void printFloatv(int mode, char *title) {
+	GLfloat v[16];
+	printf("%s\n", title);
+	glGetFloatv(mode, v);
+	for (int i = 0; i < 4; i++) {
+		for (int j = 0; j < 4; j++) {
+			printf("%f ", v[j * 4 + i]);
+		}
+		printf("\n");
+	}
+	printf("\n");
+}
 
 #define NDIM 3
 void normalize_3D(float original[][NDIM], float processed[][NDIM], size_t n, float param[NDIM + 1]) {

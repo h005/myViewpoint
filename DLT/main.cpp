@@ -594,13 +594,6 @@ void SVDDLT() {
 	PA /= PA.at<float>(3, 0);
 	PB /= PB.at<float>(3, 0);
 
-
-	K /= K.at<float>(2, 2);
-	glMatrixMode(GL_PROJECTION);
-	gluPerspective(60, 1, 0.001, 10);
-	printFloatv(GL_PROJECTION_MATRIX, "GP");
-	cout << K << endl;
-
 	// 在物体坐标系（世界坐标系）中摆放照相机和它的朝向
 	glMatrixMode(GL_MODELVIEW);
 	gluLookAt(
@@ -609,7 +602,7 @@ void SVDDLT() {
 		UpDir.at<float>(0, 0), UpDir.at<float>(1, 0), UpDir.at<float>(2, 0));
 
 	printFloatv(GL_MODELVIEW_MATRIX, "MM");
-	cout << modelView << endl;
+	cout << "modelView" << endl << modelView << endl;
 
 	
 }
@@ -706,17 +699,6 @@ main_keyboard(unsigned char key, int x, int y)
 void
 world_reshape(int width, int height)
 {
-    /*glViewport(0, 0, width, height);
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    gluPerspective(60.0, (GLfloat)width/height, 1.0, 256.0);
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-    glTranslatef(0.0, 0.0, -5.0);
-    glRotatef(-45.0, 0.0, 1.0, 0.0);
-    glClearColor(0.0, 0.0, 0.0, 0.0);
-    glEnable(GL_DEPTH_TEST);
-    glEnable(GL_LIGHT0);*/
 	twidth = width;
     theight = height;
     
@@ -856,11 +838,7 @@ world_menu(int value)
         if (!image)
             image = glmReadPPM("data/opengl.ppm", &iwidth, &iheight);
     }
-    
 
-    //glutSetWindow(world);
-    //texture();
-    
     redisplay_all();
 }
 
@@ -919,19 +897,6 @@ screen_reshape(int width, int height)
     glEnable(GL_LIGHT0);
 }
 
-void printFloatv(int mode, char *title) {
-	GLfloat v[16];
-	printf("%s\n", title);
-	glGetFloatv(mode, v);
-	for (int i = 0; i < 4; i++) {
-		for (int j = 0; j < 4; j++) {
-			printf("%f ", v[j * 4 + i]);
-		}
-		printf("\n");
-	}
-	printf("\n");
-}
-
 void
 screen_display(void)
 {
@@ -942,8 +907,6 @@ screen_display(void)
 	{
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
-		glMatrixMode(GL_PROJECTION);
-		glLoadIdentity();
 		SVDDLT();
 	}
 
@@ -1143,44 +1106,16 @@ command_display(void)
     
     setfont("helvetica", 18);
     
-    if (mode == PERSPECTIVE) {
-        drawstr(180, perspective[0].y-40, "fovy"); 
-        drawstr(230, perspective[0].y-40, "aspect"); 
-        drawstr(300, perspective[0].y-40, "zNear"); 
-        drawstr(360, perspective[0].y-40, "zFar");
-    } else {
-        drawstr(120, perspective[0].y-40, "left"); 
-        drawstr(180, perspective[0].y-40, "right"); 
-        drawstr(230, perspective[0].y-40, "bottom");
-        drawstr(310, perspective[0].y-40, "top"); 
-        drawstr(360, perspective[0].y-40, "near");
-        drawstr(420, perspective[0].y-40, "far");
-    }
-    
-    if (mode == PERSPECTIVE) {
-        drawstr(40, perspective[0].y, "gluPerspective(");
-        drawstr(230, perspective[0].y, ","); 
-        drawstr(290, perspective[0].y, ",");
-        drawstr(350, perspective[0].y, ",");
-        drawstr(410, perspective[0].y, ");");
-    } else if (mode == FRUSTUM) {
-        drawstr(20, frustum[0].y, "glFrustum(");
-        drawstr(170, frustum[0].y, ",");
-        drawstr(230, frustum[0].y, ","); 
-        drawstr(290, frustum[0].y, ",");
-        drawstr(350, frustum[0].y, ",");
-        drawstr(410, frustum[0].y, ","); 
-        drawstr(470, frustum[0].y, ");");
-    } else {
-        drawstr(35, ortho[0].y, "glOrtho(");
-        drawstr(170, ortho[0].y, ",");
-        drawstr(230, ortho[0].y, ","); 
-        drawstr(290, ortho[0].y, ",");
-        drawstr(350, ortho[0].y, ",");
-        drawstr(410, ortho[0].y, ","); 
-        drawstr(470, ortho[0].y, ");");
-    }
-    
+	drawstr(180, perspective[0].y - 40, "fovy");
+	drawstr(230, perspective[0].y - 40, "aspect");
+	drawstr(300, perspective[0].y - 40, "zNear");
+	drawstr(360, perspective[0].y - 40, "zFar");
+	drawstr(40, perspective[0].y, "gluPerspective(");
+	drawstr(230, perspective[0].y, ",");
+	drawstr(290, perspective[0].y, ",");
+	drawstr(350, perspective[0].y, ",");
+	drawstr(410, perspective[0].y, ");");
+
     drawstr(78, lookat[0].y, "gluLookAt(");
     drawstr(230, lookat[0].y, ","); 
     drawstr(290, lookat[0].y, ",");
@@ -1195,27 +1130,11 @@ command_display(void)
     drawstr(350, lookat[6].y, ");");
     drawstr(380, lookat[6].y, "<- up");
     
-    if (mode == PERSPECTIVE) {
-        cell_draw(&perspective[0]);
-        cell_draw(&perspective[1]);
-        cell_draw(&perspective[2]);
-        cell_draw(&perspective[3]); 
-    } else if (mode == FRUSTUM) {
-        cell_draw(&frustum[0]);
-        cell_draw(&frustum[1]);
-        cell_draw(&frustum[2]);
-        cell_draw(&frustum[3]);
-        cell_draw(&frustum[4]);
-        cell_draw(&frustum[5]);
-    } else if (mode == ORTHO) {
-        cell_draw(&ortho[0]);
-        cell_draw(&ortho[1]);
-        cell_draw(&ortho[2]);
-        cell_draw(&ortho[3]);
-        cell_draw(&ortho[4]);
-        cell_draw(&ortho[5]);
-    }   
-    
+	cell_draw(&perspective[0]);
+	cell_draw(&perspective[1]);
+	cell_draw(&perspective[2]);
+	cell_draw(&perspective[3]);
+
     cell_draw(&lookat[0]);
     cell_draw(&lookat[1]);
     cell_draw(&lookat[2]);
@@ -1358,9 +1277,6 @@ main(int argc, char** argv)
     glutKeyboardFunc(main_keyboard);
 	glutMouseFunc(world_mouse);
     glutCreateMenu(world_menu);
-    //glutAddMenuEntry("Toggle model", 'm');
-	glutAddMenuEntry("Images", 0);
-    glutAddMenuEntry("", 0);
     glutAddMenuEntry("Bigben", 'b');
     glutAddMenuEntry("House", 'h');
     glutAddMenuEntry("Capitol", 'c');
@@ -1379,14 +1295,6 @@ main(int argc, char** argv)
 	glutMotionFunc(screen_motion);
     glutMouseFunc(screen_mouse);
     glutCreateMenu(screen_menu);
-    glutAddMenuEntry("Models", 0);
-    glutAddMenuEntry("", 0);
-    glutAddMenuEntry("Soccerball", 's');
-    glutAddMenuEntry("Al Capone", 'a');
-    glutAddMenuEntry("F-16 Jet", 'j');
-    glutAddMenuEntry("Dolphins", 'd');
-    glutAddMenuEntry("Flowers", 'f');
-    glutAddMenuEntry("Porsche", 'p');
     glutAddMenuEntry("BigBen", 'b');
 	glutAddMenuEntry("Guggenheim", 'g');
 	glutAddMenuEntry("JinMaoTower", 'm');
