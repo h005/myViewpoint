@@ -1006,8 +1006,9 @@ world_display(void)
 		//glBegin(GL_POINTS);
 		for(int i = 0; i < imClick; i++)
 		{
-            // 由于显示窗口有缩放和变形，imCords内存放的点使用的是图像坐标
-            // 显示前先转化为窗口坐标
+            // 由于显示窗口有缩放和变形，imCords内存放的点单位是图像像素
+			// 这里使用的坐标系统，坐标原点在窗口的左下角
+            // 显示前要将坐标对应到屏幕上的像素
             GLint iX = imCords[i][0], iY = imCords[i][1];
             GLint wX = iX * 1.0 * wWidth / iwidth, wY = iY * 1.0 * wHeight / iheight;
             
@@ -1093,6 +1094,7 @@ world_menu(int value)
 void
 world_mouse(int button, int state, int x, int y)
 {
+	// 传入的坐标，坐标原点在窗口的左上角
 	oldx = x;
     oldy = y;
 	if(button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
@@ -1104,6 +1106,7 @@ world_mouse(int button, int state, int x, int y)
         GLint realy = height - oldy;
         printf("%d %d\n", viewport[2], viewport[3]);
 
+		// 这里使用的坐标系统，坐标原点在窗口的左下角
 		imCords[imClick][0] = oldx * 1.0 * iwidth / width;
 		imCords[imClick][1] = realy * 1.0 * iheight / height;
 		printf("Coordinates at cursor are (%d, %d)\n",oldx,realy);
