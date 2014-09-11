@@ -79,40 +79,10 @@ cell perspective[4] = {
         "Specifies field of view angle (in degrees) in y direction.", "%.1f" },
     { 11, 240, 80, -3.0, 3.0, 1.0, 0.01,
     "Specifies field of view in x direction (width/height).", "%.2f" },
-    { 12, 300, 80, 0.1, 10.0, 1.0, 0.05,
+    { 12, 300, 80, 0.1, 10.0, 0.1, 0.05,
     "Specifies distance from viewer to near clipping plane.", "%.1f" },
     { 13, 360, 80, 0.1, 10.0, 10.0, 0.05,
     "Specifies distance from viewer to far clipping plane.", "%.1f" },
-};
-
-cell frustum[6] = {
-    { 14, 120, 80, -10.0, 10.0, -1.0, 0.1,
-        "Specifies coordinate for left vertical clipping plane.", "%.2f" },
-    { 15, 180, 80, -10.0, 10.0, 1.0, 0.1,
-    "Specifies coordinate for right vertical clipping plane.", "%.2f" },
-    { 16, 240, 80, -10.0, 10.0, -1.0, 0.1,
-    "Specifies coordinate for bottom vertical clipping plane.", "%.2f" },
-    { 17, 300, 80, -10.0, 10.0, 1.0, 0.1,
-    "Specifies coordinate for top vertical clipping plane.", "%.2f" },
-    { 18, 360, 80, 0.1, 5.0, 1.0, 0.01,
-    "Specifies distance to near clipping plane.", "%.2f" },
-    { 19, 420, 80, 0.1, 5.0, 3.5, 0.01,
-    "Specifies distance to far clipping plane.", "%.2f" },
-};
-
-cell ortho[6] = {
-    { 14, 120, 80, -10.0, 10.0, -1.0, 0.1,
-        "Specifies coordinate for left vertical clipping plane.", "%.2f" },
-    { 15, 180, 80, -10.0, 10.0, 1.0, 0.1,
-    "Specifies coordinate for right vertical clipping plane.", "%.2f" },
-    { 16, 240, 80, -10.0, 10.0, -1.0, 0.1,
-    "Specifies coordinate for bottom vertical clipping plane.", "%.2f" },
-    { 17, 300, 80, -10.0, 10.0, 1.0, 0.1,
-    "Specifies coordinate for top vertical clipping plane.", "%.2f" },
-    { 18, 360, 80, -5.0, 5.0, 1.0, 0.01,
-    "Specifies distance to near clipping plane.", "%.2f" },
-    { 19, 420, 80, -5.0, 5.0, 3.5, 0.01,
-    "Specifies distance to far clipping plane.", "%.2f" },
 };
 
 cell pcolor[4] = {
@@ -603,8 +573,6 @@ void SVDDLT() {
 
 	printFloatv(GL_MODELVIEW_MATRIX, "MM");
 	cout << "modelView" << endl << modelView << endl;
-
-	
 }
 
 void
@@ -649,15 +617,6 @@ void
 main_keyboard(unsigned char key, int x, int y)
 {
     switch (key) {
-    case 'p':
-        mode = PERSPECTIVE;
-        break;
-    case 'o':
-        mode = ORTHO;
-        break;
-    case 'f':
-        mode = FRUSTUM;
-		break;
 	case 'c':
         isRota = true;
         break;
@@ -667,27 +626,6 @@ main_keyboard(unsigned char key, int x, int y)
         perspective[1].value = 1.0;
         perspective[2].value = 1.0;
         perspective[3].value = 10.0;
-        ortho[0].value = -1.0;
-        ortho[1].value = 1.0;
-        ortho[2].value = -1.0;
-        ortho[3].value = 1.0;
-        ortho[4].value = 1.0;
-        ortho[5].value = 3.5;
-        frustum[0].value = -1.0;
-        frustum[1].value = 1.0;
-        frustum[2].value = -1.0;
-        frustum[3].value = 1.0;
-        frustum[4].value = 1.0;
-        frustum[5].value = 3.5;
-        lookat[0].value = 0.0;
-        lookat[1].value = 0.0;
-        lookat[2].value = 2.0;
-        lookat[3].value = 0.0;
-        lookat[4].value = 0.0;
-        lookat[5].value = 0.0;
-        lookat[6].value = 0.0;
-        lookat[7].value = 1.0;
-        lookat[8].value = 0.0;
         break;
     case 27:
         exit(0);
@@ -875,22 +813,17 @@ screen_reshape(int width, int height)
     
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    if (mode == PERSPECTIVE)
-        gluPerspective(perspective[0].value, perspective[1].value, 
-        perspective[2].value, perspective[3].value);
-    else if (mode == ORTHO)
-        glOrtho(ortho[0].value, ortho[1].value, ortho[2].value,
-        ortho[3].value, ortho[4].value, ortho[5].value);
-    else if (mode == FRUSTUM)
-        glFrustum(frustum[0].value, frustum[1].value, frustum[2].value,
-        frustum[3].value, frustum[4].value, frustum[5].value);
+	gluPerspective(perspective[0].value, perspective[1].value,
+		perspective[2].value, perspective[3].value);
     glGetDoublev(GL_PROJECTION_MATRIX, projection);
+
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     gluLookAt(lookat[0].value, lookat[1].value, lookat[2].value,
         lookat[3].value, lookat[4].value, lookat[5].value,
         lookat[6].value, lookat[7].value, lookat[8].value);
     glGetDoublev(GL_MODELVIEW_MATRIX, modelview);
+
     glClearColor(0.2, 0.2, 0.2, 0.0);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_LIGHTING);
@@ -1162,28 +1095,13 @@ command_mouse(int button, int state, int x, int y)
     selection = 0;
     
     if (state == GLUT_DOWN) {
-        if (mode == PERSPECTIVE) {
-        /* mouse should only hit _one_ of the cells, so adding up all
-            the hits just propagates a single hit. */
-            selection += cell_hit(&perspective[0], x, y);
-            selection += cell_hit(&perspective[1], x, y);
-            selection += cell_hit(&perspective[2], x, y);
-            selection += cell_hit(&perspective[3], x, y);
-        } else if (mode == FRUSTUM) {
-            selection += cell_hit(&frustum[0], x, y);
-            selection += cell_hit(&frustum[1], x, y);
-            selection += cell_hit(&frustum[2], x, y);
-            selection += cell_hit(&frustum[3], x, y);
-            selection += cell_hit(&frustum[4], x, y);
-            selection += cell_hit(&frustum[5], x, y);
-        } else if (mode == ORTHO) {
-            selection += cell_hit(&ortho[0], x, y);
-            selection += cell_hit(&ortho[1], x, y);
-            selection += cell_hit(&ortho[2], x, y);
-            selection += cell_hit(&ortho[3], x, y);
-            selection += cell_hit(&ortho[4], x, y);
-            selection += cell_hit(&ortho[5], x, y);
-        }
+		/* mouse should only hit _one_ of the cells, so adding up all
+		the hits just propagates a single hit. */
+		selection += cell_hit(&perspective[0], x, y);
+		selection += cell_hit(&perspective[1], x, y);
+		selection += cell_hit(&perspective[2], x, y);
+		selection += cell_hit(&perspective[3], x, y);
+
         selection += cell_hit(&lookat[0], x, y);
         selection += cell_hit(&lookat[1], x, y);
         selection += cell_hit(&lookat[2], x, y);
@@ -1207,18 +1125,7 @@ command_motion(int x, int y)
     cell_update(&perspective[1], old_y-y);
     cell_update(&perspective[2], old_y-y);
     cell_update(&perspective[3], old_y-y);
-    cell_update(&frustum[0], old_y-y);
-    cell_update(&frustum[1], old_y-y);
-    cell_update(&frustum[2], old_y-y);
-    cell_update(&frustum[3], old_y-y);
-    cell_update(&frustum[4], old_y-y);
-    cell_update(&frustum[5], old_y-y);
-    cell_update(&ortho[0], old_y-y);
-    cell_update(&ortho[1], old_y-y);
-    cell_update(&ortho[2], old_y-y);
-    cell_update(&ortho[3], old_y-y);
-    cell_update(&ortho[4], old_y-y);
-    cell_update(&ortho[5], old_y-y);
+    
     cell_update(&lookat[0], old_y-y);
     cell_update(&lookat[1], old_y-y);
     cell_update(&lookat[2], old_y-y);
@@ -1230,7 +1137,6 @@ command_motion(int x, int y)
     cell_update(&lookat[8], old_y-y);
     
     old_y = y;
-    
     redisplay_all();
 }
 
@@ -1314,11 +1220,6 @@ main(int argc, char** argv)
     glutKeyboardFunc(main_keyboard);
     glutCreateMenu(command_menu);
     glutAddMenuEntry("Projection", 0);
-    glutAddMenuEntry("", 0);
-    glutAddMenuEntry("[o]  glOrtho", 'o');
-    glutAddMenuEntry("[f]  glFrustum", 'f');
-    glutAddMenuEntry("[p]  gluPerspective", 'p');
-    glutAddMenuEntry("", 0);
     glutAddMenuEntry("[r]  Reset parameters", 'r');
     glutAddMenuEntry("", 0);
 	glutAddMenuEntry("[c]  rotation", 'c');
