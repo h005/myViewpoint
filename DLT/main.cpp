@@ -158,7 +158,6 @@ ofstream outImfile("im.txt");   //存图像坐标
 ofstream outObjfile("obj.txt");//存模型坐标
 char str[80];
 bool flag_rotation = false;       //是否使用旋转矩阵
-bool isRota = false;
 //
 GLvoid *font_style = GLUT_BITMAP_TIMES_ROMAN_10;
 
@@ -627,7 +626,6 @@ main_keyboard(unsigned char key, int x, int y)
 		SVDDLT();
         break;
     case 'r':
-		isRota = false;
         perspective[0].value = 60.0;
         perspective[1].value = 1.0;
         perspective[2].value = 0.1;
@@ -745,7 +743,6 @@ world_menu(int value)
 {
 	char* name = 0;
     char* txt_name = 0;
-	isRota = value <= 0; //更新isRota
     switch (value) {
     case 'b':
         name = "data/Bigben.ppm";
@@ -849,17 +846,11 @@ void
 screen_display(void)
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	printFloatv(GL_MODELVIEW_MATRIX, "GL_MODELVIEW_MATRIX");
-	printFloatv(GL_PROJECTION_MATRIX, "GL_PROJECTION_MATRIX");
-
+	// 绘制模型
 	drawmodel();
-	//画交互的点
+	// 绘制模型上的点
 	if(objClick)
 	{
-		//glPointSize(9.0);
-		
-		//glBegin(GL_QUADS);
 		for(int i = 0; i < objClick; i++)
 		{
 			glPushMatrix();
@@ -867,17 +858,12 @@ screen_display(void)
 			glColorMaterial(GL_FRONT, GL_DIFFUSE);
 			glColor3f(pointColor[i].red, pointColor[i].green, pointColor[i].blue);
 
-		/*	glTranslatef((objCords[i][0]-pmodel->position[0])*model_scale,
-							(objCords[i][1]-pmodel->position[1])*model_scale,
-							(objCords[i][2]-pmodel->position[2])*model_scale);*/
 			glTranslatef(objCords[i][0],objCords[i][1],objCords[i][2]);
 			glutSolidSphere(0.04,10,10);
 			glDisable(GL_COLOR_MATERIAL);
 			glPopMatrix();
 		}
-		//glEnd();
 	}
-	//
     glutSwapBuffers();
 }
 
@@ -886,7 +872,6 @@ screen_menu(int value)
 {
     char* name = 0;
     char* txt_name = 0;
-	isRota = value <= 0; //更新isRota
     switch (value) {
     case 'a':
         name = "data/al.obj";
