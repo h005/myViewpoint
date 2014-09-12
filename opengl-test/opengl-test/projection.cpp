@@ -382,7 +382,7 @@ main_keyboard(unsigned char key, int x, int y)
         perspective[0].value = 60.0;
         perspective[1].value = 1.0;
         perspective[2].value = 1.0;
-        perspective[3].value = 10.0;
+        perspective[3].value = 30;
         ortho[0].value = -1.0;
         ortho[1].value = 1.0;
         ortho[2].value = -1.0;
@@ -395,15 +395,15 @@ main_keyboard(unsigned char key, int x, int y)
         frustum[3].value = 1.0;
         frustum[4].value = 1.0;
         frustum[5].value = 3.5;
-        lookat[0].value = 0.0;
-        lookat[1].value = 0.0;
-        lookat[2].value = 2.0;
-        lookat[3].value = 0.0;
-        lookat[4].value = 0.0;
-        lookat[5].value = 0.0;
-        lookat[6].value = 0.0;
-        lookat[7].value = 1.0;
-        lookat[8].value = 0.0;
+        lookat[0].value = 5.34;
+        lookat[1].value = -2.4;
+        lookat[2].value = -1.55;
+        lookat[3].value = 4.9;
+        lookat[4].value = -2.23;
+        lookat[5].value = -2.43;
+        lookat[6].value = 0.45;
+        lookat[7].value = 0.89;
+        lookat[8].value = -0.05;
         break;
     case 27:
         exit(0);
@@ -418,7 +418,7 @@ world_reshape(int width, int height)
     glViewport(0, 0, width, height);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluPerspective(60.0, (GLfloat)width/height, 1.0, 256.0);
+    gluPerspective(140, (GLfloat)width/height, 1.0, 256.0);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     glTranslatef(0.0, 0.0, -5.0);
