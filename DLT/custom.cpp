@@ -1,6 +1,7 @@
 ﻿#include <iostream>
 #include <math.h>
 #include <gl/glut.h>
+#include <opencv2/opencv.hpp>
 #include "custom.h"
 
 using namespace std;
@@ -109,3 +110,54 @@ void normalize_2D(int original[][NDIM], float processed[][NDIM], size_t n, float
 	param[NDIM] = s;
 }
 #undef NDIM
+
+// 将结果矩阵中数值的末尾部分去掉
+static cv::Mat removeEpsilon(cv::Mat &matrix) {
+	assert(matrix.type() == CV_32F);
+	cv::Mat result = cv::Mat::zeros(matrix.rows, matrix.cols, CV_32F);
+	for (int i = 0; i < result.cols; i++) {
+		for (int j = 0; j < result.cols; j++) {
+			result.at<float>(i, j) = round(matrix.at<float>(i, j) * 1e5) / 1e5;
+			if (abs(result.at<float>(i, j)) < 1e-5) {
+				result.at<float>(i, j) = 0;
+			}
+		}
+	}
+	return result;
+}
+
+bool verifyModelViewMatrix(cv::Mat &modelView) {
+	assert(modelView.type() == CV_32F);
+
+	// 验证rotation是否是正交矩阵
+	cv::Mat rotation = modelView(cv::Range(0, 3), cv::Range(0, 3));
+	cv::Mat result1 = rotation.t() * rotation - cv::Mat::eye(3, 3, CV_32F);
+	result1 = removeEpsilon(result1);
+
+	// 选取相机坐标系下的一组单位正交向量，使用modelView矩阵的逆变换变换到模型坐标系下
+	// 验证得到的三个向量是否还是单位正交
+	cv::Mat aDir = cv::Mat::zeros(4, 1, CV_32F);
+	aDir.at<float>(0, 0) = 1;
+	cv::Mat bDir = cv::Mat::zeros(4, 1, CV_32F);
+	bDir.at<float>(1, 0) = 1;
+	cv::Mat cDir = cv::Mat::zeros(4, 1, CV_32F);
+	cDir.at<float>(2, 0) = 1;
+	aDir = modelView.inv() * aDir;
+	bDir = modelView.inv() * bDir;
+	cDir = modelView.inv() * cDir;
+
+	cv::Mat MMM = cv::Mat::zeros(3, 3, CV_32F);
+	aDir(cv::Range(0, 3), cv::Range::all()).copyTo(MMM.col(0));
+	bDir(cv::Range(0, 3), cv::Range::all()).copyTo(MMM.col(1));
+	cDir(cv::Range(0, 3), cv::Range::all()).copyTo(MMM.col(2));
+
+	cv::Mat result2 = MMM.t() * MMM - cv::Mat::eye(3, 3, CV_32F);
+	result2 = removeEpsilon(result2);
+
+	if (cv::countNonZero(result1) + cv::countNonZero(result2) == 0) {
+		return true;
+	} else {
+		cout << "modelView is not valid:" << endl << result1 << endl << result2 << endl;
+		return false;
+	}
+}

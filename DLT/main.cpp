@@ -494,6 +494,9 @@ void SVDDLT() {
 			break;
 		}
 	}
+
+	cout << K << endl;
+	assert(verifyModelViewMatrix(modelView));
 }
 
 void
@@ -749,6 +752,8 @@ screen_reshape(int width, int height)
     gluLookAt(lookat[0].value, lookat[1].value, lookat[2].value,
         lookat[3].value, lookat[4].value, lookat[5].value,
         lookat[6].value, lookat[7].value, lookat[8].value);
+
+	printFloatv(GL_PROJECTION_MATRIX, "GP");
 
     glClearColor(0.2, 0.2, 0.2, 0.0);
     glEnable(GL_DEPTH_TEST);
