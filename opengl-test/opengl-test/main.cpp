@@ -16,7 +16,7 @@ void display(void)
 	glColor3f(1.0, 1.0, 1.0);
 	glLoadIdentity();             /* clear the matrix */
 	/* viewing transformation  */
-	gluLookAt(0.0, 0.0, 10.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+	gluLookAt(0.0, 0.0, 3.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
 	// 等价于
 	//glTranslatef(0, 0, -5);
 	printFloatv(GL_MODELVIEW_MATRIX, "GL_MODELVIEW_MATRIX");
@@ -42,7 +42,32 @@ void display(void)
 				modelView.at<float>(i, j) = v[j * 4 + i];
 			}
 		}
-		assert(verifyModelViewMatrix(modelView));
+		verifyModelViewMatrix(modelView);
+
+		// 在相机坐标系下选择相机点和其方向上的一个点
+		// PA = (0, 0, 0), PB = (0, 0, 1)
+		cv::Mat PA = cv::Mat::zeros(4, 1, CV_32F);
+		PA.at<float>(3, 0) = 1;
+		cv::Mat PB = cv::Mat::zeros(4, 1, CV_32F);
+		PB.at<float>(2, 0) = -1;
+		PB.at<float>(3, 0) = 1;
+		// 相机坐标系下，相机头部的方向（向量）
+		cv::Mat UpDir = cv::Mat::zeros(4, 1, CV_32F);
+		UpDir.at<float>(1, 0) = 1;
+
+		// 求取它们在世界坐标系下的表示
+		PA = modelView.inv() * PA;
+		PB = modelView.inv() * PB;
+		UpDir = modelView.inv() * UpDir;
+		PA /= PA.at<float>(3, 0);
+		PB /= PB.at<float>(3, 0);
+
+		glLoadIdentity();
+		gluLookAt(
+			PA.at<float>(0, 0), PA.at<float>(1, 0), PA.at<float>(2, 0),
+			PB.at<float>(0, 0), PB.at<float>(1, 0), PB.at<float>(2, 0),
+			UpDir.at<float>(0, 0), UpDir.at<float>(1, 0), UpDir.at<float>(2, 0)
+			);
 	}
 	printFloatv(GL_MODELVIEW_MATRIX, "GL_MODELVIEW_MATRIX");
 	glutWireCube(1.0);
