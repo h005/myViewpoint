@@ -1,4 +1,7 @@
-﻿#include <GL/glut.h>
+﻿#include "control.h"
+#ifndef USING_ROBIN
+
+#include <GL/glut.h>
 #include <stdio.h>
 #include <opencv2\opencv.hpp>
 
@@ -96,3 +99,5 @@ int main(int argc, char** argv)
 	glutMainLoop();
 	return 0;
 }
+
+#endif
