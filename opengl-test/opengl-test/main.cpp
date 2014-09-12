@@ -1,18 +1,8 @@
 ﻿#include <GL/glut.h>
 #include <stdio.h>
+#include <opencv2\opencv.hpp>
 
-void printFloatv(int mode, char *title) {
-	GLfloat v[16];
-	printf("%s\n", title);
-	glGetFloatv(mode, v);
-	for (int i = 0; i < 4; i++) {
-		for (int j = 0; j < 4; j++) {
-			printf("%f ", v[j * 4 + i]);
-		}
-		printf("\n");
-	}
-	printf("\n");
-}
+#include "custom.h"
 
 void init(void)
 {
@@ -30,7 +20,30 @@ void display(void)
 	// 等价于
 	//glTranslatef(0, 0, -5);
 	printFloatv(GL_MODELVIEW_MATRIX, "GL_MODELVIEW_MATRIX");
+	{
+		GLfloat v[16];
+		glGetFloatv(GL_MODELVIEW_MATRIX, v);
+		cv::Mat modelView = cv::Mat(4, 4, CV_32F);
+		for (int i = 0; i < modelView.rows; i++) {
+			for (int j = 0; j < modelView.cols; j++) {
+				modelView.at<float>(i, j) = v[j * 4 + i];
+			}
+		}
+		assert(verifyModelViewMatrix(modelView));
+	}
 	glScalef(1.0, 2.0, 1.0);      /* modeling transformation */
+	printFloatv(GL_MODELVIEW_MATRIX, "GL_MODELVIEW_MATRIX");
+	{
+		GLfloat v[16];
+		glGetFloatv(GL_MODELVIEW_MATRIX, v);
+		cv::Mat modelView = cv::Mat(4, 4, CV_32F);
+		for (int i = 0; i < modelView.rows; i++) {
+			for (int j = 0; j < modelView.cols; j++) {
+				modelView.at<float>(i, j) = v[j * 4 + i];
+			}
+		}
+		assert(verifyModelViewMatrix(modelView));
+	}
 	printFloatv(GL_MODELVIEW_MATRIX, "GL_MODELVIEW_MATRIX");
 	glutWireCube(1.0);
 	glFlush();
