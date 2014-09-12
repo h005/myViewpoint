@@ -594,6 +594,9 @@ screen_menu(int value)
     case 'r':
         name = "data/rose+vase.obj";
         break;
+	case 'l':
+		name = "data/Lugger.obj";
+		break;
     }
     
     if (name) {
@@ -847,6 +850,7 @@ main(int argc, char** argv)
     glutCreateMenu(screen_menu);
     glutAddMenuEntry("Models", 0);
     glutAddMenuEntry("", 0);
+	glutAddMenuEntry("Lugger", 'l');
     glutAddMenuEntry("Soccerball", 's');
     glutAddMenuEntry("Al Capone", 'a');
     glutAddMenuEntry("F-16 Jet", 'j');
