@@ -160,6 +160,7 @@ ofstream outObjfile("obj.txt");//存模型坐标
 char str[80];
 //
 GLvoid *font_style = GLUT_BITMAP_TIMES_ROMAN_10;
+char *wTxtName, *sTxtName;
 
 void
 setfont(char* name, int size)
@@ -303,7 +304,7 @@ bool loadTXT(char* filename, float Cords[10][3], int &count_click)
 {
 	FILE* fp;
 	count_click = 0;
-    fp = fopen(filename, "rb");
+    fp = fopen(filename, "wb");
     if (!fp) {
         perror(filename);
         return false;
@@ -315,6 +316,35 @@ bool loadTXT(char* filename, float Cords[10][3], int &count_click)
 		printf("%f %f %f\n",Cords[i][0],Cords[i][1],Cords[i][2]);
 	fclose(fp);
     return true;
+}
+
+bool saveTXT(char* filename, int Cords[10][2], int &count_click)
+{
+	FILE* fp;
+	fp = fopen(filename, "w");
+	if (!fp) {
+		perror(filename);
+		return false;
+	}
+
+	for (int i = 0; i < count_click; i++)
+		fprintf(fp, "%d %d\n", Cords[i][0], Cords[i][1]);
+	fclose(fp);
+	return true;
+}
+bool saveTXT(char* filename, float Cords[10][3], int &count_click)
+{
+	FILE* fp;
+	fp = fopen(filename, "w");
+	if (!fp) {
+		perror(filename);
+		return false;
+	}
+
+	for (int i = 0; i < count_click; i++)
+		fprintf(fp, "%f %f %f\n", Cords[i][0], Cords[i][1], Cords[i][2]);
+	fclose(fp);
+	return true;
 }
 
 void SVDDLT() {
@@ -495,7 +525,7 @@ void SVDDLT() {
 		}
 	}
 
-	cout << K << endl;
+	cout << K / K.at<float>(2, 2) << endl;
 	assert(verifyModelViewMatrix(modelView));
 }
 
@@ -542,8 +572,13 @@ main_keyboard(unsigned char key, int x, int y)
 {
     switch (key) {
 	case 'c':
-		SVDDLT();
-        break;
+		imClick = 0;
+		objClick = 0;
+		break;
+	case 's':
+		saveTXT(wTxtName, imCords, imClick);
+		saveTXT(sTxtName, objCords, objClick);
+		break;
     case 'r':
         perspective[0].value = 60.0;
         perspective[1].value = 1.0;
@@ -559,6 +594,9 @@ main_keyboard(unsigned char key, int x, int y)
 		lookat[7].value = 1.0;
 		lookat[8].value = 0.0;
         break;
+	case 'u':
+		SVDDLT();
+		break;
     case 27:
         exit(0);
     }
@@ -698,6 +736,7 @@ world_menu(int value)
     }
     
     if (name) {
+		wTxtName = txt_name;
 		//加载点
 		if(!loadTXT(txt_name,imCords,imClick))
 			imClick = 0;
@@ -859,6 +898,7 @@ screen_menu(int value)
     }
     
     if (name) {
+		sTxtName = txt_name;
 		//加载球
 		if(!loadTXT(txt_name,objCords,objClick))
 			objClick = 0;
@@ -1148,8 +1188,10 @@ main(int argc, char** argv)
     glutCreateMenu(command_menu);
     glutAddMenuEntry("Projection", 0);
     glutAddMenuEntry("[r]  Reset parameters", 'r');
+	glutAddMenuEntry("[c]  Clear all points", 'c');
+	glutAddMenuEntry("[s]  Save all points", 's');
     glutAddMenuEntry("", 0);
-	glutAddMenuEntry("[c]  Update Lookat() using DLT", 'c');
+	glutAddMenuEntry("[u]  Update Lookat() using DLT", 'u');
 	glutAddMenuEntry("", 0);
     glutAddMenuEntry("Quit", 27);
     glutAttachMenu(GLUT_RIGHT_BUTTON);
