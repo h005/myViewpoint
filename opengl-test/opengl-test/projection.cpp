@@ -330,26 +330,26 @@ normalize(float* v)
 void
 main_reshape(int width,  int height) 
 {
-    glViewport(0, 0, width, height);
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    gluOrtho2D(0, width, height, 0);
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-    
+	glViewport(0, 0, width, height);
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	gluOrtho2D(0, width, height, 0);
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+
 #define GAP  25             /* gap between subwindows */
-    sub_width = (width-GAP*3)/2.0;
-    sub_height = (height-GAP*3)/2.0;
-    
-    glutSetWindow(world);
-    glutPositionWindow(GAP, GAP);
-    glutReshapeWindow(sub_width, sub_height);
-    glutSetWindow(screen);
-    glutPositionWindow(GAP+sub_width+GAP, GAP);
-    glutReshapeWindow(sub_width, sub_height);
-    glutSetWindow(command);
-    glutPositionWindow(GAP, GAP+sub_height+GAP);
-    glutReshapeWindow(sub_width+GAP+sub_width, sub_height);
+	sub_width = (width - GAP * 3) / 2;
+	sub_height = sub_width;
+
+	glutSetWindow(world);
+	glutPositionWindow(GAP, GAP);
+	glutReshapeWindow(sub_width, sub_height);
+	glutSetWindow(screen);
+	glutPositionWindow(GAP + sub_width + GAP, GAP);
+	glutReshapeWindow(sub_width, sub_height);
+	glutSetWindow(command);
+	glutPositionWindow(GAP, GAP + sub_height + GAP);
+	glutReshapeWindow(sub_width + GAP + sub_width, height - sub_height - GAP * 3);
 }
 
 void
@@ -596,6 +596,9 @@ screen_menu(int value)
         break;
 	case 'l':
 		name = "data/Lugger.obj";
+		break;
+	case 'm':
+		name = "data/JinMaoTower.obj";
 		break;
     }
     
@@ -851,6 +854,7 @@ main(int argc, char** argv)
     glutAddMenuEntry("Models", 0);
     glutAddMenuEntry("", 0);
 	glutAddMenuEntry("Lugger", 'l');
+	glutAddMenuEntry("JinMao", 'm');
     glutAddMenuEntry("Soccerball", 's');
     glutAddMenuEntry("Al Capone", 'a');
     glutAddMenuEntry("F-16 Jet", 'j');
