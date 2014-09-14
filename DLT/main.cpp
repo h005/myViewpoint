@@ -304,7 +304,7 @@ bool loadTXT(char* filename, float Cords[10][3], int &count_click)
 {
 	FILE* fp;
 	count_click = 0;
-    fp = fopen(filename, "wb");
+    fp = fopen(filename, "rb");
     if (!fp) {
         perror(filename);
         return false;
@@ -593,9 +593,13 @@ main_keyboard(unsigned char key, int x, int y)
 		lookat[6].value = 0.0;
 		lookat[7].value = 1.0;
 		lookat[8].value = 0.0;
+		spin_x = 0;
+		spin_y = 0;
         break;
 	case 'u':
 		SVDDLT();
+		spin_x = 0;
+		spin_y = 0;
 		break;
     case 27:
         exit(0);
@@ -804,6 +808,9 @@ void
 screen_display(void)
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glMatrixMode(GL_MODELVIEW);
+	glRotatef(spin_x, 0, 1, 0);
+	glRotatef(spin_y, 1, 0, 0);
 	// 绘制模型
 	drawmodel();
 	// 绘制模型上的点
@@ -966,7 +973,7 @@ screen_motion(int x, int y)
     spin_x = x - oldx;
     spin_y = y - oldy;
     
-    redisplay_all();
+    redisplay_screen();
 }
 
 void
