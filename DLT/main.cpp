@@ -579,6 +579,12 @@ main_keyboard(unsigned char key, int x, int y)
 		saveTXT(wTxtName, imCords, imClick);
 		saveTXT(sTxtName, objCords, objClick);
 		break;
+	case '-':
+		imClick = (imClick > 0) ? imClick - 1 : imClick;
+		break;
+	case '=':
+		objClick = (objClick > 0) ? objClick - 1 : objClick;
+		break;
     case 'r':
         perspective[0].value = 60.0;
         perspective[1].value = 1.0;
@@ -1195,6 +1201,7 @@ main(int argc, char** argv)
     glutCreateMenu(command_menu);
     glutAddMenuEntry("Projection", 0);
     glutAddMenuEntry("[r]  Reset parameters", 'r');
+	glutAddMenuEntry("", 0);
 	glutAddMenuEntry("[c]  Clear all points", 'c');
 	glutAddMenuEntry("[s]  Save all points", 's');
     glutAddMenuEntry("", 0);
