@@ -347,6 +347,38 @@ bool saveTXT(char* filename, float Cords[10][3], int &count_click)
 	return true;
 }
 
+cv::Mat constructProjectionMatrix(cv::Mat &K, GLfloat n, GLfloat f, int iwidth, int iheight) {
+	// Hacked from this: http://www.songho.ca/opengl/gl_projectionmatrix.html
+	cv::Mat A = cv::Mat::zeros(4, 4, CV_32F);
+	A.at<float>(0, 0) = 1;
+	A.at<float>(1, 1) = 1;
+	A.at<float>(2, 2) = -(f + n) / (f - n);
+	A.at<float>(2, 3) = -2 * f * n / (f - n);
+	A.at<float>(3, 2) = -1;
+
+	cv::Mat B = cv::Mat::zeros(4, 4, CV_32F);
+	B.at<float>(0, 0) = K.at<float>(0, 0);
+	B.at<float>(1, 1) = K.at<float>(1, 1);
+	B.at<float>(0, 3) = K.at<float>(0, 2);
+	B.at<float>(1, 3) = K.at<float>(1, 2);
+	B.at<float>(2, 2) = 1;
+	B.at<float>(3, 3) = 1;
+
+	cv::Mat C = cv::Mat::eye(4, 4, CV_32F);
+	C.at<float>(0, 0) = 1.0 / iwidth;
+	C.at<float>(1, 1) = 1.0 / iheight;
+	C.at<float>(0, 3) = -0.5;
+	C.at<float>(1, 3) = -0.5;
+
+	cout << "construct Parameter:" << endl;
+	cout << A << endl;
+	cout << B << endl;
+	cout << C << endl;
+	cout << C * B * A << endl;
+
+	return C;
+}
+
 void SVDDLT() {
 	// DLT using SVD
 	// Reference: http://www.maths.lth.se/matematiklth/personal/calle/datorseende13/pres/forelas3.pdf
@@ -525,7 +557,9 @@ void SVDDLT() {
 		}
 	}
 
-	cout << K / K.at<float>(2, 2) << endl;
+	K /= K.at<float>(2, 2);
+	cout << K << endl;
+	constructProjectionMatrix(K, 1, 2, 500, 500);
 	assert(verifyModelViewMatrix(modelView));
 }
 
