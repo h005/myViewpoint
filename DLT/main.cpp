@@ -150,6 +150,9 @@ GLuint window, world, screen, command;
 GLuint Width = 1000,Height = 1000;
 GLuint sub_width = Width/2, sub_height = Height/2;
 
+GLfloat customProjection[16];
+GLboolean usingCustomProjection = false;
+
 //DLT
 int imCords[10][2] = {0};          //交互对应的图像点，默认10个点
 float objCords[10][3] = {0};     //对应的模型点
@@ -365,18 +368,20 @@ cv::Mat constructProjectionMatrix(cv::Mat &K, GLfloat n, GLfloat f, int iwidth, 
 	B.at<float>(3, 3) = 1;
 
 	cv::Mat C = cv::Mat::eye(4, 4, CV_32F);
-	C.at<float>(0, 0) = 1.0 / iwidth;
-	C.at<float>(1, 1) = 1.0 / iheight;
-	C.at<float>(0, 3) = -0.5;
-	C.at<float>(1, 3) = -0.5;
+	C.at<float>(0, 0) = 2.0 / iwidth;
+	C.at<float>(1, 1) = 2.0 / iheight;
+	C.at<float>(0, 3) = -1;
+	C.at<float>(1, 3) = -1;
 
 	cout << "construct Parameter:" << endl;
 	cout << A << endl;
 	cout << B << endl;
 	cout << C << endl;
-	cout << C * B * A << endl;
 
-	return C;
+	cv::Mat result = C * B * A;
+	cout << result << endl;
+
+	return result;
 }
 
 void SVDDLT() {
@@ -559,7 +564,14 @@ void SVDDLT() {
 
 	K /= K.at<float>(2, 2);
 	cout << K << endl;
-	constructProjectionMatrix(K, 1, 2, 500, 500);
+	cv::Mat proj = constructProjectionMatrix(K, 0.5, 10, iwidth, iheight);
+	for (int i = 0; i < 4; i++) {
+		for (int j = 0; j < 4; j++) {
+			customProjection[j * 4 + i] = proj.at<float>(i, j);
+		}
+	}
+	usingCustomProjection = true;
+	cout << iwidth << iheight << endl;
 	assert(verifyModelViewMatrix(modelView));
 }
 
@@ -635,6 +647,7 @@ main_keyboard(unsigned char key, int x, int y)
 		lookat[8].value = 0.0;
 		spin_x = 0;
 		spin_y = 0;
+		usingCustomProjection = false;
         break;
 	case 'u':
 		SVDDLT();
@@ -827,8 +840,14 @@ screen_reshape(int width, int height)
     
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-	gluPerspective(perspective[0].value, perspective[1].value,
-		perspective[2].value, perspective[3].value);
+	if (usingCustomProjection) {
+		glMultMatrixf(customProjection);
+	}
+	else {
+		gluPerspective(perspective[0].value, perspective[1].value,
+			perspective[2].value, perspective[3].value);
+	}
+	
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
@@ -864,7 +883,13 @@ screen_display(void)
 			glColor3f(pointColor[i].red, pointColor[i].green, pointColor[i].blue);
 
 			glTranslatef(objCords[i][0],objCords[i][1],objCords[i][2]);
-			glutSolidSphere(0.04,10,10);
+
+			if (usingCustomProjection) {
+				glutSolidSphere(0.01, 10, 10);
+			} else {
+				glutSolidSphere(0.04, 10, 10);
+			}
+			
 			glDisable(GL_COLOR_MATERIAL);
 			glPopMatrix();
 		}
