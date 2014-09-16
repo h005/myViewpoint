@@ -208,8 +208,13 @@ int main()
 
 	vector<Point2f> qPoints, tPoints;
 	for (int i = 0; i < qKeyPoints.size(); i++) {
-		qPoints.push_back(qKeyPoints[i].pt);
-		tPoints.push_back(tKeyPoints[i].pt);
+		Point pq = qKeyPoints[i].pt;
+		Point pt = tKeyPoints[i].pt;
+
+		pq.y = qImg.size().height - pq.y;
+		pt.y = tImg.size().height - pt.y;
+		qPoints.push_back(pq);
+		tPoints.push_back(pt);
 	}
 
 	Mat mask;
