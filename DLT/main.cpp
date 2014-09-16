@@ -426,7 +426,7 @@ void SVDDLT() {
 	cv::Mat S = thissvd.w;
 	cv::Mat VT = thissvd.vt;
 
-	// g(v) = 0, 求出使得((Mv)T * (Mv))最小的v
+	// 在||v|| = 1约束下, 求出使得((Mv)T * (Mv))最小的v
 	// 但是v和-v用于计算二范数是一样的，所以选择λ全部大于零的那个v
 	cv::Mat v = VT.row(S.rows - 1);
 	if (cv::countNonZero(v(cv::Range(0, 1), cv::Range(12, v.cols)) > 0) < (imClick / 2)) {
