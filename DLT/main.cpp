@@ -352,6 +352,8 @@ bool saveTXT(char* filename, float Cords[10][3], int &count_click)
 
 cv::Mat constructProjectionMatrix(cv::Mat &K, GLfloat n, GLfloat f, int iwidth, int iheight) {
 	// Hacked from this: http://www.songho.ca/opengl/gl_projectionmatrix.html
+
+	// 先将NDC中的z和w分量计算好，其中w = -z
 	cv::Mat A = cv::Mat::zeros(4, 4, CV_32F);
 	A.at<float>(0, 0) = 1;
 	A.at<float>(1, 1) = 1;
@@ -359,6 +361,7 @@ cv::Mat constructProjectionMatrix(cv::Mat &K, GLfloat n, GLfloat f, int iwidth, 
 	A.at<float>(2, 3) = -2 * f * n / (f - n);
 	A.at<float>(3, 2) = -1;
 
+	// 使用K投影和平移x和y分量
 	cv::Mat B = cv::Mat::zeros(4, 4, CV_32F);
 	B.at<float>(0, 0) = K.at<float>(0, 0);
 	B.at<float>(1, 1) = K.at<float>(1, 1);
@@ -367,6 +370,7 @@ cv::Mat constructProjectionMatrix(cv::Mat &K, GLfloat n, GLfloat f, int iwidth, 
 	B.at<float>(2, 2) = 1;
 	B.at<float>(3, 3) = 1;
 
+	// 将x和y分量规范化到NDC坐标系中
 	cv::Mat C = cv::Mat::eye(4, 4, CV_32F);
 	C.at<float>(0, 0) = 2.0 / iwidth;
 	C.at<float>(1, 1) = 2.0 / iheight;
@@ -382,6 +386,92 @@ cv::Mat constructProjectionMatrix(cv::Mat &K, GLfloat n, GLfloat f, int iwidth, 
 	cout << result << endl;
 
 	return result;
+}
+
+void extractParametersFromP(cv::Mat &P) {
+	// 求解旋转矩阵
+	cv::Mat A = P(cv::Range::all(), cv::Range(0, 3));
+	cv::Mat A1 = A.row(0).t();
+	cv::Mat A2 = A.row(1).t();
+	cv::Mat A3 = A.row(2).t();
+
+	cv::Mat t3 = A3;
+	float f = cv::norm(t3, cv::NORM_L2);
+	cv::Mat R3 = t3 / f;
+
+	float e = A2.dot(R3);
+	cv::Mat t2 = A2 - e * R3;
+	float d = cv::norm(t2, cv::NORM_L2);
+	cv::Mat R2 = t2 / d;
+
+	float c = A1.dot(R3);
+	float b = A1.dot(R2);
+	cv::Mat t1 = A1 - b * R2 - c * R3;
+	float a = cv::norm(t1, cv::NORM_L2);
+	cv::Mat R1 = t1 / a;
+
+	cv::Mat modelView = cv::Mat::zeros(4, 4, CV_32F);
+	modelView(cv::Range(0, 1), cv::Range(0, 3)) = R1.t();
+	modelView(cv::Range(1, 2), cv::Range(0, 3)) = R2.t();
+	modelView(cv::Range(2, 3), cv::Range(0, 3)) = R3.t();
+	modelView.at<float>(3, 3) = 1;
+
+	cv::Mat K = cv::Mat::zeros(3, 3, CV_32F);
+	K.at<float>(0, 0) = a;
+	K.at<float>(0, 1) = b;
+	K.at<float>(0, 2) = c;
+	K.at<float>(1, 1) = d;
+	K.at<float>(1, 2) = e;
+	K.at<float>(2, 2) = f;
+
+	cv::Mat A4 = P(cv::Range::all(), cv::Range(3, 4));
+	cv::Mat T = K.inv() * A4;
+	T.copyTo(modelView(cv::Range(0, 3), cv::Range(3, 4)));
+
+	// 在相机坐标系下选择相机点和其方向上的一个点
+	// PA = (0, 0, 0), PB = (0, 0, 1)
+	cv::Mat PA = cv::Mat::zeros(4, 1, CV_32F);
+	PA.at<float>(3, 0) = 1;
+	cv::Mat PB = cv::Mat::zeros(4, 1, CV_32F);
+	PB.at<float>(2, 0) = 1;
+	PB.at<float>(3, 0) = 1;
+	// 相机坐标系下，相机头部的方向（向量）
+	cv::Mat UpDir = cv::Mat::zeros(4, 1, CV_32F);
+	UpDir.at<float>(1, 0) = 1;
+
+	// 求取它们在世界坐标系下的表示
+	PA = modelView.inv() * PA;
+	PB = modelView.inv() * PB;
+	UpDir = modelView.inv() * UpDir;
+	PA /= PA.at<float>(3, 0);
+	PB /= PB.at<float>(3, 0);
+
+	// 在物体坐标系（世界坐标系）中摆放照相机和它的朝向
+	for (int i = 0; i < 9; i++) {
+		switch (i / 3) {
+		case 0:
+			lookat[i].value = PA.at<float>(i % 3, 0);
+			break;
+		case 1:
+			lookat[i].value = PB.at<float>(i % 3, 0);
+			break;
+		case 2:
+			lookat[i].value = UpDir.at<float>(i % 3, 0);
+			break;
+		}
+	}
+
+	K /= K.at<float>(2, 2);
+	cout << K << endl;
+	cv::Mat proj = constructProjectionMatrix(K, 0.5, 10, iwidth, iheight);
+	for (int i = 0; i < 4; i++) {
+		for (int j = 0; j < 4; j++) {
+			customProjection[j * 4 + i] = proj.at<float>(i, j);
+		}
+	}
+	usingCustomProjection = true;
+	cout << iwidth << iheight << endl;
+	assert(verifyModelViewMatrix(modelView));
 }
 
 void SVDDLT() {
@@ -464,115 +554,13 @@ void SVDDLT() {
 	// 所以 P' = NL(-1) * P * NR
 	P = NL.inv() * P * NR;
 
-	// 求解旋转矩阵
-	cv::Mat A = P(cv::Range::all(), cv::Range(0, 3));
-	cv::Mat A1 = A.row(0).t();
-	cv::Mat A2 = A.row(1).t();
-	cv::Mat A3 = A.row(2).t();
-	
-	cv::Mat t3 = A3;
-	float f = cv::norm(t3, cv::NORM_L2);
-	cv::Mat R3 = t3 / f;
+	// 从P中分解出 K * [R t]
+	// 由[R t]可以得到lookat的参数，由K可以构造GL_PROJECTION_MATRIX
+	extractParametersFromP(P);
 
-	float e = A2.dot(R3);
-	cv::Mat t2 = A2 - e * R3;
-	float d = cv::norm(t2, cv::NORM_L2);
-	cv::Mat R2 = t2 / d;
-
-	float c = A1.dot(R3);
-	float b = A1.dot(R2);
-	cv::Mat t1 = A1 - b * R2 - c * R3;
-	float a = cv::norm(t1, cv::NORM_L2);
-	cv::Mat R1 = t1 / a;
-
-	cv::Mat modelView = cv::Mat::zeros(4, 4, CV_32F);
-	modelView(cv::Range(0, 1), cv::Range(0, 3)) = R1.t();
-	modelView(cv::Range(1, 2), cv::Range(0, 3)) = R2.t();
-	modelView(cv::Range(2, 3), cv::Range(0, 3)) = R3.t();
-	modelView.at<float>(3, 3) = 1;
-    
-    cv::Mat K = cv::Mat::zeros(3, 3, CV_32F);
-    K.at<float>(0, 0) = a;
-    K.at<float>(0, 1) = b;
-    K.at<float>(0, 2) = c;
-    K.at<float>(1, 1) = d;
-    K.at<float>(1, 2) = e;
-    K.at<float>(2, 2) = f;
-    
-    cv::Mat A4 = P(cv::Range::all(), cv::Range(3, 4));
-    cv::Mat T = K.inv() * A4;
-    T.copyTo(modelView(cv::Range(0, 3), cv::Range(3, 4)));
-
-	if (false) {
-		printf("Apply transforamtion to objCords:\n");
-		for (int i = 0; i < imClick; i++) {
-			cv::Mat objHomogeneous = cv::Mat(4, 1, CV_32F);
-			objHomogeneous.at<float>(0, 0) = objCords[i][0];
-			objHomogeneous.at<float>(1, 0) = objCords[i][1];
-			objHomogeneous.at<float>(2, 0) = objCords[i][2];
-			objHomogeneous.at<float>(3, 0) = 1;
-
-			cv::Mat imHomogeneous = cv::Mat(3, 1, CV_32F);
-			imHomogeneous.at<float>(0, 0) = imCords[i][0];
-			imHomogeneous.at<float>(1, 0) = imCords[i][1];
-			imHomogeneous.at<float>(2, 0) = 1;
-
-			cv::Mat a = K * modelView(cv::Range(0, 3), cv::Range::all()) * objHomogeneous;
-			cv::Mat b = imHomogeneous * v.at<float>(0, 12 + i);
-			cv::Mat c;
-			cv::hconcat(a, b, c);
-			cout << c << endl;
-		}
-	}
-	
 	// 清理空间
 	delete cords2d;
 	delete cords3d;
-
-	// 在相机坐标系下选择相机点和其方向上的一个点
-	// PA = (0, 0, 0), PB = (0, 0, 1)
-	cv::Mat PA = cv::Mat::zeros(4, 1, CV_32F);
-	PA.at<float>(3, 0) = 1;
-	cv::Mat PB = cv::Mat::zeros(4, 1, CV_32F);
-	PB.at<float>(2, 0) = 1;
-	PB.at<float>(3, 0) = 1;
-	// 相机坐标系下，相机头部的方向（向量）
-	cv::Mat UpDir = cv::Mat::zeros(4, 1, CV_32F);
-	UpDir.at<float>(1, 0) = 1;
-
-	// 求取它们在世界坐标系下的表示
-	PA = modelView.inv() * PA;
-	PB = modelView.inv() * PB;
-	UpDir = modelView.inv() * UpDir;
-	PA /= PA.at<float>(3, 0);
-	PB /= PB.at<float>(3, 0);
-
-	// 在物体坐标系（世界坐标系）中摆放照相机和它的朝向
-	for (int i = 0; i < 9; i++) {
-		switch (i / 3) {
-		case 0:
-			lookat[i].value = PA.at<float>(i % 3, 0);
-			break;
-		case 1:
-			lookat[i].value = PB.at<float>(i % 3, 0);
-			break;
-		case 2:
-			lookat[i].value = UpDir.at<float>(i % 3, 0);
-			break;
-		}
-	}
-
-	K /= K.at<float>(2, 2);
-	cout << K << endl;
-	cv::Mat proj = constructProjectionMatrix(K, 0.5, 10, iwidth, iheight);
-	for (int i = 0; i < 4; i++) {
-		for (int j = 0; j < 4; j++) {
-			customProjection[j * 4 + i] = proj.at<float>(i, j);
-		}
-	}
-	usingCustomProjection = true;
-	cout << iwidth << iheight << endl;
-	assert(verifyModelViewMatrix(modelView));
 }
 
 void
