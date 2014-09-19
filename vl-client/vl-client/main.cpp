@@ -165,7 +165,7 @@ static void explore_match(const Mat &qImg, const Mat &tImg, const vector<KeyPoin
 
 int main()
 {
-	char *queryImg = "lugger2.ppm", *trainImg = "lugger1.png";
+	char *queryImg = "luggg.png", *trainImg = "luggg1.png";
 	Mat qImg = imread(queryImg), tImg = imread(trainImg);
 
 	vector<KeyPoint> qKeyPoints, tKeyPoints;
@@ -233,6 +233,9 @@ int main()
 	Mat output(qImg.size(), qImg.type());
 	warpPerspective(qImg, output, H, output.size());
 	imshow("warpPerspective", output);
+	imwrite("warpPerspective.png", output);
+
+	imwrite("luggg.ppm", qImg);
 
 	waitKey();
 	destroyAllWindows();
