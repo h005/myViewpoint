@@ -554,13 +554,13 @@ void SVDDLT() {
 	// 所以 P' = NL(-1) * P * NR
 	P = NL.inv() * P * NR;
 
-	/*
-	float a[3][3] = { { 0.07253366047824499, -0.03000283996124229, 83.63648132272235 } ,
-	{ -0.279132113426921, 0.2928719983519437, 134.3020218868717 }, 
-	{ -0.001163828713638414, -0.000343763778931706, 1 } };
+	
+	/*float a[3][3] = { { 1.699992075854052, 0.01342105438362604, -214.0238131616059 }, 
+	{ 0.0391793502368929, 1.514306235755864, -92.63694182789958 }, 
+	{ 0.0007446011319416598, 0.0002739344975919914, 1 } };
 	cv::Mat aa = cv::Mat(3, 3, CV_32F, a);
-	P = aa * P;
-	*/
+	P = aa * P;*/
+	
 	// 从P中分解出 K * [R t]
 	// 由[R t]可以得到lookat的参数，由K可以构造GL_PROJECTION_MATRIX
 	extractParametersFromP(P);
@@ -774,9 +774,13 @@ world_menu(int value)
 		txt_name = "data/JinMao_im_norm.txt";
         break;
 	case 'l':
-        name = "data/Lugger.ppm";
+		name = "data/Lugger.ppm";
 		txt_name = "data/Lugger_im_norm.txt";
         break;
+	case 'n':
+		name = "data/luggg.ppm";
+		txt_name = "data/luggg_im_norm.txt";
+		break;
 	case 'e':
         name = "data/Eiffel.ppm";
 		txt_name = "data/Eiffel_im_norm.txt";
@@ -954,6 +958,10 @@ screen_menu(int value)
         name = "data/Lugger.obj";
 		txt_name = "data/Lugger_obj.txt";
         break;
+	case 'n':
+		name = "data/Lugger.obj";
+		txt_name = "data/luggg_obj.txt";
+		break;
 	case 'e':
         name = "data/EiffelTower.obj";
 		txt_name = "data/Eiffel_obj.txt";
@@ -1223,6 +1231,7 @@ main(int argc, char** argv)
     glutAddMenuEntry("Oslo", 'o');
 	glutAddMenuEntry("JinMao", 'm');
 	glutAddMenuEntry("Lugger", 'l');
+	glutAddMenuEntry("example", 'n');
 	glutAddMenuEntry("Eiffel", 'e');
 	glutAddMenuEntry("triumph", 't');
 	
@@ -1242,6 +1251,7 @@ main(int argc, char** argv)
 	glutAddMenuEntry("OsloBuilding", 'o');
 	glutAddMenuEntry("House", 'h');
 	glutAddMenuEntry("Lugger", 'l');
+	glutAddMenuEntry("example", 'n');
 	glutAddMenuEntry("EiffelTower", 'e');
 	glutAddMenuEntry("triumph", 't');
     glutAttachMenu(GLUT_RIGHT_BUTTON);
