@@ -245,10 +245,10 @@ static void explore_point_homograhy(const Mat &qImg, const Mat &tImg, char *qPoi
 int main()
 {
 	
-	/*char *queryImg = "2q.png", *trainImg = "2t.png";
-	char *im_norm = "2_im_norm.txt";*/
-	char *queryImg = "1q.ppm", *trainImg = "1t.png";
-	char *im_norm = "1_im_norm.txt";
+	char *queryImg = "2q.png", *trainImg = "2t.png";
+	char *im_norm = "2_im_norm.txt";
+	/*char *queryImg = "1q.ppm", *trainImg = "1t.png";
+	char *im_norm = "1_im_norm.txt";*/
 	Mat qImg = imread(queryImg), tImg = imread(trainImg);
 
 	vector<KeyPoint> qKeyPoints, tKeyPoints;
@@ -319,6 +319,16 @@ int main()
 	imwrite("warpPerspective.png", output);
 
 	explore_point_homograhy(qImg, tImg, im_norm, H, "twp.png"); 
+
+	Mat ma = Mat::eye(3, 3, CV_64F);
+	ma.at<double>(1, 1) = -1;
+	ma.at<double>(1, 2) = qImg.size().height;
+
+	Mat mb = Mat::eye(3, 3, CV_64F);
+	mb.at<double>(1, 1) = -1;
+	mb.at<double>(1, 2) = tImg.size().height;
+
+	cout << mb * H * ma.inv() << endl;
 
 	waitKey();
 	destroyAllWindows();
