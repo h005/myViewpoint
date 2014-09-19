@@ -208,6 +208,7 @@ static bool loadTXT(char* filename, vector<Point2f> &plist, int height)
 	return true;
 }
 
+// 将变换后的点在train图像中显示出来
 static void explore_point_homograhy(const Mat &qImg, const Mat &tImg, char *qPointsFile, const Mat &H, char *fileName) {
 	// 读取query图像中标定的点
 	vector<Point2f> plist;
@@ -243,7 +244,11 @@ static void explore_point_homograhy(const Mat &qImg, const Mat &tImg, char *qPoi
 
 int main()
 {
-	char *queryImg = "luggg.png", *trainImg = "luggg1.png";
+	
+	/*char *queryImg = "2q.png", *trainImg = "2t.png";
+	char *im_norm = "2_im_norm.txt";*/
+	char *queryImg = "1q.ppm", *trainImg = "1t.png";
+	char *im_norm = "1_im_norm.txt";
 	Mat qImg = imread(queryImg), tImg = imread(trainImg);
 
 	vector<KeyPoint> qKeyPoints, tKeyPoints;
@@ -313,7 +318,7 @@ int main()
 	imshow("warpPerspective", output);
 	imwrite("warpPerspective.png", output);
 
-	explore_point_homograhy(qImg, tImg, "luggg_im_norm.txt", H, "twp.png"); 
+	explore_point_homograhy(qImg, tImg, im_norm, H, "twp.png"); 
 
 	waitKey();
 	destroyAllWindows();
