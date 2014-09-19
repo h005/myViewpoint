@@ -16,6 +16,27 @@ extern "C" {
 using namespace cv;
 using namespace std;
 
+typedef struct _color{
+	float red;
+	float green;
+	float blue;
+} color;
+
+color pointColor[12] = {
+	{ 1.0, 0.0, 0.0 },
+	{ 0.0, 1.0, 0.0 },
+	{ 0.0, 0.0, 1.0 },
+	{ 1.0, 1.0, 0.0 },
+	{ 1.0, 0.0, 1.0 },
+	{ 0.0, 1.0, 1.0 },
+	{ 0.5, 0.0, 0.0 },
+	{ 1.0, 0.6, 0.0 },
+	{ 0.8, 0.6, 1.0 },
+	{ 0.0, 0.6, 0.2 },
+	{ 0.0, 0.6, 1.0 },
+	{ 0.6, 0.0, 1.0 },
+};
+
 static inline int convertRadianToDegree(double rad) {
 	int deg = (int)(rad / M_PI * 180);
 
@@ -163,6 +184,63 @@ static void explore_match(const Mat &qImg, const Mat &tImg, const vector<KeyPoin
 	}
 }
 
+static bool loadTXT(char* filename, vector<Point2f> &plist, int height)
+{
+	FILE* fp;
+	fp = fopen(filename, "rb");
+	if (!fp) {
+		perror(filename);
+		return false;
+	}
+
+	// feof很不好用，很容易出现最后一行读两次的情况
+	// http://stackoverflow.com/questions/5431941/while-feof-file-is-always-wrong
+	// 这样处理之后，*_im_norm.txt文件的最后一行可以为空
+	Point2f p;
+	int x, y;
+	while (fscanf(fp, "%d %d", &x, &y) != EOF) {
+		// 文件中的点坐标系在左下角，需要转化为opencv中的点坐标
+		p.x = x;
+		p.y = height - y;
+		plist.push_back(p);
+	}
+	fclose(fp);
+	return true;
+}
+
+static void explore_point_homograhy(const Mat &qImg, const Mat &tImg, char *qPointsFile, const Mat &H, char *fileName) {
+	// 读取query图像中标定的点
+	vector<Point2f> plist;
+	loadTXT(qPointsFile, plist, qImg.size().height);
+
+	// 将点在query图像中表示出来
+	Mat left;
+	qImg.copyTo(left);
+	for (int i = 0; i < plist.size(); i++) {
+		Scalar pColor(pointColor[i].blue * 255, pointColor[i].green * 255, pointColor[i].red * 255);
+		circle(left, plist[i], 4, pColor, -1);
+	}
+
+	// 使用homography变换plist中的点
+	vector<Point2f> mlist;
+	perspectiveTransform(plist, mlist, H);
+
+	// 将变换后的点在train图像中表示出来
+	// 如果点在train图像中也能精确对应建筑物上的相应点，则表示homography效果好
+	// 不过一般不存在这种情况，至多一个平面上的点精确对应
+	Mat right;
+	tImg.copyTo(right);
+	for (int i = 0; i < mlist.size(); i++) {
+		Scalar pColor(pointColor[i].blue * 255, pointColor[i].green * 255, pointColor[i].red * 255);
+		circle(right, mlist[i], 4, pColor, -1);
+	}
+
+	// 将左右的图像画在一起
+	Mat panel;
+	combineImage(left, right, panel);
+	imwrite(fileName, panel);
+}
+
 int main()
 {
 	char *queryImg = "luggg.png", *trainImg = "luggg1.png";
@@ -211,8 +289,8 @@ int main()
 		Point pq = qKeyPoints[i].pt;
 		Point pt = tKeyPoints[i].pt;
 
-		pq.y = qImg.size().height - pq.y;
-		pt.y = tImg.size().height - pt.y;
+		/*pq.y = qImg.size().height - pq.y;
+		pt.y = tImg.size().height - pt.y;*/
 		qPoints.push_back(pq);
 		tPoints.push_back(pt);
 	}
@@ -235,7 +313,7 @@ int main()
 	imshow("warpPerspective", output);
 	imwrite("warpPerspective.png", output);
 
-	imwrite("luggg.ppm", qImg);
+	explore_point_homograhy(qImg, tImg, "luggg_im_norm.txt", H, "twp.png"); 
 
 	waitKey();
 	destroyAllWindows();
