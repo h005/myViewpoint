@@ -153,6 +153,8 @@ GLuint sub_width = Width/2, sub_height = Height/2;
 GLfloat customProjection[16];
 GLboolean usingCustomProjection = false;
 
+
+
 //DLT
 int imCords[10][2] = {0};          //交互对应的图像点，默认10个点
 float objCords[10][3] = {0};     //对应的模型点
@@ -164,6 +166,9 @@ char str[80];
 //
 GLvoid *font_style = GLUT_BITMAP_TIMES_ROMAN_10;
 char *wTxtName, *sTxtName;
+
+RPair candidate[100000];
+int rPairCount;
 
 void
 setfont(char* name, int size)
@@ -388,7 +393,92 @@ cv::Mat constructProjectionMatrix(cv::Mat &K, GLfloat n, GLfloat f, int iwidth, 
 	return result;
 }
 
-void extractParametersFromP(cv::Mat &P) {
+cv::Mat phase1CalculateP(int imClick, int objClick, int imCords[][2], float objCords[][3]) {
+	float *cords3d = new float[imClick * 3];
+	float *cords2d = new float[imClick * 2];
+	float param2d[3], param3d[4];
+
+	// 将选定的点进行正规化，提高SVD分解的数值精度
+	// 正规化使用的参数需要记录下来，以后还原使用
+	normalize_2D(imCords, (float(*)[2])cords2d, imClick, param2d);
+	normalize_3D(objCords, (float(*)[3])cords3d, imClick, param3d);
+
+	printf("%f %f %f\n", param2d[0], param2d[1], param2d[2]);
+	printf("%f %f %f %f\n", param3d[0], param3d[1], param3d[2], param3d[3]);
+	for (int i = 0; i < imClick; i++) {
+		printf("%f %f %f %f %f\n", cords3d[i * 3 + 0], cords3d[i * 3 + 1], cords3d[i * 3 + 2], cords2d[i * 2 + 0], cords2d[i * 2 + 1]);
+	}
+
+	cv::Mat M = cv::Mat::zeros(3 * imClick, 12 + imClick, CV_32F);
+	for (int i = 0; i < imClick; i++) {
+		for (int j = 0; j < 12; j++) {
+			if (j % 4 == 3) {
+				// 3D齐次坐标中的最后一维
+				M.at<float>(3 * i + j / 4, j) = 1;
+			}
+			else {
+				// 3D齐次坐标的前三维
+				M.at<float>(3 * i + j / 4, j) = cords3d[i * 3 + j % 4];
+			}
+
+		}
+		M.at<float>(3 * i + 0, 12 + i) = -cords2d[i * 2 + 0];
+		M.at<float>(3 * i + 1, 12 + i) = -cords2d[i * 2 + 1];
+		M.at<float>(3 * i + 2, 12 + i) = -1;
+	}
+
+	// 执行SVD分解
+	cv::SVD thissvd(M, cv::SVD::FULL_UV);
+	cv::Mat U = thissvd.u;
+	cv::Mat S = thissvd.w;
+	cv::Mat VT = thissvd.vt;
+
+	// 在||v|| = 1约束下, 求出使得((Mv)T * (Mv))最小的v
+	// 但是v和-v用于计算二范数是一样的，所以选择λ全部大于零的那个v
+	cv::Mat v = VT.row(S.rows - 1);
+	if (cv::countNonZero(v(cv::Range(0, 1), cv::Range(12, v.cols)) > 0) < (imClick / 2)) {
+		v = -v;
+	}
+
+	std::cout << "SV: " << S.t() << std::endl;
+	std::cout << "v: " << v << std::endl;
+	cv::Mat z = M * v.t();
+	std::cout << "LSR: " << cv::norm(z, cv::NORM_L2) << std::endl;
+
+	// 教程中使用的公式是
+	// λx = PX，但是里面的x和X都是正规化后的，我们需要找到真实的P'
+	// λ(NL * x) = P * (NR * X) => λx = NL(-1) * P * NR * X
+	// 所以 P' = NL(-1) * P * NR
+
+	// 将用于正规化的矩阵构造出来
+	cv::Mat NR = cv::Mat::eye(4, 4, CV_32F);
+	NR.at<float>(0, 3) = -param3d[0];
+	NR.at<float>(1, 3) = -param3d[1];
+	NR.at<float>(2, 3) = -param3d[2];
+	NR *= param3d[3];
+	NR.at<float>(3, 3) = 1;
+
+	cv::Mat NL = cv::Mat::eye(3, 3, CV_32F);
+	NL.at<float>(0, 2) = -param2d[0];
+	NL.at<float>(1, 2) = -param2d[1];
+	NL *= param2d[2];
+	NL.at<float>(2, 2) = 1;
+
+	// λ(NL * x) = P * (NR * X)
+	cv::Mat P = v(cv::Range(0, 1), cv::Range(0, 12)).reshape(0, 3);
+	// 求出P'
+	// 因为 λx = NL(-1) * P * NR * X
+	// 所以 P' = NL(-1) * P * NR
+	P = NL.inv() * P * NR;
+
+	// 清理空间
+	delete cords2d;
+	delete cords3d;
+
+	return P;
+}
+
+void phase2ExtractParametersFromP(cv::Mat &P) {
 	// 求解旋转矩阵
 	cv::Mat A = P(cv::Range::all(), cv::Range(0, 3));
 	cv::Mat A1 = A.row(0).t();
@@ -474,86 +564,11 @@ void extractParametersFromP(cv::Mat &P) {
 	assert(verifyModelViewMatrix(modelView));
 }
 
-void SVDDLT() {
+void SVDDLT(int imClick, int objClick, int imCords[][2], float objCords[][3]) {
 	// DLT using SVD
 	// Reference: http://www.maths.lth.se/matematiklth/personal/calle/datorseende13/pres/forelas3.pdf
 	assert((imClick == objClick) && (imClick >= 6)); //必须保证图像与模型对应点数相同且>=6个
-	float *cords3d = new float[imClick * 3];
-	float *cords2d = new float[imClick * 2];
-	float param2d[3], param3d[4];
-
-	// 将选定的点进行正规化，提高SVD分解的数值精度
-	// 正规化使用的参数需要记录下来，以后还原使用
-	normalize_2D(imCords, (float (*)[2])cords2d, imClick, param2d);
-	normalize_3D(objCords,(float (*)[3])cords3d, imClick, param3d);
-
-	printf("%f %f %f\n", param2d[0], param2d[1], param2d[2]);
-	printf("%f %f %f %f\n", param3d[0], param3d[1], param3d[2], param3d[3]);
-	for (int i = 0; i < imClick; i++) {
-		printf("%f %f %f %f %f\n", cords3d[i * 3 + 0], cords3d[i * 3 + 1], cords3d[i * 3 + 2], cords2d[i * 2 + 0], cords2d[i * 2 + 1]);
-	}
-
-	cv::Mat M = cv::Mat::zeros(3 * imClick, 12 + imClick, CV_32F);
-	for (int i = 0; i < imClick; i++) {
-		for (int j = 0; j < 12; j++) {
-			if (j % 4 == 3) {
-				// 3D齐次坐标中的最后一维
-				M.at<float>(3 * i + j / 4, j) = 1;
-			} else {
-				// 3D齐次坐标的前三维
-				M.at<float>(3 * i + j / 4, j) = cords3d[i * 3 + j % 4];
-			}
-			
-		}
-		M.at<float>(3 * i + 0 ,12 + i) = -cords2d[i * 2 + 0];
-		M.at<float>(3 * i + 1, 12 + i) = -cords2d[i * 2 + 1];
-		M.at<float>(3 * i + 2, 12 + i) = -1;
-	}
-
-	// 执行SVD分解
-	cv::SVD thissvd(M, cv::SVD::FULL_UV);
-	cv::Mat U = thissvd.u;
-	cv::Mat S = thissvd.w;
-	cv::Mat VT = thissvd.vt;
-
-	// 在||v|| = 1约束下, 求出使得((Mv)T * (Mv))最小的v
-	// 但是v和-v用于计算二范数是一样的，所以选择λ全部大于零的那个v
-	cv::Mat v = VT.row(S.rows - 1);
-	if (cv::countNonZero(v(cv::Range(0, 1), cv::Range(12, v.cols)) > 0) < (imClick / 2)) {
-		v = -v;
-	}
-
-	std::cout << "SV: " << S.t() << std::endl;
-	std::cout << "v: " << v << std::endl;
-	cv::Mat z = M * v.t();
-	std::cout << "LSR: " << cv::norm(z, cv::NORM_L2) << std::endl;
-
-	// 教程中使用的公式是
-	// λx = PX，但是里面的x和X都是正规化后的，我们需要找到真实的P'
-	// λ(NL * x) = P * (NR * X) => λx = NL(-1) * P * NR * X
-	// 所以 P' = NL(-1) * P * NR
-
-	// 将用于正规化的矩阵构造出来
-	cv::Mat NR = cv::Mat::eye(4, 4, CV_32F);
-	NR.at<float>(0, 3) = -param3d[0];
-	NR.at<float>(1, 3) = -param3d[1];
-	NR.at<float>(2, 3) = -param3d[2];
-	NR *= param3d[3];
-	NR.at<float>(3, 3) = 1;
-
-	cv::Mat NL = cv::Mat::eye(3, 3, CV_32F);
-	NL.at<float>(0, 2) = -param2d[0];
-	NL.at<float>(1, 2) = -param2d[1];
-	NL *= param2d[2];
-	NL.at<float>(2, 2) = 1;
-
-	// λ(NL * x) = P * (NR * X)
-	cv::Mat P = v(cv::Range(0, 1), cv::Range(0, 12)).reshape(0, 3);
-	// 求出P'
-	// 因为 λx = NL(-1) * P * NR * X
-	// 所以 P' = NL(-1) * P * NR
-	P = NL.inv() * P * NR;
-
+	cv::Mat P = phase1CalculateP(imClick, objClick, imCords, objCords);
 	
 	/*float a[3][3] = { { 1.699992075854052, 0.01342105438362604, -214.0238131616059 }, 
 	{ 0.0391793502368929, 1.514306235755864, -92.63694182789958 }, 
@@ -563,12 +578,53 @@ void SVDDLT() {
 	
 	// 从P中分解出 K * [R t]
 	// 由[R t]可以得到lookat的参数，由K可以构造GL_PROJECTION_MATRIX
-	extractParametersFromP(P);
-
-	// 清理空间
-	delete cords2d;
-	delete cords3d;
+	phase2ExtractParametersFromP(P);
 }
+
+void RansacDLT() {
+	// 切换到screen界面中，保存原来的窗口以便还原
+	int context = glutGetWindow();
+	glutSetWindow(screen);
+
+	GLint gViewport[4];
+	GLdouble gModelview[16];
+	GLdouble gProjection[16];
+
+	glGetIntegerv(GL_VIEWPORT, gViewport);
+	glGetDoublev(GL_MODELVIEW_MATRIX, gModelview);
+	glGetDoublev(GL_PROJECTION_MATRIX, gProjection);
+
+	rPairCount = 0;
+
+	printf("mm\n");
+	for (int i = 0; i < 4; i++) {
+		for (int j = 0; j < 4; j++) {
+			printf("%f ", gModelview[j * 4 + i]);
+		}
+		printf("\n");
+	}
+
+	FILE *fp = fopen("pFile.dat", "r");
+	int a, b, c, d;
+	int i = 0;
+	while (fscanf(fp, "%d %d %d %d", &a, &b, &c, &d) != EOF) {
+		float mx, my, mz;
+		bool r = getPointInModels(a, b, gViewport, gModelview, gProjection, iwidth, iheight, mx, my, mz);
+		if (r) {
+			candidate[rPairCount].mx = mx;
+			candidate[rPairCount].my = my;
+			candidate[rPairCount].mz = mz;
+			candidate[rPairCount].ix = c;
+			candidate[rPairCount].iy = d;
+			rPairCount++;
+		}
+	}
+	fclose(fp);
+	printf("aa: %d %d\n", rPairCount, i);
+	glutSetWindow(context);
+}
+
+
 
 void
 main_reshape(int width,  int height) 
@@ -645,9 +701,12 @@ main_keyboard(unsigned char key, int x, int y)
 		usingCustomProjection = false;
         break;
 	case 'u':
-		SVDDLT();
+		SVDDLT(imClick, objClick, imCords, objCords);
 		spin_x = 0;
 		spin_y = 0;
+		break;
+	case 'v':
+		RansacDLT();
 		break;
     case 27:
         exit(0);
@@ -857,7 +916,7 @@ screen_reshape(int width, int height)
 	printFloatv(GL_PROJECTION_MATRIX, "GP");
 
     glClearColor(0.2, 0.2, 0.2, 0.0);
-    glEnable(GL_DEPTH_TEST);
+	glEnable(GL_DEPTH_TEST); 
     glEnable(GL_LIGHTING);
     glEnable(GL_LIGHT0);
 }
@@ -893,6 +952,7 @@ screen_display(void)
 			glPopMatrix();
 		}
 	}
+	
     glutSwapBuffers();
 }
 
@@ -1270,6 +1330,7 @@ main(int argc, char** argv)
 	glutAddMenuEntry("[s]  Save all points", 's');
     glutAddMenuEntry("", 0);
 	glutAddMenuEntry("[u]  Update Lookat() using DLT", 'u');
+	glutAddMenuEntry("[v]  cuuu", 'v');
 	glutAddMenuEntry("", 0);
     glutAddMenuEntry("Quit", 27);
     glutAttachMenu(GLUT_RIGHT_BUTTON);
