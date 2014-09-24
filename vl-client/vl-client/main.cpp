@@ -245,10 +245,10 @@ static void explore_point_homograhy(const Mat &qImg, const Mat &tImg, char *qPoi
 int main()
 {
 	
-	char *queryImg = "2q.png", *trainImg = "2t.png";
-	char *im_norm = "2_im_norm.txt";
-	/*char *queryImg = "1q.ppm", *trainImg = "1t.png";
-	char *im_norm = "1_im_norm.txt";*/
+	/*char *queryImg = "2q.png", *trainImg = "2t.png";
+	char *im_norm = "2_im_norm.txt";*/
+	char *queryImg = "1q.ppm", *trainImg = "1t.png";
+	char *im_norm = "1_im_norm.txt";
 	Mat qImg = imread(queryImg), tImg = imread(trainImg);
 
 	vector<KeyPoint> qKeyPoints, tKeyPoints;
@@ -289,6 +289,7 @@ int main()
 	explore_match(qImg, tImg, qKeyPoints, tKeyPoints, "all_match.png");
 	printf("%d %d\n", qKeyPoints.size(), tKeyPoints.size());
 
+	FILE *pFile = fopen("pFile.dat", "w");
 	vector<Point2f> qPoints, tPoints;
 	for (int i = 0; i < qKeyPoints.size(); i++) {
 		Point pq = qKeyPoints[i].pt;
@@ -298,7 +299,9 @@ int main()
 		pt.y = tImg.size().height - pt.y;*/
 		qPoints.push_back(pq);
 		tPoints.push_back(pt);
+		fprintf(pFile, "%d %d %d %d\n", pq.x, qImg.size().height - pq.y, pt.x, tImg.size().height - pt.y);
 	}
+	fclose(pFile);
 
 	Mat mask;
 	Mat H = findHomography(qPoints, tPoints, CV_RANSAC, 3, mask);
