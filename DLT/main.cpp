@@ -167,9 +167,6 @@ char str[80];
 GLvoid *font_style = GLUT_BITMAP_TIMES_ROMAN_10;
 char *wTxtName, *sTxtName;
 
-RPair candidate[100000];
-int rPairCount;
-
 void
 setfont(char* name, int size)
 {
@@ -382,14 +379,7 @@ cv::Mat constructProjectionMatrix(cv::Mat &K, GLfloat n, GLfloat f, int iwidth, 
 	C.at<float>(0, 3) = -1;
 	C.at<float>(1, 3) = -1;
 
-	cout << "construct Parameter:" << endl;
-	cout << A << endl;
-	cout << B << endl;
-	cout << C << endl;
-
 	cv::Mat result = C * B * A;
-	cout << result << endl;
-
 	return result;
 }
 
@@ -403,11 +393,11 @@ cv::Mat phase1CalculateP(int imClick, int objClick, int imCords[][2], float objC
 	normalize_2D(imCords, (float(*)[2])cords2d, imClick, param2d);
 	normalize_3D(objCords, (float(*)[3])cords3d, imClick, param3d);
 
-	printf("%f %f %f\n", param2d[0], param2d[1], param2d[2]);
+	/*printf("%f %f %f\n", param2d[0], param2d[1], param2d[2]);
 	printf("%f %f %f %f\n", param3d[0], param3d[1], param3d[2], param3d[3]);
 	for (int i = 0; i < imClick; i++) {
 		printf("%f %f %f %f %f\n", cords3d[i * 3 + 0], cords3d[i * 3 + 1], cords3d[i * 3 + 2], cords2d[i * 2 + 0], cords2d[i * 2 + 1]);
-	}
+	}*/
 
 	cv::Mat M = cv::Mat::zeros(3 * imClick, 12 + imClick, CV_32F);
 	for (int i = 0; i < imClick; i++) {
@@ -440,10 +430,10 @@ cv::Mat phase1CalculateP(int imClick, int objClick, int imCords[][2], float objC
 		v = -v;
 	}
 
-	std::cout << "SV: " << S.t() << std::endl;
+	/*std::cout << "SV: " << S.t() << std::endl;
 	std::cout << "v: " << v << std::endl;
 	cv::Mat z = M * v.t();
-	std::cout << "LSR: " << cv::norm(z, cv::NORM_L2) << std::endl;
+	std::cout << "LSR: " << cv::norm(z, cv::NORM_L2) << std::endl;*/
 
 	// 教程中使用的公式是
 	// λx = PX，但是里面的x和X都是正规化后的，我们需要找到真实的P'
@@ -552,7 +542,7 @@ void phase2ExtractParametersFromP(cv::Mat &P) {
 	}
 
 	K /= K.at<float>(2, 2);
-	cout << K << endl;
+	cout << "K: " << K << endl;
 	cv::Mat proj = constructProjectionMatrix(K, 0.5, 10, iwidth, iheight);
 	for (int i = 0; i < 4; i++) {
 		for (int j = 0; j < 4; j++) {
@@ -581,6 +571,28 @@ void SVDDLT(int imClick, int objClick, int imCords[][2], float objCords[][3]) {
 	phase2ExtractParametersFromP(P);
 }
 
+double validator(const cv::Mat &P, int count, RPair candidate[]) {
+	int pass = 0;
+	cv::Mat objPoint = cv::Mat::ones(4, 1, CV_32F);
+	cv::Mat imPoint = cv::Mat::zeros(2, 1, CV_32F);
+	for (int i = 0; i < count; i++) {
+		objPoint.at<float>(0, 0) = candidate[i].mx;
+		objPoint.at<float>(1, 0) = candidate[i].my;
+		objPoint.at<float>(2, 0) = candidate[i].mz;
+		imPoint.at<float>(0, 0) = candidate[i].ix;
+		imPoint.at<float>(1, 0) = candidate[i].iy;
+
+		cv::Mat t = P * objPoint;
+		t = t / t.at<float>(2, 0);
+		double norm = cv::norm(t(cv::Range(0, 2), cv::Range::all()) - imPoint, cv::NORM_L2);
+		if (norm < 5) {
+			pass++;
+		}
+	}
+
+	return pass;
+}
+
 void RansacDLT() {
 	// 切换到screen界面中，保存原来的窗口以便还原
 	int context = glutGetWindow();
@@ -589,12 +601,13 @@ void RansacDLT() {
 	GLint gViewport[4];
 	GLdouble gModelview[16];
 	GLdouble gProjection[16];
-
 	glGetIntegerv(GL_VIEWPORT, gViewport);
 	glGetDoublev(GL_MODELVIEW_MATRIX, gModelview);
 	glGetDoublev(GL_PROJECTION_MATRIX, gProjection);
 
-	rPairCount = 0;
+
+	static RPair candidate[100000];
+	int rPairCount = 0;
 
 	printf("mm\n");
 	for (int i = 0; i < 4; i++) {
@@ -620,7 +633,41 @@ void RansacDLT() {
 		}
 	}
 	fclose(fp);
-	printf("aa: %d %d\n", rPairCount, i);
+
+	{
+		int max = 0;
+		cv::Mat store;
+		float objCords[10][3];
+		int imCords[10][2];
+
+#define NEED 6
+		for (int i = 0; i < 10000; i++) {
+			int list[NEED];
+			randomSample(rPairCount, NEED, list);
+			for (int j = 0; j < NEED; j++) {
+				objCords[j][0] = candidate[list[j]].mx;
+				objCords[j][1] = candidate[list[j]].my;
+				objCords[j][2] = candidate[list[j]].mz;
+
+				imCords[j][0] = candidate[list[j]].ix;
+				imCords[j][1] = candidate[list[j]].iy;
+			}
+
+			cv::Mat P = phase1CalculateP(NEED, NEED, imCords, objCords);
+			int pass = validator(P, rPairCount, candidate);
+			if (max < pass) {
+				max = pass;
+				P.copyTo(store);
+			}
+			
+		}
+#undef NEED
+		cout << "pass: " << max << endl;
+		cout << store << endl;
+		phase2ExtractParametersFromP(store);
+	}
+
+	// 恢复原来的窗口
 	glutSetWindow(context);
 }
 

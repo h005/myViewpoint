@@ -2,6 +2,8 @@
 #include <math.h>
 #include <gl/glut.h>
 #include <opencv2/opencv.hpp>
+#include <stdlib.h>
+#include <time.h>
 #include "custom.h"
 
 using namespace std;
@@ -179,4 +181,15 @@ bool getPointInModels(int x, int y, GLint viewport[4], GLdouble modelview[16], G
 	my = object_y;
 	mz = object_z;
 	return true;
+}
+
+void randomSample(int range, int need, int result[]) {
+	static bool inited = false;
+	if (!inited) {
+		srand(time(NULL));
+		inited = true;
+	}
+	for (int i = 0; i < need; i++) {
+		result[i] = rand() % range;
+	}
 }
