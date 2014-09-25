@@ -543,7 +543,7 @@ void phase2ExtractParametersFromP(cv::Mat &P) {
 
 	K /= K.at<float>(2, 2);
 	cout << "K: " << K << endl;
-	cv::Mat proj = constructProjectionMatrix(K, 0.5, 10, iwidth, iheight);
+	cv::Mat proj = constructProjectionMatrix(K, 0.1, 10, iwidth, iheight);
 	for (int i = 0; i < 4; i++) {
 		for (int j = 0; j < 4; j++) {
 			customProjection[j * 4 + i] = proj.at<float>(i, j);
@@ -629,42 +629,73 @@ void RansacDLT() {
 			candidate[rPairCount].mz = mz;
 			candidate[rPairCount].ix = c;
 			candidate[rPairCount].iy = d;
+			candidate[rPairCount].ax = a;
+			candidate[rPairCount].ay = b;
 			rPairCount++;
 		}
 	}
 	fclose(fp);
 
 	{
+#define NEED 6
 		int max = 0;
 		cv::Mat store;
-		float objCords[10][3];
-		int imCords[10][2];
+		int slist[100];
+		{
+			float objCords[10][3];
+			int imCords[10][2];
 
-#define NEED 6
-		for (int i = 0; i < 10000; i++) {
-			int list[NEED];
-			randomSample(rPairCount, NEED, list);
-			for (int j = 0; j < NEED; j++) {
-				objCords[j][0] = candidate[list[j]].mx;
-				objCords[j][1] = candidate[list[j]].my;
-				objCords[j][2] = candidate[list[j]].mz;
 
-				imCords[j][0] = candidate[list[j]].ix;
-				imCords[j][1] = candidate[list[j]].iy;
+			for (int i = 0; i < 10000; i++) {
+				int list[NEED];
+				randomSample(rPairCount, NEED, list);
+				for (int j = 0; j < NEED; j++) {
+					objCords[j][0] = candidate[list[j]].mx;
+					objCords[j][1] = candidate[list[j]].my;
+					objCords[j][2] = candidate[list[j]].mz;
+
+					imCords[j][0] = candidate[list[j]].ix;
+					imCords[j][1] = candidate[list[j]].iy;
+				}
+
+				cv::Mat P = phase1CalculateP(NEED, NEED, imCords, objCords);
+				int pass = validator(P, rPairCount, candidate);
+				if (max < pass) {
+					max = pass;
+					P.copyTo(store);
+					for (int k = 0; k < NEED; k++) {
+						slist[k] = list[k];
+					}
+				}
 			}
-
-			cv::Mat P = phase1CalculateP(NEED, NEED, imCords, objCords);
-			int pass = validator(P, rPairCount, candidate);
-			if (max < pass) {
-				max = pass;
-				P.copyTo(store);
-			}
-			
 		}
-#undef NEED
+
+		// 在图上显示选定的6个点，借用了全局数据结构
 		cout << "pass: " << max << endl;
-		cout << store << endl;
-		phase2ExtractParametersFromP(store);
+		imClick = NEED;
+		objClick = NEED;
+		for (int i = 0; i < NEED; i++) {
+			imCords[i][0] = candidate[slist[i]].ax;
+			imCords[i][1] = candidate[slist[i]].ay;
+
+			objCords[i][0] = candidate[slist[i]].mx;
+			objCords[i][1] = candidate[slist[i]].my;
+			objCords[i][2] = candidate[slist[i]].mz;
+		}
+
+		// 将这些点画到B图上面去
+		cv::Mat tImg = cv::imread("1t.png");
+		cout << tImg.size().width << " " << tImg.size().height << endl;
+		for (int i = 0; i < NEED; i++) {
+			cv::Point2i p;
+			p.x = candidate[slist[i]].ix;
+			p.y = tImg.size().height - candidate[slist[i]].iy;
+			cv::Scalar pColor(pointColor[i].blue * 255, pointColor[i].green * 255, pointColor[i].red * 255);
+			cv::circle(tImg, p, 4, pColor, -1);
+		}
+		cv::imwrite("amd.png", tImg);
+		//phase2ExtractParametersFromP(store);
+#undef NEED
 	}
 
 	// 恢复原来的窗口

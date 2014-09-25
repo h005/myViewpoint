@@ -253,7 +253,7 @@ int main()
 
 	vector<KeyPoint> qKeyPoints, tKeyPoints;
 
-	{
+	/*{
 		vector<KeyPoint> qHarrisPoints, tHarrisPoints;
 		constructMatchPairs(queryImg, trainImg, DETECT_HARRIS_AFFINE, qHarrisPoints, tHarrisPoints, "Harris.png");
 		qKeyPoints.insert(qKeyPoints.end(), qHarrisPoints.begin(), qHarrisPoints.end());
@@ -268,15 +268,15 @@ int main()
 		qKeyPoints.insert(qKeyPoints.end(), qHessianPoints.begin(), qHessianPoints.end());
 		tKeyPoints.insert(tKeyPoints.end(), tHessianPoints.begin(), tHessianPoints.end());
 		explore_match(qImg, tImg, qHessianPoints, tHessianPoints, "Hessian_match.png");
-	}
+	}*/
 
-	{
+	/*{
 		vector<KeyPoint> qSIFTPoints, tSIFTPoints;
 		constructMatchPairs(queryImg, trainImg, DETECT_USING_OPENCV_SIFT, qSIFTPoints, tSIFTPoints, "SIFT.png");
 		qKeyPoints.insert(qKeyPoints.end(), qSIFTPoints.begin(), qSIFTPoints.end());
 		tKeyPoints.insert(tKeyPoints.end(), tSIFTPoints.begin(), tSIFTPoints.end());
 		explore_match(qImg, tImg, qSIFTPoints, tSIFTPoints, "SIFT_match.png");
-	}
+	}*/
 
 	{
 		vector<KeyPoint> qSURFPoints, tSURFPoints;

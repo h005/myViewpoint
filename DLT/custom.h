@@ -3,6 +3,7 @@
 typedef struct {
 	float mx, my, mz;
 	int ix, iy;
+	int ax, ay;
 } RPair;
 
 void printFloatv(int mode, char *title);
