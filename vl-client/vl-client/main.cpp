@@ -101,6 +101,12 @@ static void constructMatchPairs(const char *queryImagePath, const char *trainIma
 		SURF surfDetector;
 		surfDetector(qImg, cv::noArray(), qKeyPoints, query);
 		surfDetector(tImg, cv::noArray(), tKeyPoints, train);
+	} else if (type == DETECT_USING_MSER_SIFT || type == DETECT_USING_MSER_SURF) {
+		MSER mser;
+		vector<vector<Point>> msers;
+		mser(qImg, msers);
+		cout << msers.size() << endl;
+		exit(-1);
 	} else {
 		// 
 		std::vector<singleFeature *> queryFeats;
@@ -253,15 +259,15 @@ int main()
 
 	vector<KeyPoint> qKeyPoints, tKeyPoints;
 
-	/*{
+	{
 		vector<KeyPoint> qHarrisPoints, tHarrisPoints;
-		constructMatchPairs(queryImg, trainImg, DETECT_HARRIS_AFFINE, qHarrisPoints, tHarrisPoints, "Harris.png");
+		constructMatchPairs(queryImg, trainImg, DETECT_USING_MSER_SIFT, qHarrisPoints, tHarrisPoints, "Harris.png");
 		qKeyPoints.insert(qKeyPoints.end(), qHarrisPoints.begin(), qHarrisPoints.end());
 		tKeyPoints.insert(tKeyPoints.end(), tHarrisPoints.begin(), tHarrisPoints.end());
 		explore_match(qImg, tImg, qHarrisPoints, tHarrisPoints, "Harris_match.png");
 	}
 
-	{
+	/*{
 		vector<KeyPoint> qHessianPoints, tHessianPoints;
 		constructMatchPairs(queryImg, trainImg, DETECT_HESSIAN_AFFINE, qHessianPoints, tHessianPoints, "Hessian.png");
 		printf("%d %d\n", qHessianPoints.size(), tHessianPoints.size());
@@ -278,13 +284,13 @@ int main()
 		explore_match(qImg, tImg, qSIFTPoints, tSIFTPoints, "SIFT_match.png");
 	}*/
 
-	{
+	/*{
 		vector<KeyPoint> qSURFPoints, tSURFPoints;
 		constructMatchPairs(queryImg, trainImg, DETECT_USING_OPENCV_SURF, qSURFPoints, tSURFPoints, "SURF.png");
 		qKeyPoints.insert(qKeyPoints.end(), qSURFPoints.begin(), qSURFPoints.end());
 		tKeyPoints.insert(tKeyPoints.end(), tSURFPoints.begin(), tSURFPoints.end());
 		explore_match(qImg, tImg, qSURFPoints, tSURFPoints, "SURF_match.png");
-	}
+	}*/
 
 	explore_match(qImg, tImg, qKeyPoints, tKeyPoints, "all_match.png");
 	printf("%d %d\n", qKeyPoints.size(), tKeyPoints.size());
