@@ -107,16 +107,14 @@ static void constructMatchPairs(const char *queryImagePath, const char *trainIma
 		mser(qImg, qContours);
 		mser(tImg, tContours);
 
-		Mat left;
-		qImg.copyTo(left);
+		Mat left = imread(queryImagePath);
 		for (int i = 0; i < qContours.size(); i++) {
 			RotatedRect box = fitEllipse(qContours[i]);
 			box.angle = (float)CV_PI / 2 - box.angle;
 			ellipse(left, box, Scalar(196, 255, 255), 2);
 		}
 
-		Mat right;
-		tImg.copyTo(right);
+		Mat right = imread(trainImagePath);
 		for (int i = 0; i < tContours.size(); i++) {
 			RotatedRect box = fitEllipse(tContours[i]);
 			box.angle = (float)CV_PI / 2 - box.angle;
