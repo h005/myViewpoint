@@ -103,9 +103,30 @@ static void constructMatchPairs(const char *queryImagePath, const char *trainIma
 		surfDetector(tImg, cv::noArray(), tKeyPoints, train);
 	} else if (type == DETECT_USING_MSER_SIFT || type == DETECT_USING_MSER_SURF) {
 		MSER mser;
-		vector<vector<Point>> msers;
-		mser(qImg, msers);
-		cout << msers.size() << endl;
+		vector<vector<Point>> qContours, tContours;
+		mser(qImg, qContours);
+		mser(tImg, tContours);
+
+		Mat left;
+		qImg.copyTo(left);
+		for (int i = 0; i < qContours.size(); i++) {
+			RotatedRect box = fitEllipse(qContours[i]);
+			box.angle = (float)CV_PI / 2 - box.angle;
+			ellipse(left, box, Scalar(196, 255, 255), 2);
+		}
+
+		Mat right;
+		tImg.copyTo(right);
+		for (int i = 0; i < tContours.size(); i++) {
+			RotatedRect box = fitEllipse(tContours[i]);
+			box.angle = (float)CV_PI / 2 - box.angle;
+			ellipse(right, box, Scalar(196, 255, 255), 2);
+		}
+
+		Mat img;
+		combineImage(left, right, img);
+		imwrite("mm.png", img);
+		printf("aaa\n");
 		exit(-1);
 	} else {
 		// 
