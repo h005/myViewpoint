@@ -80,12 +80,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\custom.cpp" />
+    <ClCompile Include="..\DLT.cpp" />
     <ClCompile Include="..\glm.cpp" />
     <ClCompile Include="..\main.cpp" />
     <ClCompile Include="..\matrix.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\custom.h" />
+    <ClInclude Include="..\DLT.h" />
     <ClInclude Include="..\glm.h" />
     <ClInclude Include="..\matrix.h" />
   </ItemGroup>
