@@ -195,11 +195,13 @@ static void explore_match(const Mat &qImg, const Mat &tImg, const vector<KeyPoin
 		Mat panel;
 		combineImage(qImg, tImg, panel);
 
+		int n = sizeof(pointColor) / sizeof(color);
+
 		for (size_t i = 0; i < qMatchPoints.size(); i++) {
 			Point2i p1 = qMatchPoints[i].pt, p2 = tMatchPoints[i].pt;
 			p2.x += qImg.cols;
 
-			Scalar color(0, 255, 0);
+			Scalar color(pointColor[i % n].blue * 255, pointColor[i % n].green * 255, pointColor[i % n].red * 255);
 			circle(panel, p1, 2, color, -1);
 			circle(panel, p2, 2, color, -1);
 
@@ -278,13 +280,13 @@ int main()
 
 	vector<KeyPoint> qKeyPoints, tKeyPoints;
 
-	{
+	/*{
 		vector<KeyPoint> qHarrisPoints, tHarrisPoints;
-		constructMatchPairs(queryImg, trainImg, DETECT_USING_MSER_SIFT, qHarrisPoints, tHarrisPoints, "Harris.png");
+		constructMatchPairs(queryImg, trainImg, DETECT_HARRIS_AFFINE, qHarrisPoints, tHarrisPoints, "Harris.png");
 		qKeyPoints.insert(qKeyPoints.end(), qHarrisPoints.begin(), qHarrisPoints.end());
 		tKeyPoints.insert(tKeyPoints.end(), tHarrisPoints.begin(), tHarrisPoints.end());
 		explore_match(qImg, tImg, qHarrisPoints, tHarrisPoints, "Harris_match.png");
-	}
+	}*/
 
 	/*{
 		vector<KeyPoint> qHessianPoints, tHessianPoints;
@@ -295,13 +297,13 @@ int main()
 		explore_match(qImg, tImg, qHessianPoints, tHessianPoints, "Hessian_match.png");
 	}*/
 
-	/*{
+	{
 		vector<KeyPoint> qSIFTPoints, tSIFTPoints;
 		constructMatchPairs(queryImg, trainImg, DETECT_USING_OPENCV_SIFT, qSIFTPoints, tSIFTPoints, "SIFT.png");
 		qKeyPoints.insert(qKeyPoints.end(), qSIFTPoints.begin(), qSIFTPoints.end());
 		tKeyPoints.insert(tKeyPoints.end(), tSIFTPoints.begin(), tSIFTPoints.end());
 		explore_match(qImg, tImg, qSIFTPoints, tSIFTPoints, "SIFT_match.png");
-	}*/
+	}
 
 	/*{
 		vector<KeyPoint> qSURFPoints, tSURFPoints;
@@ -329,7 +331,9 @@ int main()
 	fclose(pFile);
 
 	Mat mask;
-	Mat H = findHomography(qPoints, tPoints, CV_RANSAC, 3, mask);
+	Mat F = findFundamentalMat(qPoints, tPoints, CV_FM_LMEDS, 1, 0.99, mask);
+	cout << F << endl;
+	//Mat H = findHomography(qPoints, tPoints, CV_RANSAC, 3, mask);
 
 	vector<KeyPoint> qFilteredKeyPoints, tFilteredKeyPoints;
 	for (int i = 0; i < mask.rows; i++) {
@@ -340,7 +344,7 @@ int main()
 	}
 	explore_match(qImg, tImg, qFilteredKeyPoints, tFilteredKeyPoints, "Ransaced.png");
 	
-	cout << H << endl;
+	/*cout << H << endl;
 	Mat output(qImg.size(), qImg.type());
 	warpPerspective(qImg, output, H, output.size());
 	imshow("warpPerspective", output);
@@ -356,7 +360,7 @@ int main()
 	mb.at<double>(1, 1) = -1;
 	mb.at<double>(1, 2) = tImg.size().height;
 
-	cout << mb * H * ma.inv() << endl;
+	cout << mb * H * ma.inv() << endl;*/
 
 	waitKey();
 	destroyAllWindows();
