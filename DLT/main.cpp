@@ -301,8 +301,7 @@ bool loadTXT(char* filename, int Cords[10][2], int &count_click)
 	while(fscanf(fp,"%d %d",&Cords[count_click][0],&Cords[count_click][1]) != EOF) {
         count_click++;
     }
-	for(int i = 0; i < count_click; i++)
-		printf("%d %d\n",Cords[i][0],Cords[i][1]);
+
 	fclose(fp);
     return true;
 }
@@ -318,8 +317,7 @@ bool loadTXT(char* filename, float Cords[10][3], int &count_click)
 	while(fscanf(fp,"%f %f %f",&Cords[count_click][0],&Cords[count_click][1],&Cords[count_click][2]) != EOF) {
         count_click++;
     }
-	for(int i = 0; i < count_click; i++)
-		printf("%f %f %f\n",Cords[i][0],Cords[i][1],Cords[i][2]);
+
 	fclose(fp);
     return true;
 }
@@ -374,14 +372,13 @@ void SVDDLT(int imClick, int objClick, int imCords[][2], float objCords[][3]) {
 	for (int i = 0; i < 9; i++) {
 		lookat[i].value = lookatParam.at<float>(i % 3, i / 3);
 	}
-
+	// 使用生成的OpenGL投影矩阵
 	for (int i = 0; i < 4; i++) {
 		for (int j = 0; j < 4; j++) {
 			customProjection[j * 4 + i] = projMatrix.at<float>(i, j);
 		}
 	}
 	usingCustomProjection = true;
-	cout << iwidth << iheight << endl;
 }
 
 double validator(const cv::Mat &P, int count, RPair candidate[]) {
@@ -672,9 +669,7 @@ world_display(void)
         GLint viewport[4];
         glGetIntegerv(GL_VIEWPORT, viewport);
         GLint wWidth = viewport[2], wHeight = viewport[3];
-//        printf("[ww] %d %d %d %d\n", wWidth, wHeight, iwidth, iheight);
 
-		//glBegin(GL_POINTS);
 		for(int i = 0; i < imClick; i++)
 		{
             // 由于显示窗口有缩放和变形，imCords内存放的点单位是图像像素
@@ -688,11 +683,8 @@ world_display(void)
             for(int j = 0; j < n; j++)
 				glVertex2f(wX + R*cos(2*GL_PI/n*j), wY + R*sin(2*GL_PI/n*j));
             glEnd();
-			//glVertex2i(imCords[i][0],imCords[i][1]);
 		}
-		//glEnd();
 	}
-	//
     
     glutSwapBuffers();
 }
@@ -803,8 +795,6 @@ screen_reshape(int width, int height)
     gluLookAt(lookat[0].value, lookat[1].value, lookat[2].value,
         lookat[3].value, lookat[4].value, lookat[5].value,
         lookat[6].value, lookat[7].value, lookat[8].value);
-
-	printFloatv(GL_PROJECTION_MATRIX, "GP");
 
     glClearColor(0.2, 0.2, 0.2, 0.0);
 	glEnable(GL_DEPTH_TEST); 
