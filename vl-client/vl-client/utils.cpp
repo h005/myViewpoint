@@ -116,7 +116,6 @@ void explore_match(const Mat &qImg, const Mat &tImg, const vector<KeyPoint> &qMa
 }
 
 void convertLineEquationToPoints(double a, double b, double c, cv::Size imgSize, cv::Point &pa, cv::Point &pb) {
-#define END_N 300
 	if (abs(a) < abs(b)) {
 		pa = cv::Point(0, -c / b);
 		pb = cv::Point(imgSize.width, (-c - imgSize.width * a) / b);
