@@ -25,7 +25,6 @@ static void drawEpipolarLines(const cv::Mat &F,
 	const float inlierDistance = -1,
 	const char * outputPath = NULL)
 {
-	CV_Assert(points1.size() == points2.size());
 	Mat outImg(std::max<int>(img1.rows, img2.rows), img1.cols + img2.cols, img1.type());
 	outImg.setTo(0);
 	cv::Rect rect1(0, 0, img1.cols, img1.rows);
@@ -58,17 +57,21 @@ static void drawEpipolarLines(const cv::Mat &F,
 		*/
 		cv::Scalar color(rng(256), rng(256), rng(256));
 
+		cv::Point pa, pb;
+		convertLineEquationToPoints(epilines1[i][0], epilines1[i][1], epilines1[i][2], rect2.size(), pa, pb);
 		cv::line(outImg(rect2),
-			cv::Point(0, -epilines1[i][2] / epilines1[i][1]),
-			cv::Point(img1.cols, -(epilines1[i][2] + epilines1[i][0] * img1.cols) / epilines1[i][1]),
+			pa,
+			pb,
 			color,
 			1,
 			CV_AA);
 		cv::circle(outImg(rect1), points1[i], 3, color, -1, CV_AA);
 
+		cv::Point pc, pd;
+		convertLineEquationToPoints(epilines2[i][0], epilines2[i][1], epilines2[i][2], rect1.size(), pc, pd);
 		cv::line(outImg(rect1),
-			cv::Point(0, -epilines2[i][2] / epilines2[i][1]),
-			cv::Point(img2.cols, -(epilines2[i][2] + epilines2[i][0] * img2.cols) / epilines2[i][1]),
+			pc,
+			pd,
 			color,
 			1,
 			CV_AA);
