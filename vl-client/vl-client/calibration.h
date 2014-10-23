@@ -33,8 +33,8 @@ static void drawEpipolarLines(const cv::Mat &F,
 	img2.copyTo(outImg(rect2));
 
 	std::vector<cv::Vec<T2, 3>> epilines1, epilines2;
-	cv::computeCorrespondEpilines(points1, 1, F, epilines1); //Index starts with 1
-	cv::computeCorrespondEpilines(points2, 2, F, epilines2);
+	cv::computeCorrespondEpilines(points1, 1, F, epilines2); //Index starts with 1
+	cv::computeCorrespondEpilines(points2, 2, F, epilines1);
 
 	CV_Assert(points1.size() == points2.size() &&
 		points2.size() == epilines1.size() &&
@@ -58,8 +58,8 @@ static void drawEpipolarLines(const cv::Mat &F,
 		cv::Scalar color(rng(256), rng(256), rng(256));
 
 		cv::Point pa, pb;
-		convertLineEquationToPoints(epilines1[i][0], epilines1[i][1], epilines1[i][2], rect2.size(), pa, pb);
-		cv::line(outImg(rect2),
+		convertLineEquationToPoints(epilines1[i][0], epilines1[i][1], epilines1[i][2], rect1.size(), pa, pb);
+		cv::line(outImg(rect1),
 			pa,
 			pb,
 			color,
@@ -68,8 +68,8 @@ static void drawEpipolarLines(const cv::Mat &F,
 		cv::circle(outImg(rect1), points1[i], 3, color, -1, CV_AA);
 
 		cv::Point pc, pd;
-		convertLineEquationToPoints(epilines2[i][0], epilines2[i][1], epilines2[i][2], rect1.size(), pc, pd);
-		cv::line(outImg(rect1),
+		convertLineEquationToPoints(epilines2[i][0], epilines2[i][1], epilines2[i][2], rect2.size(), pc, pd);
+		cv::line(outImg(rect2),
 			pc,
 			pd,
 			color,

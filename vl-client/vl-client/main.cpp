@@ -164,6 +164,8 @@ int main()
 	/*char *queryImg = "2q.png", *trainImg = "2t.png";*/
 	char *queryImg = "1q.ppm", *trainImg = "1t.png";
 	/*char *queryImg = "et000.jpg", *trainImg = "et001.jpg";*/
+	/*char *queryImg = "et001.jpg", *trainImg = "et003.jpg";*/
+	/*char *queryImg = "et001.jpg", *trainImg = "et008.jpg";*/
 	Mat qImg = imread(queryImg), tImg = imread(trainImg);
 
 	vector<KeyPoint> qKeyPoints, tKeyPoints;
@@ -221,7 +223,7 @@ int main()
 	Mat mask;
 	Mat F = findFundamentalMat(qPoints, tPoints, CV_FM_RANSAC, 1, 0.99, mask);
 	
-	vector<Point> qFilteredPoints, tFilteredPoints;
+	vector<Point2f> qFilteredPoints, tFilteredPoints;
 	vector<KeyPoint> qFilteredKeyPoints, tFilteredKeyPoints;
 	for (int i = 0; i < mask.rows; i++) {
 		if (mask.at<uchar>(i, 0)) {
@@ -231,8 +233,9 @@ int main()
 			tFilteredKeyPoints.push_back(tKeyPoints[i]);
 		}
 	}
+	printf("Matched: %d / %d = %.2f%%\n", qFilteredPoints.size(), qPoints.size(), qFilteredPoints.size() * 100.0 / qPoints.size());
 	explore_match(qImg, tImg, qFilteredKeyPoints, tFilteredKeyPoints, "Ransaced.png");
-	drawEpipolarLines(F, qImg, tImg, qPoints, tPoints, -1, "epipolar.png");
+	drawEpipolarLines(F, qImg, tImg, qFilteredPoints, tFilteredPoints, -1, "epipolar.png");
 
 	waitKey();
 	destroyAllWindows();
