@@ -843,34 +843,6 @@ screen_menu(int value)
     char* name = 0;
     char* txt_name = 0;
     switch (value) {
-    case 'a':
-        name = "data/al.obj";
-		txt_name = "data/al_obj.txt";
-        break;
-    case 's':
-        name = "data/soccerball.obj";
-		txt_name = "data/soccerball_obj.txt";
-        break;
-    case 'd':
-        name = "data/dolphins.obj";
-		txt_name = "data/dolphins_obj.txt";
-        break;
-    case 'f':
-        name = "data/flowers.obj";
-		txt_name = "data/flowers_obj.txt";
-        break;
-    case 'j':
-        name = "data/f-16.obj";
-		txt_name = "data/f-16_obj.txt";
-        break;
-    case 'p':
-        name = "data/porsche.obj";
-		txt_name = "data/porsche_obj.txt";
-        break;
-    case 'r':
-        name = "data/rose+vase.obj";
-		txt_name = "data/rose+vase_obj.txt";
-		break;
 	case 'b':
         name = "data/BigBen.obj";
 		txt_name = "data/BigBen_obj.txt";
@@ -911,6 +883,10 @@ screen_menu(int value)
         name = "data/triumph.obj";
 		txt_name = "data/triumph_obj.txt";
         break;
+	case 'a':
+		name = "data/Tiananmen-Square.obj";
+		txt_name = "data/Tiananmen-Square_obj.txt";
+		break;
     }
     
     if (name) {
@@ -1175,7 +1151,6 @@ main(int argc, char** argv)
 	glutAddMenuEntry("example", 'n');
 	glutAddMenuEntry("Eiffel", 'e');
 	glutAddMenuEntry("triumph", 't');
-	
     glutAttachMenu(GLUT_RIGHT_BUTTON);
     
     screen = glutCreateSubWindow(window, GAP+sub_width+GAP, GAP, sub_width, sub_height);
@@ -1195,6 +1170,7 @@ main(int argc, char** argv)
 	glutAddMenuEntry("example", 'n');
 	glutAddMenuEntry("EiffelTower", 'e');
 	glutAddMenuEntry("triumph", 't');
+	glutAddMenuEntry("tiananmen", 'a');
     glutAttachMenu(GLUT_RIGHT_BUTTON);
     
     command = glutCreateSubWindow(window, GAP+sub_height+GAP, GAP+sub_height+GAP, sub_width, sub_height);
