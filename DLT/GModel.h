@@ -30,8 +30,7 @@ public:
 	bool load(const char *modelPath);
 	bool hasScene();
 	void bindTextureToGL();
-	void drawModel();
-	void drawModelFaster();
+	void drawNormalizedModel();
 	float drawScale();
 	~GModel();
 
@@ -39,5 +38,7 @@ private:
 	void apply_material(const aiMaterial *mtl);
 	void recursive_render(const aiScene *sc, const aiNode* nd);
 	void cleanUp();
+	void drawModel();
+	void drawModelFaster();
 };
 

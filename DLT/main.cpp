@@ -849,13 +849,10 @@ screen_display(void)
 		loadModel("data/EiffelTower.obj", "data/Eiffel_obj.txt");
 	}
 	
-	float scale = model.drawScale();
-	printf("%f\n", scale);
-	glPushMatrix();
-	glScalef(scale, scale, scale);
-	glTranslatef(-model.scene_center.x, -model.scene_center.y, -model.scene_center.z);
-	model.drawModelFaster();
-	glPopMatrix();
+	// 使用下面的方法，你无需考虑模型原生的点坐标
+	// 只需要考虑规范化后的坐标
+	model.drawNormalizedModel();
+
 	// 绘制模型上的点
 	if(objClick)
 	{

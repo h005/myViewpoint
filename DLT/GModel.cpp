@@ -1,4 +1,4 @@
-#include "GModel.h"
+﻿#include "GModel.h"
 
 // Can't send color down as a pointer to aiColor4D because AI colors are ABGR.
 static void Color4f(const aiColor4D *color)
@@ -211,7 +211,7 @@ void GModel::recursive_render(const aiScene *sc, const aiNode* nd)
 					}
 					glNormal3fv(&mesh->mNormals[vertexIndex].x);
 				}
-				// ʵ���ϴ������x, y, z������
+				// 实际上传入的是x, y, z的序列
 				glVertex3fv(&mesh->mVertices[vertexIndex].x);
 			}
 
@@ -308,6 +308,16 @@ void GModel::drawModelFaster() {
 	}
 
 	glCallList(scene_list);
+}
+
+void GModel::drawNormalizedModel() {
+	// 下面这个过程可以认作硬件实现的点变换
+	glPushMatrix();
+	float scale = drawScale();
+	glScalef(scale, scale, scale);
+	glTranslatef(-scene_center.x, -scene_center.y, -scene_center.z);
+	drawModelFaster();
+	glPopMatrix();
 }
 
 void GModel::cleanUp() {
