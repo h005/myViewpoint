@@ -106,7 +106,7 @@ static cv::Mat removeEpsilon(cv::Mat &matrix) {
 	for (int i = 0; i < result.cols; i++) {
 		for (int j = 0; j < result.cols; j++) {
 			result.at<float>(i, j) = round(matrix.at<float>(i, j) * 1e5) / 1e5;
-			if (abs(result.at<float>(i, j)) < 1e-5) {
+			if (abs(result.at<float>(i, j)) < 1e-3) {
 				result.at<float>(i, j) = 0;
 			}
 		}

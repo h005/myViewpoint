@@ -724,6 +724,9 @@ world_menu(int value)
         name = "data/triumph.ppm";
 		txt_name = "data/triumph_im_norm.txt";
         break;
+	case 'a':
+		name = "data/notre_dame.ppm";
+		txt_name = "data/notre_dame_im_norm.txt";
     }
     
     if (name) {
@@ -804,10 +807,8 @@ screen_reshape(int width, int height)
 	// 抗锯齿选项
 	glEnable(GL_POINT_SMOOTH);
 	glEnable(GL_LINE_SMOOTH);
-	glEnable(GL_POLYGON_SMOOTH);
 	glHint(GL_POINT_SMOOTH_HINT, GL_NICEST); // Make round points, not square points
 	glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);  // Antialias the lines
-	glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -815,8 +816,6 @@ screen_reshape(int width, int height)
 	if (getenv("MODEL_IS_BROKEN"))
 		glFrontFace(GL_CW);
 	glColorMaterial(GL_FRONT_AND_BACK, GL_DIFFUSE);
-
-	printf("init time: %d ms\n", glutGet(GLUT_ELAPSED_TIME));
 }
 
 
@@ -926,8 +925,8 @@ screen_menu(int value)
 		txt_name = "data/triumph_obj.txt";
         break;
 	case 'a':
-		name = "data/Tiananmen-Square.obj";
-		txt_name = "data/Tiananmen-Square_obj.txt";
+		name = "F:/no/models/model.dae";
+		txt_name = "data/notre_dame.txt";
 		break;
     }
     
@@ -1162,7 +1161,7 @@ main(int argc, char** argv)
     if (!image)
         exit(0);
 
-    glutInitDisplayMode(GLUT_RGB | GLUT_DEPTH | GLUT_DOUBLE);
+    glutInitDisplayMode(GLUT_RGB | GLUT_DEPTH | GLUT_DOUBLE | GLUT_MULTISAMPLE);
     glutInitWindowSize(Width+GAP*3, Height+GAP*3);
     glutInitWindowPosition(50, 50);
     glutInit(&argc, argv);
@@ -1187,6 +1186,7 @@ main(int argc, char** argv)
 	glutAddMenuEntry("example", 'n');
 	glutAddMenuEntry("Eiffel", 'e');
 	glutAddMenuEntry("triumph", 't');
+	glutAddMenuEntry("notre dame", 'a');
     glutAttachMenu(GLUT_RIGHT_BUTTON);
     
     screen = glutCreateSubWindow(window, GAP+sub_width+GAP, GAP, sub_width, sub_height);
@@ -1206,7 +1206,7 @@ main(int argc, char** argv)
 	glutAddMenuEntry("example", 'n');
 	glutAddMenuEntry("EiffelTower", 'e');
 	glutAddMenuEntry("triumph", 't');
-	glutAddMenuEntry("tiananmen", 'a');
+	glutAddMenuEntry("notre dame", 'a');
     glutAttachMenu(GLUT_RIGHT_BUTTON);
     
     command = glutCreateSubWindow(window, GAP+sub_height+GAP, GAP+sub_height+GAP, sub_width, sub_height);
