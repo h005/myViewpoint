@@ -340,7 +340,7 @@ void GModel::cleanUp() {
 	scene = NULL;
 }
 
-bool GModel::hasScene() {
+bool GModel::hasModel() {
 	return scene != NULL;
 }
 

@@ -28,7 +28,7 @@ public:
 
 	GModel();
 	bool load(const char *modelPath);
-	bool hasScene();
+	bool hasModel();
 	void bindTextureToGL();
 	void drawNormalizedModel();
 	float drawScale();

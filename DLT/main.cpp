@@ -23,7 +23,6 @@
 #include "assimp/LogStream.hpp"
 
 #include "glm.h"
-#include "matrix.h"
 #include "custom.h"
 #include "DLT.h"
 #include "GModel.h"
@@ -845,7 +844,7 @@ screen_display(void)
 	glRotatef(spin_x, 0, 1, 0);
 	glRotatef(spin_y, 1, 0, 0);
 
-	if (!model.hasScene()) {
+	if (!model.hasModel()) {
 		loadModel("data/EiffelTower.obj", "data/Eiffel_obj.txt");
 	}
 	
