@@ -31,7 +31,6 @@
 using namespace std;
 
 GModel model;
-static GLuint scene_list = 0;
 
 typedef struct _cell {
     int id;
@@ -851,11 +850,12 @@ screen_display(void)
 	}
 	
 	float scale = model.drawScale();
+	printf("%f\n", scale);
+	glPushMatrix();
 	glScalef(scale, scale, scale);
-
 	glTranslatef(-model.scene_center.x, -model.scene_center.y, -model.scene_center.z);
 	model.drawModelFaster();
-
+	glPopMatrix();
 	// 绘制模型上的点
 	if(objClick)
 	{
@@ -869,9 +869,9 @@ screen_display(void)
 			glTranslatef(objCords[i][0],objCords[i][1],objCords[i][2]);
 
 			if (usingCustomProjection) {
-				glutSolidSphere(5, 10, 10);
+				glutSolidSphere(0.01, 10, 10);
 			} else {
-				glutSolidSphere(5, 10, 10);
+				glutSolidSphere(0.02, 10, 10);
 			}
 			
 			glDisable(GL_COLOR_MATERIAL);
