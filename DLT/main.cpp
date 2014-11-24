@@ -1179,11 +1179,11 @@ main(int argc, char** argv)
     glutCreateMenu(world_menu);
     glutAddMenuEntry("Bigben", 'b');
     glutAddMenuEntry("House", 'h');
-    glutAddMenuEntry("Capitol", 'c');
+    glutAddMenuEntry("StateCapitol", 'c');
     glutAddMenuEntry("Oslo", 'o');
 	glutAddMenuEntry("JinMao", 'm');
 	glutAddMenuEntry("Lugger", 'l');
-	glutAddMenuEntry("example", 'n');
+	glutAddMenuEntry("Lugger2", 'n');
 	glutAddMenuEntry("Eiffel", 'e');
 	glutAddMenuEntry("triumph", 't');
 	glutAddMenuEntry("notre dame", 'a');
@@ -1203,7 +1203,7 @@ main(int argc, char** argv)
 	glutAddMenuEntry("OsloBuilding", 'o');
 	glutAddMenuEntry("House", 'h');
 	glutAddMenuEntry("Lugger", 'l');
-	glutAddMenuEntry("example", 'n');
+	glutAddMenuEntry("Lugger2", 'n');
 	glutAddMenuEntry("EiffelTower", 'e');
 	glutAddMenuEntry("triumph", 't');
 	glutAddMenuEntry("notre dame", 'a');
