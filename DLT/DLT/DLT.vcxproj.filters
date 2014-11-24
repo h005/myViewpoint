@@ -30,6 +30,9 @@
     <ClCompile Include="..\DLT.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="..\GModel.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\glm.h">
@@ -42,6 +45,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="..\DLT.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\GModel.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

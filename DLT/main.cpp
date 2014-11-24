@@ -16,12 +16,22 @@
 #include <fstream>
 #include <opencv2/opencv.hpp>
 
+#include "assimp/Importer.hpp"
+#include "assimp/postprocess.h"
+#include "assimp/scene.h"
+#include "assimp/DefaultLogger.hpp"
+#include "assimp/LogStream.hpp"
+
 #include "glm.h"
 #include "matrix.h"
 #include "custom.h"
 #include "DLT.h"
+#include "GModel.h"
 
 using namespace std;
+
+GModel model;
+static GLuint scene_list = 0;
 
 typedef struct _cell {
     int id;
@@ -124,7 +134,6 @@ enum {
 } mode = PERSPECTIVE;
 
 GLboolean world_draw = GL_TRUE;
-GLMmodel* pmodel = NULL;
 GLint selection = 0;
 GLfloat spin_x = 0.0;
 GLfloat spin_y = 0.0;
@@ -245,20 +254,6 @@ cell_vector(float* dst, cell* cell, int num)
 {
     while (--num >= 0)
         dst[num] = cell[num].value;
-}
-
-void
-drawmodel(void)
-{
-    if (!pmodel) {
-        pmodel = glmReadOBJ("data/f-16.obj");
-        if (!pmodel) exit(0);
-        model_scale = glmUnitize(pmodel);
-        glmFacetNormals(pmodel);
-        glmVertexNormals(pmodel, 90.0);
-    }
-    
-    glmDraw(pmodel, GLM_SMOOTH | GLM_MATERIAL);
 }
 
 void
@@ -796,21 +791,71 @@ screen_reshape(int width, int height)
         lookat[3].value, lookat[4].value, lookat[5].value,
         lookat[6].value, lookat[7].value, lookat[8].value);
 
-    glClearColor(0.2, 0.2, 0.2, 0.0);
-	glEnable(GL_DEPTH_TEST); 
-    glEnable(GL_LIGHTING);
-    glEnable(GL_LIGHT0);
+
+	// init options
+	glClearColor(0.1f, 0.1f, 0.1f, 1.f);
+
+	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHT0);    // Uses default lighting parameters
+
+	glEnable(GL_DEPTH_TEST);
+
+	glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
+	glEnable(GL_NORMALIZE);
+
+	// 抗锯齿选项
+	glEnable(GL_POINT_SMOOTH);
+	glEnable(GL_LINE_SMOOTH);
+	glEnable(GL_POLYGON_SMOOTH);
+	glHint(GL_POINT_SMOOTH_HINT, GL_NICEST); // Make round points, not square points
+	glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);  // Antialias the lines
+	glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	// XXX docs say all polygons are emitted CCW, but tests show that some aren't.
+	if (getenv("MODEL_IS_BROKEN"))
+		glFrontFace(GL_CW);
+	glColorMaterial(GL_FRONT_AND_BACK, GL_DIFFUSE);
+
+	printf("init time: %d ms\n", glutGet(GLUT_ELAPSED_TIME));
+}
+
+
+void loadModel(const char *modelPath, char *pointsName) {
+	// 由于要绑定纹理，所以需要切换到screen的上下文中
+	int context = glutGetWindow();
+	glutSetWindow(screen);
+
+	assert(model.load(modelPath));
+	model.bindTextureToGL();
+
+	if (!loadTXT(pointsName, objCords, objClick))
+		objClick = 0;
+
+	glutSetWindow(context);
 }
 
 void
 screen_display(void)
 {
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 	glMatrixMode(GL_MODELVIEW);
 	glRotatef(spin_x, 0, 1, 0);
 	glRotatef(spin_y, 1, 0, 0);
-	// 绘制模型
-	drawmodel();
+
+	if (!model.hasScene()) {
+		loadModel("data/EiffelTower.obj", "data/Eiffel_obj.txt");
+	}
+	
+	float scale = model.drawScale();
+	glScalef(scale, scale, scale);
+
+	glTranslatef(-model.scene_center.x, -model.scene_center.y, -model.scene_center.z);
+	model.drawModelFaster();
+
 	// 绘制模型上的点
 	if(objClick)
 	{
@@ -824,9 +869,9 @@ screen_display(void)
 			glTranslatef(objCords[i][0],objCords[i][1],objCords[i][2]);
 
 			if (usingCustomProjection) {
-				glutSolidSphere(0.01, 10, 10);
+				glutSolidSphere(5, 10, 10);
 			} else {
-				glutSolidSphere(0.04, 10, 10);
+				glutSolidSphere(5, 10, 10);
 			}
 			
 			glDisable(GL_COLOR_MATERIAL);
@@ -836,6 +881,7 @@ screen_display(void)
 	
     glutSwapBuffers();
 }
+
 
 void
 screen_menu(int value)
@@ -892,14 +938,8 @@ screen_menu(int value)
     if (name) {
 		sTxtName = txt_name;
 		//加载球
-		if(!loadTXT(txt_name,objCords,objClick))
-			objClick = 0;
-		//
-        pmodel = glmReadOBJ(name);
-        if (!pmodel) exit(0);
-        glmUnitize(pmodel);
-        glmFacetNormals(pmodel);
-        glmVertexNormals(pmodel, 90.0);
+		
+		loadModel(name, txt_name);
     }
     
     redisplay_all();
