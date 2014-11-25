@@ -1,4 +1,33 @@
 ﻿#include "GModel.h"
+#include <opencv2\opencv.hpp>
+#include <IL/il.h>
+
+static void *imgData(const char *texturePath, int &width, int &height) {
+	printf("%s\n", texturePath);
+	cv::Mat img = cv::imread(texturePath);
+	if (img.rows <= 0 || img.cols <= 0) {
+		return NULL;
+	}
+	assert(img.channels() == 3);
+	
+	cv::Mat fliped;
+	cv::flip(img, fliped, 0);
+	cv::Mat out;
+	cv::cvtColor(fliped, out, CV_RGB2BGR);
+	size_t mem = out.rows * out.cols * out.channels();
+	uchar *data = new uchar[mem];
+	size_t rowSize = out.cols * out.channels();
+	uchar *pivot = data;
+	for (int i = 0; i < out.rows; i++) {
+		uchar *ptr = img.ptr(i);
+		memcpy(pivot, ptr, rowSize);
+		pivot += rowSize;
+	}
+	assert(pivot - data == mem);
+	width = out.size().width;
+	height = out.size().height;
+	return data;
+}
 
 // Can't send color down as a pointer to aiColor4D because AI colors are ABGR.
 static void Color4f(const aiColor4D *color)
@@ -89,7 +118,7 @@ void GModel::apply_material(const aiMaterial *mtl)
 	int texIndex = 0;
 	aiString texPath;	//contains filename of texture
 
-	if (AI_SUCCESS == mtl->GetTexture(aiTextureType_DIFFUSE, texIndex, &texPath))
+	if (AI_SUCCESS == mtl->GetTexture(aiTextureType_DIFFUSE, texIndex, &texPath) && textureIdMap[texPath.data])
 	{
 		//bind texture
 		unsigned int texId = *textureIdMap[texPath.data];
@@ -282,7 +311,6 @@ void GModel::bindTextureToGL() {
 	int i;
 	for (i = 0, it = textureIdMap.begin(); it != textureIdMap.end(); it++, i++) {
 		std::string filename = basePath + it->first;
-		it->second = &textureIds[i];
 
 		glBindTexture(GL_TEXTURE_2D, textureIds[i]); /* Binding of texture name */
 		//redefine standard texture values
@@ -290,6 +318,18 @@ void GModel::bindTextureToGL() {
 																		  interpolation for magnification filter */
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); /* We will use linear
 																		  interpolation for minifying filter */
+
+		int width, height;
+		void *data = imgData(filename.c_str(), width, height);
+		if (data) {
+			printf("%d * %d\n", width, height);
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width,
+				height, 0, GL_RGB, GL_UNSIGNED_BYTE,
+				data); /* Texture specification */
+			delete data;
+
+			it->second = &textureIds[i];
+		}
 	}
 }
 
