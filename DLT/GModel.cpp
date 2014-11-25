@@ -225,6 +225,8 @@ void GModel::recursive_render(const aiScene *sc, const aiNode* nd)
 			default: face_mode = GL_POLYGON; break;
 			}
 
+			glEnable(GL_TEXTURE_2D);
+			glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
 			glBegin(face_mode);
 
 			for (i = 0; i < face->mNumIndices; i++)		// go through all vertices in face
@@ -244,6 +246,7 @@ void GModel::recursive_render(const aiScene *sc, const aiNode* nd)
 			}
 
 			glEnd();
+			glDisable(GL_TEXTURE_2D);
 
 		}
 
@@ -321,7 +324,7 @@ void GModel::bindTextureToGL() {
 		int width, height;
 		void *data = imgData(filename.c_str(), width, height);
 		if (data) {
-			printf("%d * %d\n", width, height);
+			glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width,
 				height, 0, GL_RGB, GL_UNSIGNED_BYTE,
 				data); /* Texture specification */
