@@ -748,8 +748,8 @@ void
 world_mouse(int button, int state, int x, int y)
 {
 	// 传入的坐标，坐标原点在窗口的左上角
-	oldx = x;
-    oldy = y;
+	int oldx = x;
+    int oldy = y;
 	if(button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
 	{
 		GLint viewport[4];
@@ -768,6 +768,48 @@ world_mouse(int button, int state, int x, int y)
 		imClick++;
 	}
 	redisplay_all();
+}
+
+void initGL(int glutWindow) {
+	int context = glutGetWindow();
+	glutSetWindow(glutWindow);
+
+	glShadeModel(GL_SMOOTH);		 // Enables Smooth Shading
+	glClearColor(0.1f, 0.1f, 0.1f, 1.f);
+	glClearDepth(1.0f);				// Depth Buffer Setup
+	glEnable(GL_DEPTH_TEST);		// Enables Depth Testing
+	glDepthFunc(GL_LEQUAL);			// The Type Of Depth Test To Do
+	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);	// Really Nice Perspective Calculation
+
+
+	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHT0);    // Uses default lighting parameters
+	glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
+	glEnable(GL_NORMALIZE);
+
+	static GLfloat LightAmbient[] = { 0.5f, 0.5f, 0.5f, 1.0f };
+	static GLfloat LightDiffuse[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	static GLfloat LightPosition[] = { 0.0f, 0.0f, 15.0f, 1.0f };
+	glLightfv(GL_LIGHT1, GL_AMBIENT, LightAmbient);
+	glLightfv(GL_LIGHT1, GL_DIFFUSE, LightDiffuse);
+	glLightfv(GL_LIGHT1, GL_POSITION, LightPosition);
+	glEnable(GL_LIGHT1);
+
+
+	// 抗锯齿选项
+	glEnable(GL_POINT_SMOOTH);
+	glEnable(GL_LINE_SMOOTH);
+	glHint(GL_POINT_SMOOTH_HINT, GL_NICEST); // Make round points, not square points
+	glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);  // Antialias the lines
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	// XXX docs say all polygons are emitted CCW, but tests show that some aren't.
+	if (getenv("MODEL_IS_BROKEN"))
+		glFrontFace(GL_CW);
+	glColorMaterial(GL_FRONT_AND_BACK, GL_DIFFUSE);
+
+	glutSetWindow(context);
 }
 void
 screen_reshape(int width, int height)
@@ -791,31 +833,6 @@ screen_reshape(int width, int height)
     gluLookAt(lookat[0].value, lookat[1].value, lookat[2].value,
         lookat[3].value, lookat[4].value, lookat[5].value,
         lookat[6].value, lookat[7].value, lookat[8].value);
-
-
-	// init options
-	glClearColor(0.1f, 0.1f, 0.1f, 1.f);
-
-	glEnable(GL_LIGHTING);
-	glEnable(GL_LIGHT0);    // Uses default lighting parameters
-
-	glEnable(GL_DEPTH_TEST);
-
-	glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
-	glEnable(GL_NORMALIZE);
-
-	// 抗锯齿选项
-	glEnable(GL_POINT_SMOOTH);
-	glEnable(GL_LINE_SMOOTH);
-	glHint(GL_POINT_SMOOTH_HINT, GL_NICEST); // Make round points, not square points
-	glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);  // Antialias the lines
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-	// XXX docs say all polygons are emitted CCW, but tests show that some aren't.
-	if (getenv("MODEL_IS_BROKEN"))
-		glFrontFace(GL_CW);
-	glColorMaterial(GL_FRONT_AND_BACK, GL_DIFFUSE);
 }
 
 
@@ -926,6 +943,7 @@ screen_menu(int value)
         break;
 	case 'a':
 		name = "F:/no/models/model.dae";
+		name = "F:/tools/assimp-3.1.1-win-binaries/test/models/OBJ/spider.obj";
 		txt_name = "data/notre_dame.txt";
 		break;
     }
@@ -1190,6 +1208,7 @@ main(int argc, char** argv)
     glutAttachMenu(GLUT_RIGHT_BUTTON);
     
     screen = glutCreateSubWindow(window, GAP+sub_width+GAP, GAP, sub_width, sub_height);
+	initGL(screen);
     glutReshapeFunc(screen_reshape);
     glutDisplayFunc(screen_display);
     glutKeyboardFunc(main_keyboard);

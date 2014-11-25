@@ -192,7 +192,6 @@ void GModel::recursive_render(const aiScene *sc, const aiNode* nd)
 
 		apply_material(sc->mMaterials[mesh->mMaterialIndex]);
 
-
 		if (mesh->mNormals == NULL)
 		{
 			glDisable(GL_LIGHTING);
@@ -225,10 +224,8 @@ void GModel::recursive_render(const aiScene *sc, const aiNode* nd)
 			default: face_mode = GL_POLYGON; break;
 			}
 
-			glEnable(GL_TEXTURE_2D);
 			glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
 			glBegin(face_mode);
-
 			for (i = 0; i < face->mNumIndices; i++)		// go through all vertices in face
 			{
 				int vertexIndex = face->mIndices[i];	// get group index for current index
@@ -244,10 +241,7 @@ void GModel::recursive_render(const aiScene *sc, const aiNode* nd)
 				// 实际上传入的是x, y, z的序列
 				glVertex3fv(&mesh->mVertices[vertexIndex].x);
 			}
-
 			glEnd();
-			glDisable(GL_TEXTURE_2D);
-
 		}
 
 	}
@@ -337,7 +331,13 @@ void GModel::bindTextureToGL() {
 
 void GModel::drawModel() {
 	assert(scene != NULL);
+	glPushAttrib(GL_ENABLE_BIT);
+
+	glEnable(GL_TEXTURE_2D);
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
 	recursive_render(scene, scene->mRootNode);
+
+	glPopAttrib();
 }
 
 void GModel::drawModelFaster() {
