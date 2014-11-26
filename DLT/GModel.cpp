@@ -2,7 +2,6 @@
 #include <opencv2\opencv.hpp>
 
 static void *imgData(const char *texturePath, int &width, int &height) {
-	printf("%s\n", texturePath);
 	cv::Mat img = cv::imread(texturePath);
 	if (img.rows <= 0 || img.cols <= 0) {
 		return NULL;

@@ -942,16 +942,18 @@ screen_menu(int value)
 		txt_name = "data/triumph_obj.txt";
         break;
 	case 'a':
-		name = "F:/no/models/model.dae";
-		name = "F:/tools/assimp-3.1.1-win-binaries/test/models/OBJ/spider.obj";
+		name = "F:/no2/models/model.dae";
 		txt_name = "data/notre_dame.txt";
+		break;
+	case 's':
+		name = "F:/tools/assimp-3.1.1-win-binaries/test/models/OBJ/spider.obj";
+		txt_name = "data/spider.txt";
 		break;
     }
     
     if (name) {
 		sTxtName = txt_name;
-		//加载球
-		
+		// 加载模型和模型上选取的点
 		loadModel(name, txt_name);
     }
     
@@ -1226,6 +1228,7 @@ main(int argc, char** argv)
 	glutAddMenuEntry("EiffelTower", 'e');
 	glutAddMenuEntry("triumph", 't');
 	glutAddMenuEntry("notre dame", 'a');
+	glutAddMenuEntry("Spider", 's');
     glutAttachMenu(GLUT_RIGHT_BUTTON);
     
     command = glutCreateSubWindow(window, GAP+sub_height+GAP, GAP+sub_height+GAP, sub_width, sub_height);
