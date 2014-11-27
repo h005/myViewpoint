@@ -53,9 +53,11 @@ static void convertSingleFeatureToMat(const vector<singleFeature *> &feats, int 
 }
 
 // 使用给定的特征，对图像进行匹配
-static void constructMatchPairs(const char *queryImagePath, const char *trainImagePath, detectTypes type, vector<KeyPoint> &qMatchPoints, vector<KeyPoint> &tMatchPoints, char *windowName = NULL) {
-	Mat qImg = imread(queryImagePath, 0);
-	Mat tImg = imread(trainImagePath, 0);
+static void constructMatchPairs(const cv::Mat &queryImg, const cv::Mat &trainImg, detectTypes type, vector<KeyPoint> &qMatchPoints, vector<KeyPoint> &tMatchPoints, char *windowName = NULL) {
+	Mat qImg;
+	cv::cvtColor(queryImg, qImg, CV_RGB2GRAY);
+	Mat tImg;
+	cv::cvtColor(trainImg, tImg, CV_RGB2GRAY);
 
 	vector<KeyPoint> qKeyPoints;
 	vector<KeyPoint> tKeyPoints;
@@ -78,14 +80,16 @@ static void constructMatchPairs(const char *queryImagePath, const char *trainIma
 		mser(qImg, qContours);
 		mser(tImg, tContours);
 
-		Mat left = imread(queryImagePath);
+		Mat left;
+		queryImg.copyTo(left);
 		for (int i = 0; i < qContours.size(); i++) {
 			RotatedRect box = fitEllipse(qContours[i]);
 			box.angle = (float)CV_PI / 2 - box.angle;
 			ellipse(left, box, Scalar(196, 255, 255), 2);
 		}
 
-		Mat right = imread(trainImagePath);
+		Mat right;
+		trainImg.copyTo(right);
 		for (int i = 0; i < tContours.size(); i++) {
 			RotatedRect box = fitEllipse(tContours[i]);
 			box.angle = (float)CV_PI / 2 - box.angle;
@@ -162,11 +166,28 @@ int main()
 {
 	
 	/*char *queryImg = "2q.png", *trainImg = "2t.png";*/
-	char *queryImg = "1q.ppm", *trainImg = "1t.png";
+	/*char *queryImg = "1q.ppm", *trainImg = "1t.png";*/
 	/*char *queryImg = "et000.jpg", *trainImg = "et001.jpg";*/
 	/*char *queryImg = "et001.jpg", *trainImg = "et003.jpg";*/
-	/*char *queryImg = "et001.jpg", *trainImg = "et008.jpg";*/
+	char *queryImg = "joeshlabotnik_2103447222.rd.jpg", *trainImg = "traviscrawford_194751102.rd.jpg";
+	//char *queryImg = "et001.jpg", *trainImg = "et008.jpg";
 	Mat qImg = imread(queryImg), tImg = imread(trainImg);
+	int height = min(qImg.size().height, tImg.size().height);
+	if (qImg.size().height > height) {
+		float scale = height * 1.0 / qImg.size().height;
+		Size size((int)(scale * qImg.size().width), height);
+		Mat tmp;
+		cv::resize(qImg, tmp, size);
+		qImg = tmp;
+	}
+	if (tImg.size().height > height) {
+		float scale = height * 1.0 / tImg.size().height;
+		Size size((int)(scale * tImg.size().width), height);
+		Mat tmp;
+		cv::resize(tImg, tmp, size);
+		tImg = tmp;
+	}
+
 
 	vector<KeyPoint> qKeyPoints, tKeyPoints;
 
@@ -189,7 +210,7 @@ int main()
 
 	{
 		vector<KeyPoint> qSIFTPoints, tSIFTPoints;
-		constructMatchPairs(queryImg, trainImg, DETECT_USING_OPENCV_SIFT, qSIFTPoints, tSIFTPoints, "SIFT.png");
+		constructMatchPairs(qImg, tImg, DETECT_USING_OPENCV_SIFT, qSIFTPoints, tSIFTPoints, "SIFT.png");
 		qKeyPoints.insert(qKeyPoints.end(), qSIFTPoints.begin(), qSIFTPoints.end());
 		tKeyPoints.insert(tKeyPoints.end(), tSIFTPoints.begin(), tSIFTPoints.end());
 		explore_match(qImg, tImg, qSIFTPoints, tSIFTPoints, "SIFT_match.png");
@@ -197,7 +218,7 @@ int main()
 
 	/*{
 		vector<KeyPoint> qSURFPoints, tSURFPoints;
-		constructMatchPairs(queryImg, trainImg, DETECT_USING_OPENCV_SURF, qSURFPoints, tSURFPoints, "SURF.png");
+		constructMatchPairs(qImg, tImg, DETECT_USING_OPENCV_SURF, qSURFPoints, tSURFPoints, "SURF.png");
 		qKeyPoints.insert(qKeyPoints.end(), qSURFPoints.begin(), qSURFPoints.end());
 		tKeyPoints.insert(tKeyPoints.end(), tSURFPoints.begin(), tSURFPoints.end());
 		explore_match(qImg, tImg, qSURFPoints, tSURFPoints, "SURF_match.png");
