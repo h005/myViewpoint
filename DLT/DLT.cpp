@@ -165,8 +165,9 @@ static cv::Mat constructProjectionMatrix(cv::Mat &K, GLfloat n, GLfloat f, int i
 	// 使用K投影和平移x和y分量
 	cv::Mat B = cv::Mat::zeros(4, 4, CV_32F);
 	B.at<float>(0, 0) = K.at<float>(0, 0);
-	B.at<float>(1, 1) = K.at<float>(1, 1);
+	B.at<float>(0, 1) = K.at<float>(0, 1);
 	B.at<float>(0, 3) = K.at<float>(0, 2);
+	B.at<float>(1, 1) = K.at<float>(1, 1);
 	B.at<float>(1, 3) = K.at<float>(1, 2);
 	B.at<float>(2, 2) = 1;
 	B.at<float>(3, 3) = 1;
