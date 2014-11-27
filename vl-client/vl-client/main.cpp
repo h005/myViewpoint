@@ -224,6 +224,10 @@ int main()
 		explore_match(qImg, tImg, qSURFPoints, tSURFPoints, "SURF_match.png");
 	}*/
 
+	Mat twoside;
+	combineImage(qImg, tImg, twoside);
+	imwrite("twoside.png", twoside);
+
 	explore_match(qImg, tImg, qKeyPoints, tKeyPoints, "all_match.png");
 	printf("%d %d\n", qKeyPoints.size(), tKeyPoints.size());
 
