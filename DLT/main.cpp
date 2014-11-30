@@ -16,6 +16,9 @@
 #include <fstream>
 #include <opencv2/opencv.hpp>
 #include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/string_cast.hpp>
+//#include <glm/ext.hpp>
 
 #include "assimp/Importer.hpp"
 #include "assimp/postprocess.h"
@@ -373,6 +376,11 @@ void SVDDLT(int imClick, int objClick, int imCords[][2], float objCords[][3]) {
 		}
 	}
 	usingCustomProjection = true;
+
+	glm::mat4 rotate = glm::rotate(glm::mat4(1.f), 90.f, glm::vec3(0.f, 0.f, -1.f));
+	glm::vec4 point = glm::vec4(glm::vec3(1.f, 0.f, 0.f), 1.f);
+	cout << glm::to_string(rotate * point) << endl; 
+	cout << glm::to_string(rotate) << endl;
 }
 
 double validator(const cv::Mat &P, int count, RPair candidate[]) {
