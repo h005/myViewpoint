@@ -41,7 +41,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ExecutablePath>$(ExecutablePath)</ExecutablePath>
     <LibraryPath>$(DP_TOOLS_DIR)\glut;$(DP_TOOLS_DIR)\opencv\build\x86\vc12\lib;$(DP_TOOLS_DIR)\assimp-3.1.1-win-binaries\build\code\Release;$(LibraryPath)</LibraryPath>
-    <IncludePath>$(DP_TOOLS_DIR)\glut;$(DP_TOOLS_DIR)\opencv\build\include;$(DP_TOOLS_DIR)\assimp-3.1.1-win-binaries\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)\..\..\vendor\glm;$(DP_TOOLS_DIR)\glut;$(DP_TOOLS_DIR)\opencv\build\include;$(DP_TOOLS_DIR)\assimp-3.1.1-win-binaries\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <IncludePath>$(DP_TOOLS_DIR)\glut;$(DP_TOOLS_DIR)\opencv\build\include;$(DP_TOOLS_DIR)\assimp-3.1.1-win-binaries\include;$(IncludePath)</IncludePath>

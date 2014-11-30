@@ -15,6 +15,7 @@
 #include <iostream>
 #include <fstream>
 #include <opencv2/opencv.hpp>
+#include <glm/glm.hpp>
 
 #include "assimp/Importer.hpp"
 #include "assimp/postprocess.h"
