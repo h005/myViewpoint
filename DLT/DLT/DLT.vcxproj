@@ -81,14 +81,12 @@
   <ItemGroup>
     <ClCompile Include="..\custom.cpp" />
     <ClCompile Include="..\DLT.cpp" />
-    <ClCompile Include="..\glm.cpp" />
     <ClCompile Include="..\GModel.cpp" />
     <ClCompile Include="..\main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\custom.h" />
     <ClInclude Include="..\DLT.h" />
-    <ClInclude Include="..\glm.h" />
     <ClInclude Include="..\GModel.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

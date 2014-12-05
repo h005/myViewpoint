@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include <gl/glut.h>
 
 typedef struct {
 	float mx, my, mz;

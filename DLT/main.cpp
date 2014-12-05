@@ -26,7 +26,6 @@
 #include "assimp/DefaultLogger.hpp"
 #include "assimp/LogStream.hpp"
 
-#include "glm.h"
 #include "custom.h"
 #include "DLT.h"
 #include "GModel.h"
@@ -279,6 +278,7 @@ void
 texture(void)
 {
     texenv();
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     gluBuild2DMipmaps(GL_TEXTURE_2D, 3, iwidth, iheight, GL_RGB, GL_UNSIGNED_BYTE, image); 
 }
 
@@ -734,7 +734,7 @@ world_menu(int value)
 		txt_name = "data/triumph_im_norm.txt";
         break;
 	case 'a':
-		name = "data/notre_dame.ppm";
+		name = "data/rd.jpg";
 		txt_name = "data/notre_dame_im_norm.txt";
     }
     
@@ -743,11 +743,9 @@ world_menu(int value)
 		//加载点
 		if(!loadTXT(txt_name,imCords,imClick))
 			imClick = 0;
-		//
-        free(image);
-        image = glmReadPPM(name, &iwidth, &iheight);
-        if (!image)
-            image = glmReadPPM("data/opengl.ppm", &iwidth, &iheight);
+
+		delete image;
+		image = (unsigned char *)imgData(name, iwidth, iheight);
     }
 
     redisplay_all();
@@ -1186,7 +1184,7 @@ int
 main(int argc, char** argv)
 {
     
-	image = glmReadPPM("./data/opengl.ppm", &iwidth, &iheight);
+	image = (unsigned char *)imgData("./data/opengl.ppm", iwidth, iheight);
     if (!image)
         exit(0);
 

@@ -13,6 +13,8 @@ typedef std::map<std::string, GLuint *> TextureIdMapType;
 #define aisgl_min(x,y) (x<y?x:y)
 #define aisgl_max(x,y) (y>x?y:x)
 
+void *imgData(const char *texturePath, int &width, int &height);
+
 class GModel
 {
 private:
