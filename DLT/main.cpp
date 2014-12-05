@@ -18,7 +18,6 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/string_cast.hpp>
-//#include <glm/ext.hpp>
 
 #include "assimp/Importer.hpp"
 #include "assimp/postprocess.h"
@@ -29,6 +28,7 @@
 #include "custom.h"
 #include "DLT.h"
 #include "GModel.h"
+#include "trackball.h"
 
 using namespace std;
 
@@ -136,9 +136,9 @@ enum {
 
 GLboolean world_draw = GL_TRUE;
 GLint selection = 0;
-GLfloat spin_x = 0.0;
-GLfloat spin_y = 0.0;
-GLfloat model_scale = 0.0;
+glm::vec3 N(1.f);
+float m_angle;
+glm::mat4 rot(1.f);
 
 int iheight, iwidth;
 unsigned char* image = NULL;
@@ -586,14 +586,16 @@ main_keyboard(unsigned char key, int x, int y)
 		lookat[6].value = 0.0;
 		lookat[7].value = 1.0;
 		lookat[8].value = 0.0;
-		spin_x = 0;
-		spin_y = 0;
 		usingCustomProjection = false;
+		N = glm::vec3(1.f);
+		m_angle = 0;
+		rot = glm::mat4(1.f);
         break;
 	case 'u':
 		SVDDLT(imClick, objClick, imCords, objCords);
-		spin_x = 0;
-		spin_y = 0;
+		N = glm::vec3(1.f);
+		m_angle = 0;
+		rot = glm::mat4(1.f);
 		break;
 	case 'v':
 		RansacDLT();
@@ -734,8 +736,13 @@ world_menu(int value)
 		txt_name = "data/triumph_im_norm.txt";
         break;
 	case 'a':
-		name = "data/rd.jpg";
+		name = "data/bbb.jpg";
 		txt_name = "data/notre_dame_im_norm.txt";
+		break;
+	case 1:
+		name = "data/rd.jpg";
+		txt_name = "data/rd_im_norm.txt";
+		break;
     }
     
     if (name) {
@@ -864,8 +871,8 @@ screen_display(void)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glMatrixMode(GL_MODELVIEW);
-	glRotatef(spin_x, 0, 1, 0);
-	glRotatef(spin_y, 1, 0, 0);
+	glRotatef(m_angle / glm::pi<float>() * 180.f, N.x, N.y, N.z);
+	glMultMatrixf(&rot[0][0]);
 
 	if (!model.hasModel()) {
 		loadModel("data/EiffelTower.obj", "data/Eiffel_obj.txt");
@@ -956,6 +963,9 @@ screen_menu(int value)
 		name = "F:/tools/assimp-3.1.1-win-binaries/test/models/OBJ/spider.obj";
 		txt_name = "data/spider.txt";
 		break;
+	case 1:
+		name = "F:/no2/models/model.dae";
+		txt_name = "data/rd.txt";
     }
     
     if (name) {
@@ -1010,6 +1020,11 @@ screen_mouse(int button, int state, int x, int y)
 		printf("World Coordinates of Object are (%f,%f,%f)\n",object_x,object_y,object_z);*/
 		objClick++;
 	}
+	else if (button == GLUT_LEFT_BUTTON && state == GLUT_UP) {
+		glm::mat4 left = glm::rotate(glm::mat4(1.f), m_angle, N);
+		rot = left * rot;
+		m_angle = 0;
+	}
 
     redisplay_all();
 }
@@ -1017,9 +1032,19 @@ screen_mouse(int button, int state, int x, int y)
 void
 screen_motion(int x, int y)
 {
-    spin_x = x - oldx;
-    spin_y = y - oldy;
-    
+	GLint m_viewport[4];
+	glGetIntegerv(GL_VIEWPORT, m_viewport);
+
+	int width = m_viewport[2];
+	int height = m_viewport[3];
+
+	glm::vec2 a, b;
+	a.x = (oldx - width / 2.f) / (width / 2.f);
+	a.y = (height / 2.f - oldy) / (height / 2.f);
+	b.x = (x - width / 2.f) / (width / 2.f);
+	b.y = (height / 2.f - y) / (height / 2.f);
+
+	computeRotation(a, b, N, m_angle);
     redisplay_screen();
 }
 
@@ -1214,6 +1239,7 @@ main(int argc, char** argv)
 	glutAddMenuEntry("Eiffel", 'e');
 	glutAddMenuEntry("triumph", 't');
 	glutAddMenuEntry("notre dame", 'a');
+	glutAddMenuEntry("notre dame2", 1);
     glutAttachMenu(GLUT_RIGHT_BUTTON);
     
     screen = glutCreateSubWindow(window, GAP+sub_width+GAP, GAP, sub_width, sub_height);
@@ -1235,6 +1261,7 @@ main(int argc, char** argv)
 	glutAddMenuEntry("EiffelTower", 'e');
 	glutAddMenuEntry("triumph", 't');
 	glutAddMenuEntry("notre dame", 'a');
+	glutAddMenuEntry("notre dame2", 1);
 	glutAddMenuEntry("Spider", 's');
     glutAttachMenu(GLUT_RIGHT_BUTTON);
     
