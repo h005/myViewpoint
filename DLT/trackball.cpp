@@ -28,5 +28,5 @@ void computeRotation(const glm::vec2 &start, const glm::vec2 &end, glm::vec3 &N,
 
 	N = glm::cross(a, t);
 	angle = glm::length(t) / R;
-	printf("%f %f %f angle %f\n", N.x, N.y, N.z, angle);
+	//printf("%f %f %f angle %f\n", N.x, N.y, N.z, angle);
 }
