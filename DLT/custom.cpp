@@ -50,3 +50,34 @@ void randomSample(int range, int need, int result[]) {
 		result[i] = rand() % range;
 	}
 }
+
+void drawCamera(const cv::Mat &lookAt) {
+	glPushMatrix();
+	glEnable(GL_COLOR_MATERIAL);
+	glColorMaterial(GL_FRONT, GL_DIFFUSE);
+	glColor3f(1.f, 0.f, 0.f);
+
+	cv::Mat PA = lookAt.col(0);
+	glTranslatef(PA.at<float>(0, 0), PA.at<float>(1, 0), PA.at<float>(2, 0));
+	glutSolidSphere(0.1, 10, 10);
+
+	glDisable(GL_COLOR_MATERIAL);
+	glPopMatrix();
+}
+
+void transition(const cv::Mat &M1, const cv::Mat &M2, const cv::Mat &Md, cv::Mat &out) {
+	out = cv::Mat::zeros(4, 4, CV_32F);
+	out.at<float>(3, 3) = 1;
+
+	cv::Mat R1 = M1(cv::Range(0, 3), cv::Range(0, 3));
+	cv::Mat R2 = M2(cv::Range(0, 3), cv::Range(0, 3));
+	cv::Mat Rd = Md(cv::Range(0, 3), cv::Range(0, 3));
+	cv::Mat t1 = M1(cv::Range(0, 3), cv::Range(3, 4));
+	cv::Mat t2 = M2(cv::Range(0, 3), cv::Range(3, 4));
+	cv::Mat td = Md(cv::Range(0, 3), cv::Range(3, 4));
+
+	cv::Mat R = R2 * R1.inv() * Rd;
+	cv::Mat t = t2 + R2 * R1.inv() * (td - t1);
+	R.copyTo(out(cv::Range(0, 3), cv::Range(0, 3)));
+	t.copyTo(out(cv::Range(0, 3), cv::Range(3, 4)));
+}

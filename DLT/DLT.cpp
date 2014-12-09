@@ -1,6 +1,11 @@
 ﻿#include <stdio.h>
 #include <iostream>
 
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/string_cast.hpp>
+#include <glm/gtx/vector_angle.hpp>
+
 #include "glm.h"
 #include "DLT.h"
 #include "custom.h"
@@ -336,6 +341,26 @@ void phase2ExtractParametersFromP(cv::Mat &P, int iwidth, int iheight, cv::Mat &
 	cv::Mat T = K.inv() * A4;
 	T.copyTo(modelView(cv::Range(0, 3), cv::Range(3, 4)));
 
+	float m1_data[3][4] = {
+		9.632440339e-01, 5.212319384e-02, 2.635224923e-01, 3.390252435e-01,
+		-1.429585590e-02, 9.895510810e-01, -1.434722501e-01, -8.322170986e-02,
+		-2.682471990e-01, 1.344315093e-01, 9.539243207e-01, -2.117552279e-01
+	};
+	float m2_data[3][4] = {
+		9.995460962e-01, 1.340383462e-02, 2.698034055e-02, 1.738524313e-02,
+		-1.994891594e-02, 9.655765383e-01, 2.593530208e-01, 4.711119626e-02,
+		-2.257525884e-02, -2.597735281e-01, 9.654056514e-01, 1.591457635e-01
+	};
+	cv::Mat m1(3, 4, CV_32F, m1_data);
+	cv::Mat m2(3, 4, CV_32F, m2_data);
+	cv::Mat out;
+
+	cout << modelView << endl;
+	transition(m1, m2, modelView, out);
+	modelView = out;
+
+	cout << modelView << endl;
+
 	// 在相机坐标系下选择相机点和其方向上的一个点
 	// PA = (0, 0, 0), PB = (0, 0, 1)
 	cv::Mat PA = cv::Mat::zeros(4, 1, CV_32F);
@@ -363,8 +388,15 @@ void phase2ExtractParametersFromP(cv::Mat &P, int iwidth, int iheight, cv::Mat &
 	PB(cv::Range(0, 3), cv::Range::all()).copyTo(lookat.col(1));
 	UpDir(cv::Range(0, 3), cv::Range::all()).copyTo(lookat.col(2));
 
+	/*glm::vec3 from(PA.at<float>(0, 0), PA.at<float>(1, 0), PA.at<float>(2, 0));
+	glm::vec3 to(PB.at<float>(0, 0), PB.at<float>(1, 0), PB.at<float>(2, 0));
+	glm::vec3 up(UpDir.at<float>(0, 0), UpDir.at<float>(1, 0), UpDir.at<float>(2, 0));
+	glm::mat4 m = glm::lookAt(from, to, up);
+	cv::Mat md(4, 4, CV_32F, &m[0][0]);
+	md = md.t();*/
+
 	K /= K.at<float>(2, 2);
 	cout << "K: " << K << endl;
-	projection = constructProjectionMatrix(K, 0.1, 10, iwidth, iheight);
+	projection = constructProjectionMatrixWithoutPrinciplePoint(K, 0.1, 10, iwidth, iheight);
 	assert(verifyModelViewMatrix(modelView));
 }

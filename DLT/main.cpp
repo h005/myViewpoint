@@ -34,7 +34,7 @@ using namespace std;
 
 GModel model, modelForProjection;
 
-cv::Mat PA;
+cv::Mat lookAtParams;
 
 typedef struct _cell {
     int id;
@@ -362,13 +362,12 @@ void SVDDLT(int imClick, int objClick, int imCords[][2], float objCords[][3]) {
 	// 第二阶段
 	// 从P中分解出 K * [R t]
 	// 由[R t]可以得到lookat的参数，由K可以构造GL_PROJECTION_MATRIX
-	cv::Mat lookatParam, projMatrix;
-	phase2ExtractParametersFromP(P, iwidth, iheight, lookatParam, projMatrix);
+	cv::Mat projMatrix;
+	phase2ExtractParametersFromP(P, iwidth, iheight, lookAtParams, projMatrix);
 
-	PA = lookatParam.col(0);
 	// 在物体坐标系（世界坐标系）中摆放照相机和它的朝向
 	for (int i = 0; i < 9; i++) {
-		lookat[i].value = lookatParam.at<float>(i % 3, i / 3);
+		lookat[i].value = lookAtParams.at<float>(i % 3, i / 3);
 	}
 	// 使用生成的OpenGL投影矩阵
 	for (int i = 0; i < 4; i++) {
@@ -739,8 +738,8 @@ world_menu(int value)
 		txt_name = "data/notre_dame_im_norm.txt";
 		break;
 	case 1:
-		name = "data/rd.jpg";
-		txt_name = "data/rd_im_norm.txt";
+		name = "data/exp622.rd.jpg";
+		txt_name = "data/exp622_im_norm.txt";
 		break;
     }
     
@@ -861,7 +860,7 @@ void loadModel(const char *modelPath, char *pointsName) {
 void
 screen_display(void)
 {
-	
+
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glMatrixMode(GL_MODELVIEW);
@@ -871,44 +870,38 @@ screen_display(void)
 	if (!model.hasModel()) {
 		loadModel("data/EiffelTower.obj", "data/Eiffel_obj.txt");
 	}
-	
+
 	// 使用下面的方法，你无需考虑模型原生的点坐标
 	// 只需要考虑规范化后的坐标
 	model.drawNormalizedModel();
 
 	// 绘制模型上的点
-	if(objClick)
+	if (objClick)
 	{
-		for(int i = 0; i < objClick; i++)
+		for (int i = 0; i < objClick; i++)
 		{
 			glPushMatrix();
 			glEnable(GL_COLOR_MATERIAL);
 			glColorMaterial(GL_FRONT, GL_DIFFUSE);
 			glColor3f(pointColor[i].red, pointColor[i].green, pointColor[i].blue);
 
-			glTranslatef(objCords[i][0],objCords[i][1],objCords[i][2]);
+			glTranslatef(objCords[i][0], objCords[i][1], objCords[i][2]);
 
 			if (usingCustomProjection) {
 				glutSolidSphere(0.01, 10, 10);
-			} else {
+			}
+			else {
 				glutSolidSphere(0.02, 10, 10);
 			}
-			
+
 			glDisable(GL_COLOR_MATERIAL);
 			glPopMatrix();
 		}
 	}
-	
-	glPushMatrix();
-	glEnable(GL_COLOR_MATERIAL);
-	glColorMaterial(GL_FRONT, GL_DIFFUSE);
-	glColor3f(pointColor[0].red, pointColor[0].green, pointColor[0].blue);
 
-	glTranslatef(PA.at<float>(0, 0), PA.at<float>(1, 0), PA.at<float>(2, 0));
-	glutSolidSphere(0.1, 10, 10);
-
-	glDisable(GL_COLOR_MATERIAL);
-	glPopMatrix();
+	if (lookAtParams.cols == 3 && lookAtParams.rows == 3) {
+		drawCamera(lookAtParams);
+	}
 	
     glutSwapBuffers();
 }
@@ -961,7 +954,7 @@ screen_menu(int value)
 		txt_name = "data/triumph_obj.txt";
         break;
 	case 'a':
-		name = "F:/no2/models/model.dae";
+		name = "D:/no2/models/model.dae";
 		txt_name = "data/notre_dame.txt";
 		break;
 	case 's':
@@ -1274,7 +1267,6 @@ redisplay_all(void)
 int
 main(int argc, char** argv)
 {
-	PA = cv::Mat::zeros(4, 1, CV_32F);
 	image = (unsigned char *)imgData("./data/opengl.ppm", iwidth, iheight);
     if (!image)
         exit(0);
