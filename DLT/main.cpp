@@ -32,7 +32,9 @@
 
 using namespace std;
 
-GModel model;
+GModel model, modelForProjection;
+
+cv::Mat PA;
 
 typedef struct _cell {
     int id;
@@ -157,9 +159,9 @@ void redisplay_screen();
 void redisplay_world();
 void redisplay_all(void);
 
-GLuint window, world, screen, command;
+GLuint window, world, screen, billboard, command;
 GLuint Width = 1000,Height = 1000;
-GLuint sub_width = Width/2, sub_height = Height/2;
+GLuint sub_width = Width/3, sub_height = Height * 2 / 3;
 
 GLfloat customProjection[16];
 GLboolean usingCustomProjection = false;
@@ -349,8 +351,6 @@ bool saveTXT(char* filename, float Cords[10][3], int &count_click)
 }
 
 
-
-
 void SVDDLT(int imClick, int objClick, int imCords[][2], float objCords[][3]) {
 	// DLT using SVD
 	// Reference: http://www.maths.lth.se/matematiklth/personal/calle/datorseende13/pres/forelas3.pdf
@@ -365,6 +365,7 @@ void SVDDLT(int imClick, int objClick, int imCords[][2], float objCords[][3]) {
 	cv::Mat lookatParam, projMatrix;
 	phase2ExtractParametersFromP(P, iwidth, iheight, lookatParam, projMatrix);
 
+	PA = lookatParam.col(0);
 	// 在物体坐标系（世界坐标系）中摆放照相机和它的朝向
 	for (int i = 0; i < 9; i++) {
 		lookat[i].value = lookatParam.at<float>(i % 3, i / 3);
@@ -520,20 +521,25 @@ main_reshape(int width,  int height)
     gluOrtho2D(0, width, height, 0);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    
-#define GAP  25             /* gap between subwindows */
-    sub_width = (width - GAP * 3) / 2;
+
+#define GAP 20
+#define HGAP 10
+#define VGAP 20
+    sub_width = (width - HGAP * 4) / 3;
     sub_height = sub_width;
     
     glutSetWindow(world);
-    glutPositionWindow(GAP, GAP);
+    glutPositionWindow(HGAP, VGAP);
     glutReshapeWindow(sub_width, sub_height);
     glutSetWindow(screen);
-    glutPositionWindow(GAP+sub_width+GAP, GAP);
+    glutPositionWindow(HGAP * 2 + sub_width, VGAP);
     glutReshapeWindow(sub_width, sub_height);
+	glutSetWindow(billboard);
+	glutPositionWindow(HGAP * 3 + sub_width * 2, VGAP);
+	glutReshapeWindow(sub_width, sub_height);
     glutSetWindow(command);
-    glutPositionWindow(GAP, GAP+sub_height+GAP);
-    glutReshapeWindow(sub_width+GAP+sub_width, height - sub_height - GAP * 3);
+    glutPositionWindow(HGAP, VGAP+sub_height+VGAP);
+    glutReshapeWindow(width - 2 * HGAP, height - sub_height - VGAP * 3);
 }
 
 void
@@ -543,9 +549,10 @@ main_display(void)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glColor3ub(0, 0, 0);
     setfont("helvetica", 12);
-    drawstr(GAP, GAP-5, "Image view");//World-space
-    drawstr(GAP+sub_width+GAP, GAP-5, "Model view");//Screen-space
-    drawstr(GAP, GAP+sub_height+GAP-5, "Command manipulation window");
+    drawstr(HGAP, VGAP-5, "Image view");//World-space
+    drawstr(HGAP * 2+sub_width, VGAP-5, "Model view");//Screen-space
+	drawstr(HGAP * 3 + sub_width * 2, VGAP - 5, "Projection Result");//Screen-space
+    drawstr(HGAP, VGAP*2+sub_height-5, "Command manipulation window");
     glutSwapBuffers();
 }
 
@@ -588,9 +595,6 @@ main_keyboard(unsigned char key, int x, int y)
         break;
 	case 'u':
 		SVDDLT(imClick, objClick, imCords, objCords);
-		N = glm::vec3(1.f);
-		m_angle = 0;
-		rot = glm::mat4(1.f);
 		break;
 	case 'v':
 		RansacDLT();
@@ -828,20 +832,12 @@ screen_reshape(int width, int height)
     
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-	if (usingCustomProjection) {
-		glMultMatrixf(customProjection);
-	}
-	else {
-		gluPerspective(perspective[0].value, perspective[1].value,
-			perspective[2].value, perspective[3].value);
-	}
-	
+	gluPerspective(perspective[0].value, perspective[1].value,
+		perspective[2].value, perspective[3].value);
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    gluLookAt(lookat[0].value, lookat[1].value, lookat[2].value,
-        lookat[3].value, lookat[4].value, lookat[5].value,
-        lookat[6].value, lookat[7].value, lookat[8].value);
+	gluLookAt(0, 0, 2, 0, 0, 0, 0, 1, 0);
 }
 
 
@@ -849,9 +845,12 @@ void loadModel(const char *modelPath, char *pointsName) {
 	// 由于要绑定纹理，所以需要切换到screen的上下文中
 	int context = glutGetWindow();
 	glutSetWindow(screen);
-
 	assert(model.load(modelPath));
 	model.bindTextureToGL();
+
+	glutSetWindow(billboard);
+	assert(modelForProjection.load(modelPath));
+	modelForProjection.bindTextureToGL();
 
 	if (!loadTXT(pointsName, objCords, objClick))
 		objClick = 0;
@@ -899,6 +898,17 @@ screen_display(void)
 			glPopMatrix();
 		}
 	}
+	
+	glPushMatrix();
+	glEnable(GL_COLOR_MATERIAL);
+	glColorMaterial(GL_FRONT, GL_DIFFUSE);
+	glColor3f(pointColor[0].red, pointColor[0].green, pointColor[0].blue);
+
+	glTranslatef(PA.at<float>(0, 0), PA.at<float>(1, 0), PA.at<float>(2, 0));
+	glutSolidSphere(0.1, 10, 10);
+
+	glDisable(GL_COLOR_MATERIAL);
+	glPopMatrix();
 	
     glutSwapBuffers();
 }
@@ -959,7 +969,7 @@ screen_menu(int value)
 		txt_name = "data/spider.txt";
 		break;
 	case 1:
-		name = "F:/no2/models/model.dae";
+		name = "D:/no2/models/model.dae";
 		txt_name = "data/rd.txt";
     }
     
@@ -1175,6 +1185,60 @@ command_menu(int value)
 }
 
 void
+billboard_reshape(int width, int height)
+{
+	glViewport(0, 0, width, height);
+
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	if (usingCustomProjection) {
+		glMultMatrixf(customProjection);
+	}
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+	gluLookAt(lookat[0].value, lookat[1].value, lookat[2].value,
+		lookat[3].value, lookat[4].value, lookat[5].value,
+		lookat[6].value, lookat[7].value, lookat[8].value);
+}
+
+void
+billboard_display(void)
+{
+	
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	glMatrixMode(GL_MODELVIEW);
+
+	if (!modelForProjection.hasModel()) {
+		loadModel("data/EiffelTower.obj", "data/Eiffel_obj.txt");
+	}
+
+	// 使用下面的方法，你无需考虑模型原生的点坐标
+	// 只需要考虑规范化后的坐标
+	modelForProjection.drawNormalizedModel();
+
+	// 绘制模型上的点
+	if (objClick)
+	{
+		for (int i = 0; i < objClick; i++)
+		{
+			glPushMatrix();
+			glEnable(GL_COLOR_MATERIAL);
+			glColorMaterial(GL_FRONT, GL_DIFFUSE);
+			glColor3f(pointColor[i].red, pointColor[i].green, pointColor[i].blue);
+
+			glTranslatef(objCords[i][0], objCords[i][1], objCords[i][2]);
+			glutSolidSphere(0.01, 10, 10);
+
+			glDisable(GL_COLOR_MATERIAL);
+			glPopMatrix();
+		}
+	}
+
+	glutSwapBuffers();
+}
+
+void
 redisplay_world() {
 	glutSetWindow(world);
 	world_reshape(sub_width, sub_height);
@@ -1184,6 +1248,12 @@ redisplay_world() {
 void redisplay_screen() {
 	glutSetWindow(screen);
 	screen_reshape(sub_width, sub_height);
+	glutPostRedisplay();
+}
+
+void redisplay_billboard() {
+	glutSetWindow(billboard);
+	billboard_reshape(sub_width, sub_height);
 	glutPostRedisplay();
 }
 
@@ -1198,12 +1268,13 @@ redisplay_all(void)
 	redisplay_command();
 	redisplay_screen();
 	redisplay_world();
+	redisplay_billboard();
 }
 
 int
 main(int argc, char** argv)
 {
-    
+	PA = cv::Mat::zeros(4, 1, CV_32F);
 	image = (unsigned char *)imgData("./data/opengl.ppm", iwidth, iheight);
     if (!image)
         exit(0);
@@ -1259,6 +1330,11 @@ main(int argc, char** argv)
 	glutAddMenuEntry("notre dame2", 1);
 	glutAddMenuEntry("Spider", 's');
     glutAttachMenu(GLUT_RIGHT_BUTTON);
+
+	billboard = glutCreateSubWindow(window, GAP + sub_width + GAP, GAP, sub_width, sub_height);
+	initGL(billboard);
+	glutReshapeFunc(billboard_reshape);
+	glutDisplayFunc(billboard_display);
     
     command = glutCreateSubWindow(window, GAP+sub_height+GAP, GAP+sub_height+GAP, sub_width, sub_height);
     glutReshapeFunc(command_reshape);

@@ -365,6 +365,6 @@ void phase2ExtractParametersFromP(cv::Mat &P, int iwidth, int iheight, cv::Mat &
 
 	K /= K.at<float>(2, 2);
 	cout << "K: " << K << endl;
-	projection = constructProjectionMatrixWithoutPrinciplePoint(K, 0.1, 10, iwidth, iheight);
+	projection = constructProjectionMatrix(K, 0.1, 10, iwidth, iheight);
 	assert(verifyModelViewMatrix(modelView));
 }
