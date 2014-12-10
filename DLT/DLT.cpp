@@ -346,20 +346,13 @@ void phase2ExtractParametersFromP(cv::Mat &P, int iwidth, int iheight, cv::Mat &
 		-1.429585590e-02, 9.895510810e-01, -1.434722501e-01, -8.322170986e-02,
 		-2.682471990e-01, 1.344315093e-01, 9.539243207e-01, -2.117552279e-01
 	};
-	float m2_data[3][4] = {
-		9.995460962e-01, 1.340383462e-02, 2.698034055e-02, 1.738524313e-02,
-		-1.994891594e-02, 9.655765383e-01, 2.593530208e-01, 4.711119626e-02,
-		-2.257525884e-02, -2.597735281e-01, 9.654056514e-01, 1.591457635e-01
-	};
 	cv::Mat m1(3, 4, CV_32F, m1_data);
-	cv::Mat m2(3, 4, CV_32F, m2_data);
+	cv::Mat m2;
+	doit(453, m2);
+	cout << "m2 " << m2 << endl;
 	cv::Mat out;
-
-	cout << modelView << endl;
 	transition(m1, m2, modelView, out);
 	modelView = out;
-
-	cout << modelView << endl;
 
 	// 在相机坐标系下选择相机点和其方向上的一个点
 	// PA = (0, 0, 0), PB = (0, 0, 1)
@@ -376,9 +369,6 @@ void phase2ExtractParametersFromP(cv::Mat &P, int iwidth, int iheight, cv::Mat &
 	PA = modelView.inv() * PA;
 	PB = modelView.inv() * PB;
 	UpDir = modelView.inv() * UpDir;
-	PA /= PA.at<float>(3, 0);
-
-	PB /= PB.at<float>(3, 0);
 
 	// | from.x to.x upDir.x |
 	// | from.y to.y upDir.y |
@@ -387,6 +377,16 @@ void phase2ExtractParametersFromP(cv::Mat &P, int iwidth, int iheight, cv::Mat &
 	PA(cv::Range(0, 3), cv::Range::all()).copyTo(lookat.col(0));
 	PB(cv::Range(0, 3), cv::Range::all()).copyTo(lookat.col(1));
 	UpDir(cv::Range(0, 3), cv::Range::all()).copyTo(lookat.col(2));
+	
+
+	// 由于modelView中最后一列是相机中心指向模型中心，PA又是相机中心在模型坐标系下的表示
+	// 所以可以推出R * PA = -t
+	// 从公式角度看，有:
+	// | R t |   |PA|   |0|
+	// |     | * |  | = | |
+	// | 0 1 |   |1 |   |1|
+	// 所以有 R*PA + t = 0, 由于旋转矩阵的正交性，||R * PA|| = ||t||
+	assert(abs(cv::norm(modelView(cv::Range(0, 3), cv::Range(3, 4)), cv::NORM_L2) - cv::norm(PA(cv::Range(0, 3), cv::Range::all()), cv::NORM_L2)) < 0.001);
 
 	/*glm::vec3 from(PA.at<float>(0, 0), PA.at<float>(1, 0), PA.at<float>(2, 0));
 	glm::vec3 to(PB.at<float>(0, 0), PB.at<float>(1, 0), PB.at<float>(2, 0));

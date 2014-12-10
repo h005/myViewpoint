@@ -81,3 +81,25 @@ void transition(const cv::Mat &M1, const cv::Mat &M2, const cv::Mat &Md, cv::Mat
 	R.copyTo(out(cv::Range(0, 3), cv::Range(0, 3)));
 	t.copyTo(out(cv::Range(0, 3), cv::Range(3, 4)));
 }
+
+void doit(int index, cv::Mat &m2) {
+	const char *dir = "D:\\DriverGenius2013\\NotreDame\\NotreDame\\images";
+	char filepath[255];
+	sprintf(filepath, "%s\\exp%d.txt", dir, index);
+	FILE *fp;
+	fp = fopen(filepath, "r");
+	if (fp) {
+		float input[5][3];
+		for (int i = 0; i < 5; i++) {
+			for (int j = 0; j < 3; j++) {
+				fscanf(fp, "%f", &input[i][j]);
+			}
+		}
+		cv::Mat m_input = cv::Mat(5, 3, CV_32F, input);
+		m2 = cv::Mat::zeros(3, 4, CV_32F);
+		m_input(cv::Range(1, 4), cv::Range(0, 3)).copyTo(m2(cv::Range(0, 3), cv::Range(0, 3)));
+		cv::Mat t = m_input.row(4).t();
+		t.copyTo(m2.col(3));
+		fclose(fp);
+	}
+}

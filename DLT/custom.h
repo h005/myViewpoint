@@ -12,3 +12,4 @@ bool getPointInModels(int x, int y, GLint viewport[4], GLdouble modelview[16], G
 void randomSample(int range, int need, int result[]);
 void drawCamera(const cv::Mat &lookAt); 
 void transition(const cv::Mat &M1, const cv::Mat &M2, const cv::Mat &Md, cv::Mat &out);
+void doit(int index, cv::Mat &m2);
