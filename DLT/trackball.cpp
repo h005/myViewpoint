@@ -1,7 +1,7 @@
 #include "trackball.h"
 #include <iostream>
 
-#define R 2.f
+#define R 5.f
 
 static void computeNormVec3(const glm::vec2 &in, glm::vec3 &out) {
 	float z;

@@ -348,7 +348,7 @@ void phase2ExtractParametersFromP(cv::Mat &P, int iwidth, int iheight, cv::Mat &
 	};
 	cv::Mat m1(3, 4, CV_32F, m1_data);
 	cv::Mat m2;
-	doit(453, m2);
+	doit(611, m2);
 	cout << "m2 " << m2 << endl;
 	cv::Mat out;
 	transition(m1, m2, modelView, out);

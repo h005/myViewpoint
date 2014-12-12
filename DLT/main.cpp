@@ -89,7 +89,7 @@ cell lookat[9] = {
 };
 
 cell perspective[4] = {
-    { 10, 180, 80, 1.0, 179.0, 60.0, 1.0,
+    { 10, 180, 80, 1.0, 179.0, 100, 1.0,
         "Specifies field of view angle (in degrees) in y direction.", "%.1f" },
     { 11, 240, 80, -3.0, 3.0, 1.0, 0.01,
     "Specifies field of view in x direction (width/height).", "%.2f" },
@@ -145,6 +145,8 @@ glm::mat4 rot(1.f);
 int iheight, iwidth;
 unsigned char* image = NULL;
 int twidth, theight;
+int g_Viewport;
+GLuint g_RenderDestination;
 
 const GLfloat GL_PI = 3.1415926536f;
 
@@ -179,6 +181,38 @@ char str[80];
 //
 GLvoid *font_style = GLUT_BITMAP_TIMES_ROMAN_10;
 char *wTxtName, *sTxtName;
+
+void CreateRenderTexture(GLuint *p_textureId, int size, int channels, int type)
+{
+	// Create a pointer to store the blank image data
+	unsigned int *pTexture = NULL;
+
+	// We need to create a blank texture to render our dynamic texture too.
+	// To do this, we just create an array to hold the data and then give this
+	// array to OpenGL.  The texture is stored on the video card so we can
+	// destroy the array immediately afterwards.
+	// This function takes the texture array to store the texture, the
+	// size of the texture for width and the heigth, the channels (1, 3 or 4),
+	// the type (LUMINANCE, RGB, RGBA, etc..) and the texture ID to assign it too.
+
+	// Allocate and init memory for the image array and point to it from pTexture
+	pTexture = new unsigned int[size * size * channels];
+	memset(pTexture, 0, size * size * channels * sizeof(unsigned int));
+
+	// Register the texture with OpenGL and bind it to the texture ID
+	glGenTextures(1, p_textureId);
+	glBindTexture(GL_TEXTURE_2D, *p_textureId);
+
+	// Create the texture and store it on the video card
+	glTexImage2D(GL_TEXTURE_2D, 0, channels, size, size, 0, type, GL_UNSIGNED_INT, pTexture);
+
+	// Set the texture quality
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	// Since we stored the texture space with OpenGL, we can delete the image data
+	delete[] pTexture;
+}
 
 void
 setfont(char* name, int size)
@@ -827,6 +861,7 @@ void
 screen_reshape(int width, int height)
 {
     perspective[1].value = width * 1.0 / height;
+	g_Viewport = width;
     glViewport(0, 0, width, height);
     
     glMatrixMode(GL_PROJECTION);
@@ -836,7 +871,7 @@ screen_reshape(int width, int height)
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-	gluLookAt(0, 0, 2, 0, 0, 0, 0, 1, 0);
+	gluLookAt(0, 3, 0, 0, 0, 0, 0, 0, 1);
 }
 
 
@@ -902,6 +937,9 @@ screen_display(void)
 	if (lookAtParams.cols == 3 && lookAtParams.rows == 3) {
 		drawCamera(lookAtParams);
 	}
+
+	glBindTexture(GL_TEXTURE_2D, g_RenderDestination);
+	glCopyTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 0, 0, g_Viewport, g_Viewport, 0);
 	
     glutSwapBuffers();
 }
@@ -1302,6 +1340,7 @@ main(int argc, char** argv)
     
     screen = glutCreateSubWindow(window, GAP+sub_width+GAP, GAP, sub_width, sub_height);
 	initGL(screen);
+	CreateRenderTexture(&g_RenderDestination, 512, 3, GL_RGB);
     glutReshapeFunc(screen_reshape);
     glutDisplayFunc(screen_display);
     glutKeyboardFunc(main_keyboard);
