@@ -12,6 +12,8 @@
 
 using namespace std;
 
+int baseline = 0, index = 0;
+
 #define NDIM 3
 static void normalize_3D(float original[][NDIM], float processed[][NDIM], size_t n, float param[NDIM + 1]) {
 	for (size_t i = 0; i < n; i++) {
@@ -341,18 +343,15 @@ void phase2ExtractParametersFromP(cv::Mat &P, int iwidth, int iheight, cv::Mat &
 	cv::Mat T = K.inv() * A4;
 	T.copyTo(modelView(cv::Range(0, 3), cv::Range(3, 4)));
 
-	float m1_data[3][4] = {
-		9.632440339e-01, 5.212319384e-02, 2.635224923e-01, 3.390252435e-01,
-		-1.429585590e-02, 9.895510810e-01, -1.434722501e-01, -8.322170986e-02,
-		-2.682471990e-01, 1.344315093e-01, 9.539243207e-01, -2.117552279e-01
-	};
-	cv::Mat m1(3, 4, CV_32F, m1_data);
+	cv::Mat m1;
 	cv::Mat m2;
-	doit(611, m2);
-	cout << "m2 " << m2 << endl;
+	doit(baseline, m1);
+	doit(index, m2);
 	cv::Mat out;
 	transition(m1, m2, modelView, out);
 	modelView = out;
+
+	cout << index << endl;
 
 	// 在相机坐标系下选择相机点和其方向上的一个点
 	// PA = (0, 0, 0), PB = (0, 0, 1)
@@ -379,7 +378,7 @@ void phase2ExtractParametersFromP(cv::Mat &P, int iwidth, int iheight, cv::Mat &
 	UpDir(cv::Range(0, 3), cv::Range::all()).copyTo(lookat.col(2));
 	
 
-	// 由于modelView中最后一列是相机中心指向模型中心，PA又是相机中心在模型坐标系下的表示
+	// 由于modelView中最后一列是相机中心指向模型中心（相机坐标系下表示)，PA又是相机中心在模型坐标系下的表示
 	// 所以可以推出R * PA = -t
 	// 从公式角度看，有:
 	// | R t |   |PA|   |0|
@@ -397,6 +396,6 @@ void phase2ExtractParametersFromP(cv::Mat &P, int iwidth, int iheight, cv::Mat &
 
 	K /= K.at<float>(2, 2);
 	cout << "K: " << K << endl;
-	projection = constructProjectionMatrixWithoutPrinciplePoint(K, 0.1, 10, iwidth, iheight);
+	projection = constructProjectionMatrix(K, 0.1, 10, iwidth, iheight);
 	assert(verifyModelViewMatrix(modelView));
 }

@@ -146,7 +146,7 @@ int iheight, iwidth;
 unsigned char* image = NULL;
 int twidth, theight;
 int g_Viewport;
-GLuint g_RenderDestination;
+GLuint g_RenderDestination = 0;
 
 const GLfloat GL_PI = 3.1415926536f;
 
@@ -212,6 +212,36 @@ void CreateRenderTexture(GLuint *p_textureId, int size, int channels, int type)
 
 	// Since we stored the texture space with OpenGL, we can delete the image data
 	delete[] pTexture;
+}
+
+void writeRenderToFile(const char *filename) {
+	char *data = (char *)malloc(g_Viewport * g_Viewport * 3);
+	int context = glutGetWindow();
+	glutSetWindow(screen);
+	glBindTexture(GL_TEXTURE_2D, g_RenderDestination);
+	glGetTexImage(GL_TEXTURE_2D,
+		0,
+		GL_RGB,
+		GL_UNSIGNED_BYTE,
+		data);
+	glutSetWindow(context);
+
+	cv::Mat img = cv::Mat::zeros(g_Viewport, g_Viewport, CV_8UC3);
+	for (int i = 0; i < g_Viewport; i++) {
+		for (int j = 0; j < g_Viewport; j++) {
+			cv::Vec3b intensity;
+			for (int k = 0; k < 3; k++) {
+				// v[0] = B, v[1] = G, v[2] = R
+				intensity[2 - k] = data[(i * g_Viewport + j) * 3 + k];
+			}
+			img.at<cv::Vec3b>(i, j) = intensity;
+		}
+	}
+	free(data);
+
+	cv::Mat fliped;
+	cv::flip(img, fliped, 0);
+	cv::imwrite(filename, fliped);
 }
 
 void
@@ -627,10 +657,35 @@ main_keyboard(unsigned char key, int x, int y)
 		rot = glm::mat4(1.f);
         break;
 	case 'u':
-		SVDDLT(imClick, objClick, imCords, objCords);
+	{
+				extern int index;
+				index = 709;
+				SVDDLT(imClick, objClick, imCords, objCords);
+	}
+		
 		break;
 	case 'v':
-		RansacDLT();
+		//RansacDLT();
+		{
+			extern int baseline;
+			// 将摄像机位置渲染出来
+			int context = glutGetWindow();
+			glutSetWindow(screen);
+
+			extern int index;
+			for (int i = 1; i <= 715; i++) {
+				index = i;
+				SVDDLT(imClick, objClick, imCords, objCords);
+				void screen_display();
+				screen_display();
+
+				char path[255];
+				const char *dir = "D:\\DriverGenius2013\\NotreDame\\NotreDame\\images";
+				sprintf(path, "%s\\exp%d_by%d.pos.png", dir, index, baseline);
+				writeRenderToFile(path);
+			}
+			glutSetWindow(context);
+		}
 		break;
     case 27:
         exit(0);
@@ -775,6 +830,10 @@ world_menu(int value)
 		name = "data/exp622.rd.jpg";
 		txt_name = "data/exp622_im_norm.txt";
 		break;
+	case 2:
+		name = "data/exp709.rd.jpg";
+		txt_name = "data/exp709_im_norm.txt";
+		break;
     }
     
     if (name) {
@@ -860,8 +919,13 @@ void initGL(int glutWindow) {
 void
 screen_reshape(int width, int height)
 {
-    perspective[1].value = width * 1.0 / height;
 	g_Viewport = width;
+	if (g_RenderDestination != 0) {
+		glDeleteTextures(1, &g_RenderDestination);
+		g_RenderDestination = 0;
+	}
+	CreateRenderTexture(&g_RenderDestination, g_Viewport, 3, GL_RGB);
+    perspective[1].value = width * 1.0 / height;
     glViewport(0, 0, width, height);
     
     glMatrixMode(GL_PROJECTION);
@@ -872,6 +936,7 @@ screen_reshape(int width, int height)
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 	gluLookAt(0, 3, 0, 0, 0, 0, 0, 0, 1);
+	//gluLookAt(0, 0, 2, 0, 0, 0, 0, 1, 0);
 }
 
 
@@ -937,10 +1002,9 @@ screen_display(void)
 	if (lookAtParams.cols == 3 && lookAtParams.rows == 3) {
 		drawCamera(lookAtParams);
 	}
-
+	
 	glBindTexture(GL_TEXTURE_2D, g_RenderDestination);
 	glCopyTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 0, 0, g_Viewport, g_Viewport, 0);
-	
     glutSwapBuffers();
 }
 
@@ -992,6 +1056,8 @@ screen_menu(int value)
 		txt_name = "data/triumph_obj.txt";
         break;
 	case 'a':
+		extern int baseline;
+		baseline = 709;
 		name = "D:/no2/models/model.dae";
 		txt_name = "data/notre_dame.txt";
 		break;
@@ -1000,6 +1066,8 @@ screen_menu(int value)
 		txt_name = "data/spider.txt";
 		break;
 	case 1:
+		extern int baseline;
+		baseline = 622;
 		name = "D:/no2/models/model.dae";
 		txt_name = "data/rd.txt";
     }
@@ -1336,6 +1404,7 @@ main(int argc, char** argv)
 	glutAddMenuEntry("triumph", 't');
 	glutAddMenuEntry("notre dame", 'a');
 	glutAddMenuEntry("notre dame2", 1);
+	glutAddMenuEntry("notre dame3", 2);
     glutAttachMenu(GLUT_RIGHT_BUTTON);
     
     screen = glutCreateSubWindow(window, GAP+sub_width+GAP, GAP, sub_width, sub_height);
@@ -1357,8 +1426,8 @@ main(int argc, char** argv)
 	glutAddMenuEntry("Lugger2", 'n');
 	glutAddMenuEntry("EiffelTower", 'e');
 	glutAddMenuEntry("triumph", 't');
-	glutAddMenuEntry("notre dame", 'a');
 	glutAddMenuEntry("notre dame2", 1);
+	glutAddMenuEntry("notre dame3", 'a');
 	glutAddMenuEntry("Spider", 's');
     glutAttachMenu(GLUT_RIGHT_BUTTON);
 
