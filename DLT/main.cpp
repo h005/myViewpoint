@@ -35,7 +35,7 @@ using namespace std;
 GModel model, modelForProjection;
 
 cv::Mat lookAtParams;
-cv::Point3f cameraPos;
+std::vector<cv::Point3f> cameraPos;
 
 typedef struct _cell {
     int id;
@@ -429,8 +429,11 @@ void SVDDLT(int imClick, int objClick, int imCords[][2], float objCords[][3]) {
 	// 由[R t]可以得到lookat的参数，由K可以构造GL_PROJECTION_MATRIX
 	cv::Mat modelView, K;
 	phase2ExtractParametersFromP(P, modelView, K);
-	extern int baseline;
-	getCameraPosByDLTandSfM(modelView, baseline, baseline, cameraPos);
+
+	extern int baseline, index;
+	cv::Point3f point;
+	getCameraPosByDLTandSfM(modelView, baseline, index, point);
+	cameraPos.push_back(point);
 
 	cv::Mat projMatrix;
 	phase3GenerateLookAtAndProjection(modelView, K, iwidth, iheight, lookAtParams, projMatrix);
@@ -664,8 +667,9 @@ main_keyboard(unsigned char key, int x, int y)
         break;
 	case 'u':
 	{
-				extern int index;
-				index = 709;
+				extern int index, baseline;
+				index = baseline;
+				cameraPos.clear();
 				SVDDLT(imClick, objClick, imCords, objCords);
 	}
 		
@@ -673,13 +677,14 @@ main_keyboard(unsigned char key, int x, int y)
 	case 'v':
 		//RansacDLT();
 		{
+			// 每得到一个点，就执行渲染并写入文件s
 			extern int baseline;
-			// 将摄像机位置渲染出来
 			int context = glutGetWindow();
 			glutSetWindow(screen);
 
 			extern int index;
 			for (int i = 1; i <= 715; i++) {
+				cameraPos.clear();
 				index = i;
 				SVDDLT(imClick, objClick, imCords, objCords);
 				void screen_display();
@@ -692,6 +697,32 @@ main_keyboard(unsigned char key, int x, int y)
 			}
 			glutSetWindow(context);
 		}
+		break;
+	case 'a':
+	{
+				// 将得到的点保存起来，一次性渲染并保存
+				cameraPos.clear();
+				extern int index, baseline;
+				for (int i = 1; i <= 715; i++) {
+					index = i;
+					SVDDLT(imClick, objClick, imCords, objCords);
+				}
+
+				extern int baseline;
+				// 将所有摄像机位置渲染出来
+				int context = glutGetWindow();
+				glutSetWindow(screen);
+
+
+				void screen_display();
+				screen_display();
+				char path[255];
+				const char *dir = "D:\\DriverGenius2013\\NotreDame\\NotreDame\\images";
+				sprintf(path, "%s\\all_by%d.pos.png", dir, baseline);
+				writeRenderToFile(path);
+
+				glutSetWindow(context);
+	}
 		break;
     case 27:
         exit(0);
@@ -1005,14 +1036,16 @@ screen_display(void)
 		}
 	}
 
+	std::vector<cv::Point3f>::iterator it;
+	for (it = cameraPos.begin(); it != cameraPos.end(); it++)
 	{
 		glPushMatrix();
 		glEnable(GL_COLOR_MATERIAL);
 		glColorMaterial(GL_FRONT, GL_DIFFUSE);
 		glColor3f(1.f, 0.f, 0.f);
 
-		glTranslatef(cameraPos.x, cameraPos.y, cameraPos.z);
-		glutSolidSphere(0.1, 10, 10);
+		glTranslatef(it->x, it->y, it->z);
+		glutSolidSphere(0.03, 10, 10);
 
 		glDisable(GL_COLOR_MATERIAL);
 		glPopMatrix();
@@ -1465,7 +1498,8 @@ main(int argc, char** argv)
 	glutAddMenuEntry("[s]  Save all points", 's');
     glutAddMenuEntry("", 0);
 	glutAddMenuEntry("[u]  Update Lookat() using DLT", 'u');
-	glutAddMenuEntry("[v]  cuuu", 'v');
+	glutAddMenuEntry("[v]  write split", 'v');
+	glutAddMenuEntry("[a]  write in one", 'a');
 	glutAddMenuEntry("", 0);
     glutAddMenuEntry("Quit", 27);
     glutAttachMenu(GLUT_RIGHT_BUTTON);
