@@ -35,6 +35,7 @@ using namespace std;
 GModel model, modelForProjection;
 
 cv::Mat lookAtParams;
+cv::Point3f cameraPos;
 
 typedef struct _cell {
     int id;
@@ -426,8 +427,13 @@ void SVDDLT(int imClick, int objClick, int imCords[][2], float objCords[][3]) {
 	// 第二阶段
 	// 从P中分解出 K * [R t]
 	// 由[R t]可以得到lookat的参数，由K可以构造GL_PROJECTION_MATRIX
+	cv::Mat modelView, K;
+	phase2ExtractParametersFromP(P, modelView, K);
+	extern int baseline;
+	getCameraPosByDLTandSfM(modelView, baseline, baseline, cameraPos);
+
 	cv::Mat projMatrix;
-	phase2ExtractParametersFromP(P, iwidth, iheight, lookAtParams, projMatrix);
+	phase3GenerateLookAtAndProjection(modelView, K, iwidth, iheight, lookAtParams, projMatrix);
 
 	// 在物体坐标系（世界坐标系）中摆放照相机和它的朝向
 	for (int i = 0; i < 9; i++) {
@@ -999,8 +1005,17 @@ screen_display(void)
 		}
 	}
 
-	if (lookAtParams.cols == 3 && lookAtParams.rows == 3) {
-		drawCamera(lookAtParams);
+	{
+		glPushMatrix();
+		glEnable(GL_COLOR_MATERIAL);
+		glColorMaterial(GL_FRONT, GL_DIFFUSE);
+		glColor3f(1.f, 0.f, 0.f);
+
+		glTranslatef(cameraPos.x, cameraPos.y, cameraPos.z);
+		glutSolidSphere(0.1, 10, 10);
+
+		glDisable(GL_COLOR_MATERIAL);
+		glPopMatrix();
 	}
 	
 	glBindTexture(GL_TEXTURE_2D, g_RenderDestination);

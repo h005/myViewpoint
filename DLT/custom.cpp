@@ -65,7 +65,7 @@ void drawCamera(const cv::Mat &lookAt) {
 	glPopMatrix();
 }
 
-void transition(const cv::Mat &M1, const cv::Mat &M2, const cv::Mat &Md, cv::Mat &out) {
+static void transition(const cv::Mat &M1, const cv::Mat &M2, const cv::Mat &Md, cv::Mat &out) {
 	out = cv::Mat::zeros(4, 4, CV_32F);
 	out.at<float>(3, 3) = 1;
 
@@ -82,7 +82,7 @@ void transition(const cv::Mat &M1, const cv::Mat &M2, const cv::Mat &Md, cv::Mat
 	t.copyTo(out(cv::Range(0, 3), cv::Range(3, 4)));
 }
 
-void doit(int index, cv::Mat &m2) {
+static void loadSfMModelView(int index, cv::Mat &m2) {
 	const char *dir = "D:\\DriverGenius2013\\NotreDame\\NotreDame\\images";
 	char filepath[255];
 	sprintf(filepath, "%s\\exp%d.txt", dir, index);
@@ -102,4 +102,27 @@ void doit(int index, cv::Mat &m2) {
 		t.copyTo(m2.col(3));
 		fclose(fp);
 	}
+}
+
+void getCameraPosByDLTandSfM(const cv::Mat &Md, int srcLabel, int dstLabel, cv::Point3f &dstPos) {
+	cv::Mat m1;
+	cv::Mat m2;
+	loadSfMModelView(srcLabel, m1);
+	loadSfMModelView(dstLabel, m2);
+	cv::Mat out;
+	transition(m1, m2, Md, out);
+
+	// 由于modelView中最后一列是相机中心指向模型中心（相机坐标系下表示)，PA又是相机中心在模型坐标系下的表示
+	// 所以可以推出R * PA = -t
+	// 从公式角度看，有:
+	// | R t |   |PA|   |0|
+	// |     | * |  | = | |
+	// | 0 1 |   |1 |   |1|
+	// 所以PA = R.inv() * t
+	cv::Mat R = out(cv::Range(0, 3), cv::Range(0, 3));
+	cv::Mat t = out(cv::Range(0, 3), cv::Range(3, 4));
+	cv::Mat PA = R.inv() * (-t);
+	dstPos.x = PA.at<float>(0, 0); 
+	dstPos.y = PA.at<float>(1, 0);
+	dstPos.z = PA.at<float>(2, 0);
 }

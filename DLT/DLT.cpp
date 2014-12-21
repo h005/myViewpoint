@@ -121,7 +121,7 @@ static cv::Mat removeEpsilon(cv::Mat &matrix) {
 	return result;
 }
 
-static bool verifyModelViewMatrix(cv::Mat &modelView) {
+static bool verifyModelViewMatrix(const cv::Mat &modelView) {
 	assert(modelView.type() == CV_32F);
 
 	// 验证rotation是否是正交矩阵
@@ -158,7 +158,7 @@ static bool verifyModelViewMatrix(cv::Mat &modelView) {
 	}
 }
 
-static cv::Mat constructProjectionMatrix(cv::Mat &K, GLfloat n, GLfloat f, int iwidth, int iheight) {
+static cv::Mat constructProjectionMatrix(const cv::Mat &K, GLfloat n, GLfloat f, int iwidth, int iheight) {
 	// Hacked from this: http://www.songho.ca/opengl/gl_projectionmatrix.html
 
 	// 先将NDC中的z和w分量计算好，其中w = -z
@@ -303,7 +303,7 @@ cv::Mat phase1CalculateP(int imClick, int objClick, int imCords[][2], float objC
 	return P;
 }
 
-void phase2ExtractParametersFromP(cv::Mat &P, int iwidth, int iheight, cv::Mat &lookat, cv::Mat &projection) {
+void phase2ExtractParametersFromP(cv::Mat &P, cv::Mat &modelView, cv::Mat &K) {
 	// 求解旋转矩阵
 	cv::Mat A = P(cv::Range::all(), cv::Range(0, 3));
 	cv::Mat A1 = A.row(0).t();
@@ -325,13 +325,13 @@ void phase2ExtractParametersFromP(cv::Mat &P, int iwidth, int iheight, cv::Mat &
 	float a = cv::norm(t1, cv::NORM_L2);
 	cv::Mat R1 = t1 / a;
 
-	cv::Mat modelView = cv::Mat::zeros(4, 4, CV_32F);
+	modelView = cv::Mat::zeros(4, 4, CV_32F);
 	modelView(cv::Range(0, 1), cv::Range(0, 3)) = R1.t();
 	modelView(cv::Range(1, 2), cv::Range(0, 3)) = R2.t();
 	modelView(cv::Range(2, 3), cv::Range(0, 3)) = R3.t();
 	modelView.at<float>(3, 3) = 1;
 
-	cv::Mat K = cv::Mat::zeros(3, 3, CV_32F);
+	K = cv::Mat::zeros(3, 3, CV_32F);
 	K.at<float>(0, 0) = a;
 	K.at<float>(0, 1) = b;
 	K.at<float>(0, 2) = c;
@@ -342,17 +342,10 @@ void phase2ExtractParametersFromP(cv::Mat &P, int iwidth, int iheight, cv::Mat &
 	cv::Mat A4 = P(cv::Range::all(), cv::Range(3, 4));
 	cv::Mat T = K.inv() * A4;
 	T.copyTo(modelView(cv::Range(0, 3), cv::Range(3, 4)));
+	K /= K.at<float>(2, 2);
+}
 
-	cv::Mat m1;
-	cv::Mat m2;
-	doit(baseline, m1);
-	doit(index, m2);
-	cv::Mat out;
-	transition(m1, m2, modelView, out);
-	modelView = out;
-
-	cout << index << endl;
-
+void phase3GenerateLookAtAndProjection(const cv::Mat &modelView, const cv::Mat &K, int iwidth, int iheight, cv::Mat &lookat, cv::Mat &projection) {
 	// 在相机坐标系下选择相机点和其方向上的一个点
 	// PA = (0, 0, 0), PB = (0, 0, 1)
 	cv::Mat PA = cv::Mat::zeros(4, 1, CV_32F);
@@ -376,16 +369,6 @@ void phase2ExtractParametersFromP(cv::Mat &P, int iwidth, int iheight, cv::Mat &
 	PA(cv::Range(0, 3), cv::Range::all()).copyTo(lookat.col(0));
 	PB(cv::Range(0, 3), cv::Range::all()).copyTo(lookat.col(1));
 	UpDir(cv::Range(0, 3), cv::Range::all()).copyTo(lookat.col(2));
-	
-
-	// 由于modelView中最后一列是相机中心指向模型中心（相机坐标系下表示)，PA又是相机中心在模型坐标系下的表示
-	// 所以可以推出R * PA = -t
-	// 从公式角度看，有:
-	// | R t |   |PA|   |0|
-	// |     | * |  | = | |
-	// | 0 1 |   |1 |   |1|
-	// 所以有 R*PA + t = 0, 由于旋转矩阵的正交性，||R * PA|| = ||t||
-	assert(abs(cv::norm(modelView(cv::Range(0, 3), cv::Range(3, 4)), cv::NORM_L2) - cv::norm(PA(cv::Range(0, 3), cv::Range::all()), cv::NORM_L2)) < 0.001);
 
 	/*glm::vec3 from(PA.at<float>(0, 0), PA.at<float>(1, 0), PA.at<float>(2, 0));
 	glm::vec3 to(PB.at<float>(0, 0), PB.at<float>(1, 0), PB.at<float>(2, 0));
@@ -394,8 +377,6 @@ void phase2ExtractParametersFromP(cv::Mat &P, int iwidth, int iheight, cv::Mat &
 	cv::Mat md(4, 4, CV_32F, &m[0][0]);
 	md = md.t();*/
 
-	K /= K.at<float>(2, 2);
-	cout << "K: " << K << endl;
 	projection = constructProjectionMatrix(K, 0.1, 10, iwidth, iheight);
 	assert(verifyModelViewMatrix(modelView));
 }
