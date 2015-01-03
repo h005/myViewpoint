@@ -7,7 +7,7 @@ l = open('list.txt', 'r')
 i = 0
 for line in l:
 	i += 1
-	line = line.strip()
+	line = line.strip().split(' ')[0]
 	dirname = os.path.dirname(line)
 	basename = os.path.basename(line)
 	fname, fext = os.path.splitext(basename)
@@ -26,7 +26,7 @@ for line in l:
 
 l.close()
 
-l = open('notredame.out', 'r')
+l = open('bundle.out', 'r')
 l.readline()
 a, b = l.readline().strip().split(' ')
 a = int(a)
