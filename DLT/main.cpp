@@ -96,7 +96,7 @@ cell perspective[4] = {
     "Specifies field of view in x direction (width/height).", "%.2f" },
     { 12, 300, 80, 0.1, 10.0, 0.1, 0.05,
     "Specifies distance from viewer to near clipping plane.", "%.1f" },
-    { 13, 360, 80, 0.1, 10.0, 10.0, 0.05,
+    { 13, 360, 80, 0.1, 10.0, 16.0, 0.05,
     "Specifies distance from viewer to far clipping plane.", "%.1f" },
 };
 
@@ -168,8 +168,6 @@ GLuint sub_width = Width/3, sub_height = Height * 2 / 3;
 
 GLfloat customProjection[16];
 GLboolean usingCustomProjection = false;
-
-
 
 //DLT
 int imCords[10][2] = {0};          //交互对应的图像点，默认10个点
@@ -683,7 +681,7 @@ main_keyboard(unsigned char key, int x, int y)
 			glutSetWindow(screen);
 
 			extern int index;
-			for (int i = 1; i <= 715; i++) {
+			for (int i = 1; i <= 909; i++) {
 				cameraPos.clear();
 				index = i;
 				SVDDLT(imClick, objClick, imCords, objCords);
@@ -691,7 +689,7 @@ main_keyboard(unsigned char key, int x, int y)
 				screen_display();
 
 				char path[255];
-				const char *dir = "D:\\DriverGenius2013\\NotreDame\\NotreDame\\images";
+				const char *dir = "D:\\DriverGenius2013\\tiananmen3";
 				sprintf(path, "%s\\exp%d_by%d.pos.png", dir, index, baseline);
 				writeRenderToFile(path);
 			}
@@ -871,6 +869,14 @@ world_menu(int value)
 		name = "data/exp709.rd.jpg";
 		txt_name = "data/exp709_im_norm.txt";
 		break;
+	case 3:
+		name = "data/exp640.jpg";
+		txt_name = "data/exp640_im_norm.txt";
+		break;
+	case 4:
+		name = "data/exp24.jpg";
+		txt_name = "data/exp24_im_norm.txt";
+		break;
     }
     
     if (name) {
@@ -972,7 +978,7 @@ screen_reshape(int width, int height)
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-	gluLookAt(0, 3, 0, 0, 0, 0, 0, 0, 1);
+	gluLookAt(0, 12, 0, 0, 0, 0, 0, 0, 1);
 	//gluLookAt(0, 0, 2, 0, 0, 0, 0, 1, 0);
 }
 
@@ -1042,10 +1048,10 @@ screen_display(void)
 		glPushMatrix();
 		glEnable(GL_COLOR_MATERIAL);
 		glColorMaterial(GL_FRONT, GL_DIFFUSE);
-		glColor3f(1.f, 0.f, 0.f);
+		glColor3f(1.f, 1.f, 1.f);
 
 		glTranslatef(it->x, it->y, it->z);
-		glutSolidSphere(0.03, 10, 10);
+		glutSolidSphere(0.3, 10, 10);
 
 		glDisable(GL_COLOR_MATERIAL);
 		glPopMatrix();
@@ -1118,6 +1124,19 @@ screen_menu(int value)
 		baseline = 622;
 		name = "D:/no2/models/model.dae";
 		txt_name = "data/rd.txt";
+		break;
+	case 2:
+		extern int baseline;
+		baseline = 640;
+		name = "D:\\Tiananmen-Square\\models\\warehouse_model.dae";
+		txt_name = "data/tam.txt";
+		break;
+	case 3:
+		extern int baseline;
+		baseline = 24;
+		name = "D:\\Tiananmen-Square\\models\\warehouse_model.dae";
+		txt_name = "data/tam24.txt";
+		break;
     }
     
     if (name) {
@@ -1453,6 +1472,8 @@ main(int argc, char** argv)
 	glutAddMenuEntry("notre dame", 'a');
 	glutAddMenuEntry("notre dame2", 1);
 	glutAddMenuEntry("notre dame3", 2);
+	glutAddMenuEntry("Tiananmen640", 3);
+	glutAddMenuEntry("Tiananmen24", 4);
     glutAttachMenu(GLUT_RIGHT_BUTTON);
     
     screen = glutCreateSubWindow(window, GAP+sub_width+GAP, GAP, sub_width, sub_height);
@@ -1476,6 +1497,8 @@ main(int argc, char** argv)
 	glutAddMenuEntry("triumph", 't');
 	glutAddMenuEntry("notre dame2", 1);
 	glutAddMenuEntry("notre dame3", 'a');
+	glutAddMenuEntry("Tiananmen640", 2);
+	glutAddMenuEntry("Tiananmen24", 3);
 	glutAddMenuEntry("Spider", 's');
     glutAttachMenu(GLUT_RIGHT_BUTTON);
 

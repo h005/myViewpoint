@@ -83,7 +83,7 @@ static void transition(const cv::Mat &M1, const cv::Mat &M2, const cv::Mat &Md, 
 }
 
 static void loadSfMModelView(int index, cv::Mat &m2) {
-	const char *dir = "D:\\DriverGenius2013\\NotreDame\\NotreDame\\images";
+	const char *dir = "D:\\DriverGenius2013\\tiananmen3";
 	char filepath[255];
 	sprintf(filepath, "%s\\exp%d.txt", dir, index);
 	FILE *fp;
@@ -109,6 +109,13 @@ void getCameraPosByDLTandSfM(const cv::Mat &Md, int srcLabel, int dstLabel, cv::
 	cv::Mat m2;
 	loadSfMModelView(srcLabel, m1);
 	loadSfMModelView(dstLabel, m2);
+
+	if (cv::norm(m1, cv::NORM_L2) < 0.001 || cv::norm(m2, cv::NORM_L2) < 0.001) {
+		dstPos.x = 0;
+		dstPos.y = 0;
+		dstPos.z = 0;
+		return;
+	}
 	cv::Mat out;
 	transition(m1, m2, Md, out);
 
