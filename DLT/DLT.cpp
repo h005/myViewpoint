@@ -12,8 +12,6 @@
 
 using namespace std;
 
-int baseline = 0, index = 0;
-
 #define NDIM 3
 static void normalize_3D(float original[][NDIM], float processed[][NDIM], size_t n, float param[NDIM + 1]) {
 	for (size_t i = 0; i < n; i++) {

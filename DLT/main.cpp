@@ -181,6 +181,9 @@ char str[80];
 GLvoid *font_style = GLUT_BITMAP_TIMES_ROMAN_10;
 char *wTxtName, *sTxtName;
 
+static int baseline; // 选定的基准图片序号
+static const char *dataDir; // 测试样例所在的目录
+
 void CreateRenderTexture(GLuint *p_textureId, int size, int channels, int type)
 {
 	// Create a pointer to store the blank image data
@@ -414,7 +417,7 @@ bool saveTXT(char* filename, float Cords[10][3], int &count_click)
 }
 
 
-void SVDDLT(int imClick, int objClick, int imCords[][2], float objCords[][3]) {
+static void SVDDLT(int imClick, int objClick, int imCords[][2], float objCords[][3], int baseline, int index, const char *dataDir) {
 	// DLT using SVD
 	// Reference: http://www.maths.lth.se/matematiklth/personal/calle/datorseende13/pres/forelas3.pdf
 	assert((imClick == objClick) && (imClick >= 6)); //必须保证图像与模型对应点数相同且>=6个
@@ -428,9 +431,8 @@ void SVDDLT(int imClick, int objClick, int imCords[][2], float objCords[][3]) {
 	cv::Mat modelView, K;
 	phase2ExtractParametersFromP(P, modelView, K);
 
-	extern int baseline, index;
 	cv::Point3f point;
-	getCameraPosByDLTandSfM(modelView, baseline, index, point);
+	getCameraPosByDLTandSfM(dataDir, modelView, baseline, index, point);
 	cameraPos.push_back(point);
 
 	cv::Mat projMatrix;
@@ -665,32 +667,25 @@ main_keyboard(unsigned char key, int x, int y)
         break;
 	case 'u':
 	{
-				extern int index, baseline;
-				index = baseline;
 				cameraPos.clear();
-				SVDDLT(imClick, objClick, imCords, objCords);
+				SVDDLT(imClick, objClick, imCords, objCords, baseline, baseline, dataDir);
 	}
 		
 		break;
 	case 'v':
-		//RansacDLT();
 		{
 			// 每得到一个点，就执行渲染并写入文件s
-			extern int baseline;
 			int context = glutGetWindow();
 			glutSetWindow(screen);
 
-			extern int index;
 			for (int i = 1; i <= 909; i++) {
 				cameraPos.clear();
-				index = i;
-				SVDDLT(imClick, objClick, imCords, objCords);
+				SVDDLT(imClick, objClick, imCords, objCords, baseline, i, dataDir);
 				void screen_display();
 				screen_display();
 
-				char path[255];
-				const char *dir = "D:\\DriverGenius2013\\tiananmen3";
-				sprintf(path, "%s\\exp%d_by%d.pos.png", dir, index, baseline);
+				char path[512];
+				sprintf(path, "%s\\exp%d_by%d.pos.png", dataDir, i, baseline);
 				writeRenderToFile(path);
 			}
 			glutSetWindow(context);
@@ -700,13 +695,10 @@ main_keyboard(unsigned char key, int x, int y)
 	{
 				// 将得到的点保存起来，一次性渲染并保存
 				cameraPos.clear();
-				extern int index, baseline;
 				for (int i = 1; i <= 715; i++) {
-					index = i;
-					SVDDLT(imClick, objClick, imCords, objCords);
+					SVDDLT(imClick, objClick, imCords, objCords, baseline, i, dataDir);
 				}
 
-				extern int baseline;
 				// 将所有摄像机位置渲染出来
 				int context = glutGetWindow();
 				glutSetWindow(screen);
@@ -714,9 +706,8 @@ main_keyboard(unsigned char key, int x, int y)
 
 				void screen_display();
 				screen_display();
-				char path[255];
-				const char *dir = "D:\\DriverGenius2013\\NotreDame\\NotreDame\\images";
-				sprintf(path, "%s\\all_by%d.pos.png", dir, baseline);
+				char path[512];
+				sprintf(path, "%s\\all_by%d.pos.png", dataDir, baseline);
 				writeRenderToFile(path);
 
 				glutSetWindow(context);
@@ -1110,30 +1101,25 @@ screen_menu(int value)
 		txt_name = "data/triumph_obj.txt";
         break;
 	case 'a':
-		extern int baseline;
 		baseline = 709;
+		dataDir = 
 		name = "D:/no2/models/model.dae";
 		txt_name = "data/notre_dame.txt";
 		break;
-	case 's':
-		name = "F:/tools/assimp-3.1.1-win-binaries/test/models/OBJ/spider.obj";
-		txt_name = "data/spider.txt";
-		break;
 	case 1:
-		extern int baseline;
 		baseline = 622;
 		name = "D:/no2/models/model.dae";
 		txt_name = "data/rd.txt";
 		break;
 	case 2:
-		extern int baseline;
 		baseline = 640;
+		dataDir = "D:\\DriverGenius2013\\TAM_A";
 		name = "D:\\Tiananmen-Square\\models\\warehouse_model.dae";
 		txt_name = "data/tam.txt";
 		break;
 	case 3:
-		extern int baseline;
 		baseline = 24;
+		dataDir = "D:\\DriverGenius2013\\TAM_A";
 		name = "D:\\Tiananmen-Square\\models\\warehouse_model.dae";
 		txt_name = "data/tam24.txt";
 		break;

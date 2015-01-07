@@ -82,8 +82,7 @@ static void transition(const cv::Mat &M1, const cv::Mat &M2, const cv::Mat &Md, 
 	t.copyTo(out(cv::Range(0, 3), cv::Range(3, 4)));
 }
 
-static void loadSfMModelView(int index, cv::Mat &m2) {
-	const char *dir = "D:\\DriverGenius2013\\tiananmen3";
+static void loadSfMModelView(const char *dir, int index, cv::Mat &m2) {
 	char filepath[255];
 	sprintf(filepath, "%s\\exp%d.txt", dir, index);
 	FILE *fp;
@@ -104,11 +103,11 @@ static void loadSfMModelView(int index, cv::Mat &m2) {
 	}
 }
 
-void getCameraPosByDLTandSfM(const cv::Mat &Md, int srcLabel, int dstLabel, cv::Point3f &dstPos) {
+void getCameraPosByDLTandSfM(const char *dataDir, const cv::Mat &Md, int srcLabel, int dstLabel, cv::Point3f &dstPos) {
 	cv::Mat m1;
 	cv::Mat m2;
-	loadSfMModelView(srcLabel, m1);
-	loadSfMModelView(dstLabel, m2);
+	loadSfMModelView(dataDir, srcLabel, m1);
+	loadSfMModelView(dataDir, dstLabel, m2);
 
 	if (cv::norm(m1, cv::NORM_L2) < 0.001 || cv::norm(m2, cv::NORM_L2) < 0.001) {
 		dstPos.x = 0;
