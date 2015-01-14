@@ -137,6 +137,7 @@ enum {
     PERSPECTIVE, FRUSTUM, ORTHO
 } mode = PERSPECTIVE;
 
+
 GLboolean world_draw = GL_TRUE;
 GLint selection = 0;
 glm::vec3 N(1.f);
@@ -844,10 +845,6 @@ world_menu(int value)
         name = "data/Eiffel.ppm";
 		txt_name = "data/Eiffel_im_norm.txt";
         break;
-	case 't':
-        name = "data/triumph.ppm";
-		txt_name = "data/triumph_im_norm.txt";
-        break;
 	case 'a':
 		name = "data/bbb.jpg";
 		txt_name = "data/notre_dame_im_norm.txt";
@@ -867,6 +864,22 @@ world_menu(int value)
 	case 4:
 		name = "data/exp24.jpg";
 		txt_name = "data/exp24_im_norm.txt";
+		break;
+	case 5:
+		name = "data/exp9.jpg";
+		txt_name = "data/exp9_im_norm.txt";
+		break;
+	case 6:
+		name = "data/exp3.jpg";
+		txt_name = "data/exp3_im_norm.txt";
+		break;
+	case 7:
+		name = "data/exp156.jpg";
+		txt_name = "data/triumph_im_norm.txt";
+		break;
+	case 8:
+		name = "data/exp227.jpg";
+		txt_name = "data/triumph_im_norm.txt";
 		break;
     }
     
@@ -950,6 +963,8 @@ void initGL(int glutWindow) {
 
 	glutSetWindow(context);
 }
+
+float scale = 4;
 void
 screen_reshape(int width, int height)
 {
@@ -969,8 +984,8 @@ screen_reshape(int width, int height)
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-	gluLookAt(0, 12, 0, 0, 0, 0, 0, 0, 1);
-	//gluLookAt(0, 0, 2, 0, 0, 0, 0, 1, 0);
+	gluLookAt(0, scale, 0, 0, 0, 0, 0, 0, 1);
+	//gluLookAt(0, 0, 3, 0, 0, 0, 0, 1, 0);
 }
 
 
@@ -1042,7 +1057,7 @@ screen_display(void)
 		glColor3f(1.f, 1.f, 1.f);
 
 		glTranslatef(it->x, it->y, it->z);
-		glutSolidSphere(0.3, 10, 10);
+		glutSolidSphere(0.03 * scale, 10, 10);
 
 		glDisable(GL_COLOR_MATERIAL);
 		glPopMatrix();
@@ -1096,13 +1111,8 @@ screen_menu(int value)
         name = "data/EiffelTower.obj";
 		txt_name = "data/Eiffel_obj.txt";
         break;
-	case 't':
-        name = "data/triumph.obj";
-		txt_name = "data/triumph_obj.txt";
-        break;
 	case 'a':
 		baseline = 709;
-		dataDir = 
 		name = "D:/no2/models/model.dae";
 		txt_name = "data/notre_dame.txt";
 		break;
@@ -1122,6 +1132,31 @@ screen_menu(int value)
 		dataDir = "D:\\DriverGenius2013\\TAM_A";
 		name = "D:\\Tiananmen-Square\\models\\warehouse_model.dae";
 		txt_name = "data/tam24.txt";
+		break;
+
+	case 4:
+		baseline = 9;
+		dataDir = "D:\\DriverGenius2013\\zyns";
+		name = "D:\\no3\\models\\model.dae";
+		txt_name = "data/zyns9.txt";
+		break;
+	case 5:
+		baseline = 3;
+		dataDir = "D:\\DriverGenius2013\\zyns";
+		name = "D:\\no3\\models\\model.dae";
+		txt_name = "data/zyns3.txt";
+		break;
+	case 6:
+		baseline = 156;
+		dataDir = "D:\\DriverGenius2013\\kxm";
+		name = "D:\\no4\\models\\model.dae";
+		txt_name = "data/triumph_obj.txt";
+		break;
+	case 7:
+		baseline = 227;
+		dataDir = "D:\\DriverGenius2013\\kxm";
+		name = "D:\\no4\\models\\model.dae";
+		txt_name = "data/triumph227.txt";
 		break;
     }
     
@@ -1460,6 +1495,10 @@ main(int argc, char** argv)
 	glutAddMenuEntry("notre dame3", 2);
 	glutAddMenuEntry("Tiananmen640", 3);
 	glutAddMenuEntry("Tiananmen24", 4);
+	glutAddMenuEntry("zyns9", 5);
+	glutAddMenuEntry("zyns3", 6);
+	glutAddMenuEntry("triumph", 7);
+	glutAddMenuEntry("triumph", 8);
     glutAttachMenu(GLUT_RIGHT_BUTTON);
     
     screen = glutCreateSubWindow(window, GAP+sub_width+GAP, GAP, sub_width, sub_height);
@@ -1480,12 +1519,14 @@ main(int argc, char** argv)
 	glutAddMenuEntry("Lugger", 'l');
 	glutAddMenuEntry("Lugger2", 'n');
 	glutAddMenuEntry("EiffelTower", 'e');
-	glutAddMenuEntry("triumph", 't');
 	glutAddMenuEntry("notre dame2", 1);
 	glutAddMenuEntry("notre dame3", 'a');
 	glutAddMenuEntry("Tiananmen640", 2);
 	glutAddMenuEntry("Tiananmen24", 3);
-	glutAddMenuEntry("Spider", 's');
+	glutAddMenuEntry("zyns9", 4);
+	glutAddMenuEntry("zyns3", 5);
+	glutAddMenuEntry("triumph", 6);
+	glutAddMenuEntry("triumph", 7);
     glutAttachMenu(GLUT_RIGHT_BUTTON);
 
 	billboard = glutCreateSubWindow(window, GAP + sub_width + GAP, GAP, sub_width, sub_height);
