@@ -41,6 +41,7 @@
 #include "glwidget.h"
 #include "window.h"
 #include "mainwindow.h"
+#include <iostream>
 #include <QSlider>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
@@ -50,41 +51,31 @@
 #include <QApplication>
 #include <QMessageBox>
 
-Window::Window(MainWindow *mw)
+Window::Window(MainWindow *mw, const QString imagePath, const QString modelPath)
     : mainWindow(mw)
 {
-    glWidget = new GLWidget;
-
+    right = new GLWidget;
     xSlider = createSlider();
-    ySlider = createSlider();
-    zSlider = createSlider();
 
-    connect(xSlider, SIGNAL(valueChanged(int)), glWidget, SLOT(setXRotation(int)));
-    connect(glWidget, SIGNAL(xRotationChanged(int)), xSlider, SLOT(setValue(int)));
-    connect(ySlider, SIGNAL(valueChanged(int)), glWidget, SLOT(setYRotation(int)));
-    connect(glWidget, SIGNAL(yRotationChanged(int)), ySlider, SLOT(setValue(int)));
-    connect(zSlider, SIGNAL(valueChanged(int)), glWidget, SLOT(setZRotation(int)));
-    connect(glWidget, SIGNAL(zRotationChanged(int)), zSlider, SLOT(setValue(int)));
+    connect(xSlider, SIGNAL(valueChanged(int)), right, SLOT(setXRotation(int)));
+    connect(right, SIGNAL(xRotationChanged(int)), xSlider, SLOT(setValue(int)));
 
     QVBoxLayout *mainLayout = new QVBoxLayout;
     QHBoxLayout *container = new QHBoxLayout;
-    container->addWidget(glWidget);
+    container->addWidget(right);
     container->addWidget(xSlider);
-    container->addWidget(ySlider);
-    container->addWidget(zSlider);
 
+    // 布局用，类似于div
     QWidget *w = new QWidget;
     w->setLayout(container);
-    mainLayout->addWidget(w);
+
     dockBtn = new QPushButton(tr("Undock"), this);
     connect(dockBtn, SIGNAL(clicked()), this, SLOT(dockUndock()));
     mainLayout->addWidget(dockBtn);
+    mainLayout->addWidget(w);
 
     setLayout(mainLayout);
-
     xSlider->setValue(15 * 16);
-    ySlider->setValue(345 * 16);
-    zSlider->setValue(0 * 16);
 
     setWindowTitle(tr("Hello GL"));
 }

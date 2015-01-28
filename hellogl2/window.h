@@ -56,7 +56,7 @@ class Window : public QWidget
     Q_OBJECT
 
 public:
-    Window(MainWindow *mw);
+    Window(MainWindow *mw, const QString imagePath, const QString modelPath);
 
 protected:
     void keyPressEvent(QKeyEvent *event) Q_DECL_OVERRIDE;
@@ -67,10 +67,8 @@ private slots:
 private:
     QSlider *createSlider();
 
-    GLWidget *glWidget;
+    GLWidget *right;
     QSlider *xSlider;
-    QSlider *ySlider;
-    QSlider *zSlider;
     QPushButton *dockBtn;
     MainWindow *mainWindow;
 };
