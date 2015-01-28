@@ -18,10 +18,6 @@ SOURCES       = glwidget.cpp \
 
 QT           += widgets
 
-# install
-target.path = $$[QT_INSTALL_EXAMPLES]/opengl/hellogl2
-INSTALLS += target
-
 DEFINES += _CRT_SECURE_NO_WARNINGS
 
 DP_TOOLS_DIR = $$(DP_TOOLS_DIR)
