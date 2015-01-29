@@ -46,6 +46,7 @@
 QT_BEGIN_NAMESPACE
 class QSlider;
 class QPushButton;
+class QLabel;
 QT_END_NAMESPACE
 
 class GLWidget;
@@ -67,8 +68,8 @@ private slots:
 private:
     QSlider *createSlider();
 
+    QLabel *left;
     GLWidget *right;
-    QSlider *xSlider;
     QPushButton *dockBtn;
     MainWindow *mainWindow;
 };

@@ -46,6 +46,7 @@
 #include <QOpenGLVertexArrayObject>
 #include <QOpenGLBuffer>
 #include <QMatrix4x4>
+#include <glm/glm.hpp>
 #include "logo.h"
 
 QT_FORWARD_DECLARE_CLASS(QOpenGLShaderProgram)
@@ -62,15 +63,9 @@ public:
     QSize sizeHint() const Q_DECL_OVERRIDE;
 
 public slots:
-    void setXRotation(int angle);
-    void setYRotation(int angle);
-    void setZRotation(int angle);
     void cleanup();
 
 signals:
-    void xRotationChanged(int angle);
-    void yRotationChanged(int angle);
-    void zRotationChanged(int angle);
 
 protected:
     void initializeGL() Q_DECL_OVERRIDE;
@@ -83,9 +78,8 @@ private:
     void setupVertexAttribs();
 
     bool m_core;
-    int m_xRot;
-    int m_yRot;
-    int m_zRot;
+    glm::vec3 m_rotateN;
+    float m_angle;
     QPoint m_lastPos;
     Logo m_logo;
     QOpenGLVertexArrayObject m_vao;

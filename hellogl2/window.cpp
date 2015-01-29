@@ -46,6 +46,7 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QKeyEvent>
+#include <QLabel>
 #include <QPushButton>
 #include <QDesktopWidget>
 #include <QApplication>
@@ -54,16 +55,26 @@
 Window::Window(MainWindow *mw, const QString imagePath, const QString modelPath)
     : mainWindow(mw)
 {
+    left = new QLabel;
+    left->setBackgroundRole(QPalette::Base);
+    left->setScaledContents(true);
+//    QString filename = QString("H:/aa.jpg");
+//    QImage image(filename);
+//    left->setPixmap(QPixmap::fromImage(image));
+//    std::cout << image.width() << image.height() << std::endl;
+    left->setStyleSheet("border: 1px solid black");
+
     right = new GLWidget;
-    xSlider = createSlider();
 
-    connect(xSlider, SIGNAL(valueChanged(int)), right, SLOT(setXRotation(int)));
-    connect(right, SIGNAL(xRotationChanged(int)), xSlider, SLOT(setValue(int)));
-
-    QVBoxLayout *mainLayout = new QVBoxLayout;
+    // 将左右窗口加入布局管理器
     QHBoxLayout *container = new QHBoxLayout;
+
+    QSizePolicy cellPolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    cellPolicy.setHorizontalStretch(1);
+    left->setSizePolicy(cellPolicy);
+    right->setSizePolicy(cellPolicy);
+    container->addWidget(left);
     container->addWidget(right);
-    container->addWidget(xSlider);
 
     // 布局用，类似于div
     QWidget *w = new QWidget;
@@ -71,11 +82,12 @@ Window::Window(MainWindow *mw, const QString imagePath, const QString modelPath)
 
     dockBtn = new QPushButton(tr("Undock"), this);
     connect(dockBtn, SIGNAL(clicked()), this, SLOT(dockUndock()));
+
+    QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addWidget(dockBtn);
     mainLayout->addWidget(w);
 
     setLayout(mainLayout);
-    xSlider->setValue(15 * 16);
 
     setWindowTitle(tr("Hello GL"));
 }

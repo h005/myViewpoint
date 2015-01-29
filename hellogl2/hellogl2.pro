@@ -5,7 +5,8 @@ HEADERS       = glwidget.h \
     custom.h \
     DLT.h \
     GModel.h \
-    trackball.h
+    trackball.h \
+    imageandpoint.h
 SOURCES       = glwidget.cpp \
                 main.cpp \
                 window.cpp \
@@ -14,7 +15,8 @@ SOURCES       = glwidget.cpp \
     custom.cpp \
     DLT.cpp \
     GModel.cpp \
-    trackball.cpp
+    trackball.cpp \
+    imageandpoint.cpp
 
 QT           += widgets
 

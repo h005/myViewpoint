@@ -39,17 +39,18 @@
 ****************************************************************************/
 
 #include "glwidget.h"
+#include <iostream>
 #include <QMouseEvent>
 #include <QOpenGLShaderProgram>
 #include <QCoreApplication>
 #include <math.h>
-#include <glm/glm.hpp>
+
+#include "trackball.h"
 
 GLWidget::GLWidget(QWidget *parent)
     : QOpenGLWidget(parent),
-      m_xRot(0),
-      m_yRot(0),
-      m_zRot(0),
+      m_angle(0),
+      m_rotateN(1.f),
       m_program(0)
 {
     m_core = QCoreApplication::arguments().contains(QStringLiteral("--coreprofile"));
@@ -81,36 +82,6 @@ static void qNormalizeAngle(int &angle)
         angle += 360 * 16;
     while (angle > 360 * 16)
         angle -= 360 * 16;
-}
-
-void GLWidget::setXRotation(int angle)
-{
-    qNormalizeAngle(angle);
-    if (angle != m_xRot) {
-        m_xRot = angle;
-        emit xRotationChanged(angle);
-        update();
-    }
-}
-
-void GLWidget::setYRotation(int angle)
-{
-    qNormalizeAngle(angle);
-    if (angle != m_yRot) {
-        m_yRot = angle;
-        emit yRotationChanged(angle);
-        update();
-    }
-}
-
-void GLWidget::setZRotation(int angle)
-{
-    qNormalizeAngle(angle);
-    if (angle != m_zRot) {
-        m_zRot = angle;
-        emit zRotationChanged(angle);
-        update();
-    }
 }
 
 void GLWidget::cleanup()
@@ -247,9 +218,9 @@ void GLWidget::paintGL()
     glEnable(GL_CULL_FACE);
 
     m_world.setToIdentity();
-    m_world.rotate(180.0f - (m_xRot / 16.0f), 1, 0, 0);
-    m_world.rotate(m_yRot / 16.0f, 0, 1, 0);
-    m_world.rotate(m_zRot / 16.0f, 0, 0, 1);
+    QVector3D N(m_rotateN[0], m_rotateN[1], m_rotateN[2]);
+    std::cout << N[0] << " " << N[1] << " " << N[2] << std::endl;
+    m_world.rotate((m_angle / glm::pi<float>() * 180.f), N);
 
     QOpenGLVertexArrayObject::Binder vaoBinder(&m_vao);
     m_program->bind();
@@ -276,15 +247,15 @@ void GLWidget::mousePressEvent(QMouseEvent *event)
 
 void GLWidget::mouseMoveEvent(QMouseEvent *event)
 {
-    int dx = event->x() - m_lastPos.x();
-    int dy = event->y() - m_lastPos.y();
+    float width = this->width();
+    float height = this->height();
 
-    if (event->buttons() & Qt::LeftButton) {
-        setXRotation(m_xRot + 8 * dy);
-        setYRotation(m_yRot + 8 * dx);
-    } else if (event->buttons() & Qt::RightButton) {
-        setXRotation(m_xRot + 8 * dy);
-        setZRotation(m_zRot + 8 * dx);
-    }
-    m_lastPos = event->pos();
+    glm::vec2 a, b;
+    a.x = (m_lastPos.x() - width / 2.f) / (width / 2.f);
+    a.y = (height / 2.f - m_lastPos.x()) / (height / 2.f);
+    b.x = (event->pos().x() - width / 2.f) / (width / 2.f);
+    b.y = (height / 2.f - event->pos().y()) / (height / 2.f);
+
+    computeRotation(a, b, m_rotateN, m_angle);
+    update();
 }
