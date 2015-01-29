@@ -78,6 +78,7 @@ private:
     void setupVertexAttribs();
 
     bool m_core;
+    glm::mat4 m_baseRotate;
     glm::vec3 m_rotateN;
     float m_angle;
     QPoint m_lastPos;
@@ -89,9 +90,8 @@ private:
     int m_mvMatrixLoc;
     int m_normalMatrixLoc;
     int m_lightPosLoc;
-    QMatrix4x4 m_proj;
-    QMatrix4x4 m_camera;
-    QMatrix4x4 m_world;
+    glm::mat4 m_proj;
+    glm::mat4 m_camera;
     bool m_transparent;
 };
 

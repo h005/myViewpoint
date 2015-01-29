@@ -51,6 +51,7 @@ GLWidget::GLWidget(QWidget *parent)
     : QOpenGLWidget(parent),
       m_angle(0),
       m_rotateN(1.f),
+      m_baseRotate(1.f),
       m_program(0)
 {
     m_core = QCoreApplication::arguments().contains(QStringLiteral("--coreprofile"));
@@ -191,8 +192,7 @@ void GLWidget::initializeGL()
     setupVertexAttribs();
 
     // Our camera never changes in this example.
-    m_camera.setToIdentity();
-    m_camera.translate(0, 0, -1);
+    m_camera = glm::translate(glm::mat4(), glm::vec3(0.f, 0.f, -1.f));
 
     // Light position is fixed.
     m_program->setUniformValue(m_lightPosLoc, QVector3D(0, 0, 70));
@@ -217,15 +217,14 @@ void GLWidget::paintGL()
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
 
-    m_world.setToIdentity();
-    QVector3D N(m_rotateN[0], m_rotateN[1], m_rotateN[2]);
-    std::cout << N[0] << " " << N[1] << " " << N[2] << std::endl;
-    m_world.rotate((m_angle / glm::pi<float>() * 180.f), N);
+    glm::mat4 worldTransform = glm::rotate(glm::mat4(), m_rotateN, m_angle);
+    worldTransform *= m_baseRotate;
+    glm::mat4 modelViewTransfrom = m_camera * worldTransform;
 
     QOpenGLVertexArrayObject::Binder vaoBinder(&m_vao);
     m_program->bind();
     m_program->setUniformValue(m_projMatrixLoc, m_proj);
-    m_program->setUniformValue(m_mvMatrixLoc, m_camera * m_world);
+    m_program->setUniformValue(m_mvMatrixLoc, QMatrix(&modelViewTransform[0][0]));
     QMatrix3x3 normalMatrix = m_world.normalMatrix();
     m_program->setUniformValue(m_normalMatrixLoc, normalMatrix);
 
