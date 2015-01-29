@@ -46,6 +46,7 @@
 #include <math.h>
 #include <glm/gtc/matrix_inverse.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/gtx/string_cast.hpp>
 
 #include "trackball.h"
 
@@ -253,7 +254,9 @@ void GLWidget::mousePressEvent(QMouseEvent *event)
 
 void GLWidget::mouseReleaseEvent(QMouseEvent *event)
 {
-    m_baseRotate = glm::rotate(m_baseRotate, m_angle, m_rotateN);
+    // 注意新增加的旋转量是左乘，与paintGL中一致
+    glm::mat4 leftRotationMatrix = glm::rotate(glm::mat4(1.f), m_angle, m_rotateN);
+    m_baseRotate = leftRotationMatrix * m_baseRotate;
     // 重点是将m_angle清零，因为旋转已经被融合进m_baseRotate了
     m_angle = 0.f;
     m_rotateN = glm::vec3(1.f);
@@ -266,7 +269,7 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
 
     glm::vec2 a, b;
     a.x = (m_lastPos.x() - width / 2.f) / (width / 2.f);
-    a.y = (height / 2.f - m_lastPos.x()) / (height / 2.f);
+    a.y = (height / 2.f - m_lastPos.y()) / (height / 2.f);
     b.x = (event->pos().x() - width / 2.f) / (width / 2.f);
     b.y = (height / 2.f - event->pos().y()) / (height / 2.f);
 
