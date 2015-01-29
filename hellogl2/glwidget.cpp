@@ -44,6 +44,8 @@
 #include <QOpenGLShaderProgram>
 #include <QCoreApplication>
 #include <math.h>
+#include <glm/gtc/matrix_inverse.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 #include "trackball.h"
 
@@ -217,16 +219,22 @@ void GLWidget::paintGL()
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
 
-    glm::mat4 worldTransform = glm::rotate(glm::mat4(), m_rotateN, m_angle);
+    // 计算modelView矩阵
+    glm::mat4 worldTransform = glm::rotate(glm::mat4(1.f), m_angle, m_rotateN);
     worldTransform *= m_baseRotate;
-    glm::mat4 modelViewTransfrom = m_camera * worldTransform;
+    glm::mat4 modelViewMatrix = m_camera * worldTransform;
+    // 计算modelView的法向计算矩阵
+    glm::mat3 gl_NormalMatrix = glm::inverseTranspose(glm::mat3(modelViewMatrix));
+    // 转换成Qt中的OpenGL类型
+    QMatrix4x4 Q_projMatrix(glm::value_ptr(glm::transpose(m_proj)));
+    QMatrix4x4 Q_modelViewMatrix(glm::value_ptr(glm::transpose(modelViewMatrix)));
+    QMatrix3x3 Q_normalMatrix(glm::value_ptr(glm::transpose(gl_NormalMatrix)));
 
     QOpenGLVertexArrayObject::Binder vaoBinder(&m_vao);
     m_program->bind();
-    m_program->setUniformValue(m_projMatrixLoc, m_proj);
-    m_program->setUniformValue(m_mvMatrixLoc, QMatrix(&modelViewTransform[0][0]));
-    QMatrix3x3 normalMatrix = m_world.normalMatrix();
-    m_program->setUniformValue(m_normalMatrixLoc, normalMatrix);
+    m_program->setUniformValue(m_projMatrixLoc, Q_projMatrix);
+    m_program->setUniformValue(m_mvMatrixLoc, Q_modelViewMatrix);
+    m_program->setUniformValue(m_normalMatrixLoc, Q_normalMatrix);
 
     glDrawArrays(GL_TRIANGLES, 0, m_logo.vertexCount());
 
@@ -235,13 +243,20 @@ void GLWidget::paintGL()
 
 void GLWidget::resizeGL(int w, int h)
 {
-    m_proj.setToIdentity();
-    m_proj.perspective(45.0f, GLfloat(w) / h, 0.01f, 100.0f);
+    m_proj = glm::perspective(45.0f, GLfloat(w) / h, 0.01f, 100.0f);
 }
 
 void GLWidget::mousePressEvent(QMouseEvent *event)
 {
     m_lastPos = event->pos();
+}
+
+void GLWidget::mouseReleaseEvent(QMouseEvent *event)
+{
+    m_baseRotate = glm::rotate(m_baseRotate, m_angle, m_rotateN);
+    // 重点是将m_angle清零，因为旋转已经被融合进m_baseRotate了
+    m_angle = 0.f;
+    m_rotateN = glm::vec3(1.f);
 }
 
 void GLWidget::mouseMoveEvent(QMouseEvent *event)
