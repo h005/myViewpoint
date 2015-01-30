@@ -195,7 +195,9 @@ void GLWidget::initializeGL()
     setupVertexAttribs();
 
     // Our camera never changes in this example.
-    m_camera = glm::translate(glm::mat4(), glm::vec3(0.f, 0.f, -1.f));
+    // Equal to:
+    // m_camera = glm::translate(glm::mat4(), glm::vec3(0.f, 0.f, -1.f));
+    m_camera = glm::lookAt(glm::vec3(0.f, 0.f, 1.f), glm::vec3(0.f), glm::vec3(0.f, 1.f, 0.f));
 
     // Light position is fixed.
     m_program->setUniformValue(m_lightPosLoc, QVector3D(0, 0, 70));
