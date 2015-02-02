@@ -241,6 +241,15 @@ void GLWidget::paintGL()
 
     glDrawArrays(GL_TRIANGLES, 0, m_logo.vertexCount());
 
+//    测试在不同位置画模型
+//    modelViewMatrix = glm::translate(modelViewMatrix, glm::vec3(0.5, 0.5, 0.5));
+//    gl_NormalMatrix = glm::inverseTranspose(glm::mat3(modelViewMatrix));
+//    Q_modelViewMatrix = QMatrix4x4(glm::value_ptr(glm::transpose(modelViewMatrix)));
+//    Q_normalMatrix = QMatrix3x3(glm::value_ptr(glm::transpose(gl_NormalMatrix)));
+//    m_program->setUniformValue(m_mvMatrixLoc, Q_modelViewMatrix);
+//    m_program->setUniformValue(m_normalMatrixLoc, Q_normalMatrix);
+//    glDrawArrays(GL_TRIANGLES, 0, m_logo.vertexCount());
+
     m_program->release();
 }
 
