@@ -28,7 +28,7 @@ class GModel
         QOpenGLFunctions *f;
         // 该mesh最终的Model矩阵
         QOpenGLVertexArrayObject m_vao;
-        QOpenGLBuffer m_vbo[4];
+        QOpenGLBuffer *m_vbo[4];
         int elementCount;
 
     public:

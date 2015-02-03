@@ -373,6 +373,11 @@ void GModel::cleanUp() {
     }
 
 	scene = NULL;
+
+    std::vector<GModel::MeshEntry *>::iterator it;
+    for (it = meshEntries.begin(); it != meshEntries.end(); it++) {
+        delete *it;
+    }
     meshEntries.clear();
 }
 
@@ -400,7 +405,9 @@ GModel::MeshEntry::MeshEntry(const aiMesh *mesh, const glm::mat4 &transformation
     m_vao.create();
     m_vao.bind();
 
+    // 由于采用了vbo索引，元素数目一般大于mesh->mNumVertices
     elementCount = mesh->mNumFaces * 3;
+    m_vbo[VERTEX_BUFFER] = NULL;
     if(mesh->HasPositions()) {
         float *vertices = new float[mesh->mNumVertices * 3];
         for(uint32_t i = 0; i < mesh->mNumVertices; ++i) {
@@ -409,9 +416,10 @@ GModel::MeshEntry::MeshEntry(const aiMesh *mesh, const glm::mat4 &transformation
             vertices[i * 3 + 2] = mesh->mVertices[i].z;
         }
 
-        m_vbo[VERTEX_BUFFER].create();
-        m_vbo[VERTEX_BUFFER].bind();
-        m_vbo[VERTEX_BUFFER].allocate(vertices, 3 * mesh->mNumVertices * sizeof(GLfloat));
+        m_vbo[VERTEX_BUFFER] = new QOpenGLBuffer();
+        m_vbo[VERTEX_BUFFER]->create();
+        m_vbo[VERTEX_BUFFER]->bind();
+        m_vbo[VERTEX_BUFFER]->allocate(vertices, 3 * mesh->mNumVertices * sizeof(GLfloat));
 
         f->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
         f->glEnableVertexAttribArray (0);
@@ -419,25 +427,26 @@ GModel::MeshEntry::MeshEntry(const aiMesh *mesh, const glm::mat4 &transformation
         delete vertices;
     }
 
-
+    m_vbo[TEXCOORD_BUFFER] = NULL;
     if(mesh->HasTextureCoords(0)) {
         float *texCoords = new float[mesh->mNumVertices * 2];
         for(uint32_t i = 0; i < mesh->mNumVertices; ++i) {
             texCoords[i * 2] = mesh->mTextureCoords[0][i].x;
-            texCoords[i * 2 + 1] = mesh->mTextureCoords[0][i].y;
+            texCoords[i * 2 + 1] = 1 - mesh->mTextureCoords[0][i].y;
         }
 
-        m_vbo[TEXCOORD_BUFFER].create();
-        m_vbo[TEXCOORD_BUFFER].bind();
-        m_vbo[TEXCOORD_BUFFER].allocate(texCoords, 2 * mesh->mNumVertices * sizeof(GLfloat));
+        m_vbo[TEXCOORD_BUFFER] = new QOpenGLBuffer();
+        m_vbo[TEXCOORD_BUFFER]->create();
+        m_vbo[TEXCOORD_BUFFER]->bind();
+        m_vbo[TEXCOORD_BUFFER]->allocate(texCoords, 2 * mesh->mNumVertices * sizeof(GLfloat));
 
-        f->glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+        f->glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, NULL);
         f->glEnableVertexAttribArray (1);
 
         delete texCoords;
     }
 
-
+    m_vbo[NORMAL_BUFFER] = NULL;
     if(mesh->HasNormals()) {
         float *normals = new float[mesh->mNumVertices * 3];
         for(uint32_t i = 0; i < mesh->mNumVertices; ++i) {
@@ -446,9 +455,10 @@ GModel::MeshEntry::MeshEntry(const aiMesh *mesh, const glm::mat4 &transformation
             normals[i * 3 + 2] = mesh->mNormals[i].z;
         }
 
-        m_vbo[NORMAL_BUFFER].create();
-        m_vbo[NORMAL_BUFFER].bind();
-        m_vbo[NORMAL_BUFFER].allocate(normals, 3 * mesh->mNumVertices * sizeof(GLfloat));
+        m_vbo[NORMAL_BUFFER] = new QOpenGLBuffer();
+        m_vbo[NORMAL_BUFFER]->create();
+        m_vbo[NORMAL_BUFFER]->bind();
+        m_vbo[NORMAL_BUFFER]->allocate(normals, 3 * mesh->mNumVertices * sizeof(GLfloat));
 
         f->glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, NULL);
         f->glEnableVertexAttribArray (2);
@@ -456,19 +466,28 @@ GModel::MeshEntry::MeshEntry(const aiMesh *mesh, const glm::mat4 &transformation
         delete normals;
     }
 
-
+    m_vbo[INDEX_BUFFER] = NULL;
     if(mesh->HasFaces()) {
         unsigned int *indices = new unsigned int[mesh->mNumFaces * 3];
+        int count = 0;
+        // 一个face代表一个面（暂时只考虑三角形，其余类型pass），其存储着各个顶点的索引
+        // 可以根据索引到mesh->mVertices[]中找到对应顶点的数据(x, y, z)
         for(uint32_t i = 0; i < mesh->mNumFaces; ++i) {
+            if (mesh->mFaces[i].mNumIndices != 3)
+                continue;
+            count++;
             indices[i * 3] = mesh->mFaces[i].mIndices[0];
             indices[i * 3 + 1] = mesh->mFaces[i].mIndices[1];
             indices[i * 3 + 2] = mesh->mFaces[i].mIndices[2];
             assert(mesh->mFaces[i].mNumIndices == 3);
         }
 
-        m_vbo[INDEX_BUFFER].create();
-        m_vbo[INDEX_BUFFER].bind();
-        m_vbo[INDEX_BUFFER].allocate(indices, 3 * mesh->mNumFaces * sizeof(GLuint));
+        elementCount = 3 * count;
+        // 注意索引的声明方式
+        m_vbo[INDEX_BUFFER] = new QOpenGLBuffer(QOpenGLBuffer::IndexBuffer);
+        m_vbo[INDEX_BUFFER]->create();
+        m_vbo[INDEX_BUFFER]->bind();
+        m_vbo[INDEX_BUFFER]->allocate(indices, elementCount * sizeof(GLuint));
 
         f->glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 0, NULL);
         f->glEnableVertexAttribArray (3);
@@ -483,20 +502,28 @@ GModel::MeshEntry::MeshEntry(const aiMesh *mesh, const glm::mat4 &transformation
 *	Deletes the allocated OpenGL buffers
 **/
 GModel::MeshEntry::~MeshEntry() {
-    if(m_vbo[VERTEX_BUFFER].isCreated()) {
-        m_vbo[VERTEX_BUFFER].destroy();
+    if(m_vbo[VERTEX_BUFFER]
+            && m_vbo[VERTEX_BUFFER]->isCreated()) {
+        m_vbo[VERTEX_BUFFER]->destroy();
+        delete m_vbo[VERTEX_BUFFER];
     }
 
-    if(m_vbo[TEXCOORD_BUFFER].isCreated()) {
-        m_vbo[TEXCOORD_BUFFER].destroy();
+    if(m_vbo[TEXCOORD_BUFFER]
+            && m_vbo[TEXCOORD_BUFFER]->isCreated()) {
+        m_vbo[TEXCOORD_BUFFER]->destroy();
+        delete m_vbo[TEXCOORD_BUFFER];
     }
 
-    if(m_vbo[NORMAL_BUFFER].isCreated()) {
-        m_vbo[NORMAL_BUFFER].destroy();
+    if(m_vbo[NORMAL_BUFFER]
+            && m_vbo[NORMAL_BUFFER]->isCreated()) {
+        m_vbo[NORMAL_BUFFER]->destroy();
+        delete m_vbo[NORMAL_BUFFER];
     }
 
-    if(m_vbo[INDEX_BUFFER].isCreated()) {
-        m_vbo[INDEX_BUFFER].destroy();
+    if(m_vbo[INDEX_BUFFER]
+            && m_vbo[INDEX_BUFFER]->isCreated()) {
+        m_vbo[INDEX_BUFFER]->destroy();
+        delete m_vbo[INDEX_BUFFER];
     }
 
     if (m_vao.isCreated()) {
@@ -513,9 +540,9 @@ void GModel::MeshEntry::render() {
     // 3.1 切换vao
     // 3.2 绘制三角形
     m_vao.bind();
-    // glDrawElements第三个参数似乎不对，一直crash；修改后也无法显示模型
-    // glDrawElements(GL_TRIANGLES, elementCount, GL_UNSIGNED_INT, NULL);
-    glDrawArrays(GL_TRIANGLES, 0, mesh->mNumVertices);
+    glDrawElements(GL_TRIANGLES, elementCount, GL_UNSIGNED_INT, NULL);
+    // 注意和下面的区别，上面的使用顶点索引，下面的不使用顶点索引
+    //glDrawArrays(GL_TRIANGLES, 0, mesh->mNumVertices);
     m_vao.release();
 }
 

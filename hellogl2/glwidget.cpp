@@ -112,7 +112,7 @@ void GLWidget::initializeGL()
     // m_camera = glm::translate(glm::mat4(), glm::vec3(0.f, 0.f, -2.f));
     m_camera = glm::lookAt(glm::vec3(0.f, 0.f, 2.f), glm::vec3(0.f), glm::vec3(0.f, 1.f, 0.f));
 
-    model.load("D:\\no4\\models\\model.dae");
+    model.load("F:\\no4\\models\\model.dae");
     model.bindDataToGL();
 }
 
