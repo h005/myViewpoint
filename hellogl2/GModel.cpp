@@ -234,8 +234,8 @@ void GModel::bindDataToGL() {
     // 读入shader程序并编译
     // 需要在OpenGL环境下调用，放在这里合适
     m_program = new QOpenGLShaderProgram;
-    m_program->addShaderFromSourceFile(QOpenGLShader::Vertex, QString("simpleShader.vert"));
-    m_program->addShaderFromSourceFile(QOpenGLShader::Fragment, QString("simpleShader.frag"));
+    m_program->addShaderFromSourceFile(QOpenGLShader::Vertex, QString("shader/simpleShader.vert"));
+    m_program->addShaderFromSourceFile(QOpenGLShader::Fragment, QString("shader/simpleShader.frag"));
     m_program->link();
 
     // 1.将纹理读取到显存
@@ -318,9 +318,9 @@ void GModel::drawNormalizedModel(const glm::mat4 &inheritModelView, const glm::m
 
         const aiMesh *mesh = (*it)->mesh;
         // 一个aiMesh拥有一致的纹理和材质
-//        f->glActiveTexture(GL_TEXTURE0);
+        f->glActiveTexture(GL_TEXTURE0);
         apply_material(scene->mMaterials[mesh->mMaterialIndex]);
-//        m_program->setUniformValue("myTextureSampler", 0);
+        m_program->setUniformValue("myTextureSampler", 0);
         if (mesh->HasNormals())
         {
             glDisable(GL_LIGHTING);
