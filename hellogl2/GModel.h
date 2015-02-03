@@ -27,10 +27,8 @@ class GModel
         // 用于描述OpenGLContext
         QOpenGLFunctions *f;
         // 该mesh最终的Model矩阵
-        glm::mat4 finalTransformation;
         QOpenGLVertexArrayObject m_vao;
         QOpenGLBuffer m_vbo[4];
-        QOpenGLShaderProgram *m_program;
         int elementCount;
 
     public:
@@ -38,6 +36,7 @@ class GModel
             VERTEX_BUFFER, TEXCOORD_BUFFER, NORMAL_BUFFER, INDEX_BUFFER
         };
         const aiMesh *mesh;
+        glm::mat4 finalTransformation;
 
         MeshEntry(const aiMesh *mesh, const glm::mat4 &transformation, QOpenGLFunctions *f);
         ~MeshEntry();
@@ -50,8 +49,8 @@ private:
 	std::string basePath;
 	TextureIdMapType textureIdMap;
 	GLuint *textureIds;
-    GLuint mvMatrixID;
     std::vector<MeshEntry *> meshEntries;
+    QOpenGLShaderProgram *m_program;
 
 public:
 	aiVector3D scene_min, scene_max, scene_center;
@@ -60,7 +59,7 @@ public:
 	bool load(const char *modelPath);
 	bool hasModel();
     void bindDataToGL();
-    void GModel::drawNormalizedModel(GLuint mvMatrixID, const glm::mat4 &initTransformation);
+    void drawNormalizedModel(const glm::mat4 &inheritModelView, const glm::mat4 &projection);
 	float drawScale();
 	~GModel();
 

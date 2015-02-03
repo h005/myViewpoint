@@ -47,7 +47,7 @@
 #include <QOpenGLBuffer>
 #include <QMatrix4x4>
 #include <glm/glm.hpp>
-#include "logo.h"
+#include "GModel.h"
 
 QT_FORWARD_DECLARE_CLASS(QOpenGLShaderProgram)
 
@@ -76,21 +76,12 @@ protected:
     void mouseMoveEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
 
 private:
-    void setupVertexAttribs();
-
+    GModel model;
     bool m_core;
     glm::mat4 m_baseRotate;
     glm::vec3 m_rotateN;
     float m_angle;
     QPoint m_lastPos;
-    Logo m_logo;
-    QOpenGLVertexArrayObject m_vao;
-    QOpenGLBuffer m_logoVbo;
-    QOpenGLShaderProgram *m_program;
-    int m_projMatrixLoc;
-    int m_mvMatrixLoc;
-    int m_normalMatrixLoc;
-    int m_lightPosLoc;
     glm::mat4 m_proj;
     glm::mat4 m_camera;
     bool m_transparent;

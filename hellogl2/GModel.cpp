@@ -2,6 +2,7 @@
 #include <opencv2/opencv.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/matrix_inverse.hpp>
 #include <qopenglfunctions.h>
 
 void *imgData(const char *texturePath, int &width, int &height) {
@@ -185,7 +186,6 @@ void GModel::recursive_create(const aiScene *sc, const aiNode* nd, const glm::ma
     glm::mat4 absoluteTransformation = inheritedTransformation * mTransformation;
     // 设置shader中的model view矩阵
     QOpenGLFunctions *f = QOpenGLContext::currentContext()->functions();
-    f->glUniformMatrix4fv(mvMatrixID, 1, GL_FALSE,glm::value_ptr(absoluteTransformation));
 
 	for (; n < nd->mNumMeshes; ++n)
 	{
@@ -207,7 +207,8 @@ GModel::GModel()
 {
 	pImporter = NULL;
 	scene = NULL;
-	textureIds = NULL;
+    textureIds = NULL;
+    m_program = NULL;
 }
 
 bool GModel::load(const char *modelPath) {
@@ -224,17 +225,22 @@ bool GModel::load(const char *modelPath) {
 	scene_center.x = (scene_min.x + scene_max.x) / 2.f;
 	scene_center.y = (scene_min.y + scene_max.y) / 2.f;
 	scene_center.z = (scene_min.z + scene_max.z) / 2.f;
-	printf("%f %f %f\n", scene_center.x, scene_center.y, scene_center.z);
 	basePath = getBasePath(modelPath);
 
 	return 1;
 }
 
 void GModel::bindDataToGL() {
+    // 读入shader程序并编译
+    // 需要在OpenGL环境下调用，放在这里合适
+    m_program = new QOpenGLShaderProgram;
+    m_program->addShaderFromSourceFile(QOpenGLShader::Vertex, QString("simpleShader.vert"));
+    m_program->addShaderFromSourceFile(QOpenGLShader::Fragment, QString("simpleShader.frag"));
+    m_program->link();
+
     // 1.将纹理读取到显存
     // 2.递归创建meshEntry
 	textureIdMap.clear();
-	printf("%d %d %d %d\n", scene->mNumMeshes, scene->mNumTextures, scene->mNumMaterials, scene->HasTextures());
 	for (unsigned int m = 0; m<scene->mNumMaterials; m++)
 	{
 		int texIndex = 0;
@@ -275,13 +281,11 @@ void GModel::bindDataToGL() {
 		}
 	}
 
-
     recursive_create(scene, scene->mRootNode, glm::mat4());
 }
 
 
-void GModel::drawNormalizedModel(GLuint mvMatrixID, const glm::mat4 &initTransformation) {
-    this->mvMatrixID = mvMatrixID;
+void GModel::drawNormalizedModel(const glm::mat4 &inheritModelView, const glm::mat4 &projection) {
     assert(scene != NULL);
     glPushAttrib(GL_ENABLE_BIT);
 
@@ -289,19 +293,25 @@ void GModel::drawNormalizedModel(GLuint mvMatrixID, const glm::mat4 &initTransfo
     glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
 
     // 下面这个过程可以认作硬件实现的点变换
+    // 对模型进行移中和缩放
     float scale = drawScale();
-    glm::mat4 transformation = glm::scale(initTransformation, glm::vec3(scale, scale, scale));
+    glm::mat4 transformation = glm::scale(inheritModelView, glm::vec3(scale, scale, scale));
     transformation = glm::translate(transformation, glm::vec3(-scene_center.x, -scene_center.y, -scene_center.z));
+
+    // 绑定使用的shader并设置其中的投影矩阵
+    m_program->bind();
+    QMatrix4x4 Q_projMatrix(glm::value_ptr(glm::transpose(projection)));
+    m_program->setUniformValue("projMatrix", Q_projMatrix);
 
     std::vector<GModel::MeshEntry *>::iterator it;
     for (it = meshEntries.begin(); it != meshEntries.end(); it++) {
         // 绘制一个mesh主要分为下面几个步骤
         //
         // 1.应用材质、纹理
-        // 2.调用MeshEntry的绘制函数:
-        // 2.1 设置Transformation
-        // 2.2 切换vao
-        // 2.3 绘制三角形
+        // 2 设置Transformation
+        // 3.调用MeshEntry的绘制函数:
+        // 3.1 切换vao
+        // 3.2 绘制三角形
         //
 
         const aiMesh *mesh = (*it)->mesh;
@@ -324,8 +334,19 @@ void GModel::drawNormalizedModel(GLuint mvMatrixID, const glm::mat4 &initTransfo
             glDisable(GL_COLOR_MATERIAL);
         }
 
+        // 计算最终的model view矩阵以及对应的法向变换矩阵
+        glm::mat4 modelViewMatrix = transformation * (*it)->finalTransformation;
+        glm::mat3 gl_NormalMatrix = glm::inverseTranspose(glm::mat3(modelViewMatrix));
+        // 转换成Qt中的OpenGL类型
+        QMatrix4x4 Q_modelViewMatrix(glm::value_ptr(glm::transpose(modelViewMatrix)));
+        QMatrix3x3 Q_normalMatrix(glm::value_ptr(glm::transpose(gl_NormalMatrix)));
+        // 在shader程序中设置
+        m_program->setUniformValue("mvMatrix", Q_modelViewMatrix);
+        m_program->setUniformValue("normalMatrix", Q_normalMatrix);
+
         (*it)->render();
     }
+    m_program->release();
 
     glPopAttrib();
 
@@ -342,6 +363,10 @@ void GModel::cleanUp() {
 		delete textureIds;
 		textureIds = NULL;
 	}
+    if (m_program) {
+        delete m_program;
+        m_program = NULL;
+    }
 
 	scene = NULL;
     meshEntries.clear();
@@ -369,10 +394,9 @@ GModel::~GModel()
 GModel::MeshEntry::MeshEntry(const aiMesh *mesh, const glm::mat4 &transformation, QOpenGLFunctions *f)
     : f(f), finalTransformation(transformation), mesh(mesh) {
     m_vao.create();
-    QOpenGLVertexArrayObject::Binder vaoBinder(&m_vao);
+    m_vao.bind();
 
     elementCount = mesh->mNumFaces * 3;
-
     if(mesh->HasPositions()) {
         float *vertices = new float[mesh->mNumVertices * 3];
         for(uint32_t i = 0; i < mesh->mNumVertices; ++i) {
@@ -435,6 +459,7 @@ GModel::MeshEntry::MeshEntry(const aiMesh *mesh, const glm::mat4 &transformation
             indices[i * 3] = mesh->mFaces[i].mIndices[0];
             indices[i * 3 + 1] = mesh->mFaces[i].mIndices[1];
             indices[i * 3 + 2] = mesh->mFaces[i].mIndices[2];
+            assert(mesh->mFaces[i].mNumIndices == 3);
         }
 
         m_vbo[INDEX_BUFFER].create();
@@ -446,7 +471,6 @@ GModel::MeshEntry::MeshEntry(const aiMesh *mesh, const glm::mat4 &transformation
 
         delete indices;
     }
-
 
     m_vao.release();
 }
@@ -481,16 +505,13 @@ GModel::MeshEntry::~MeshEntry() {
 *	Renders this MeshEntry
 **/
 void GModel::MeshEntry::render() {
-    // 2.1 设置Transformation
-    // 2.2 切换vao
-    // 2.3 绘制三角形
-    m_program->bind();
-    //int ModelMatrixID = m_program->uniformLocation("ModelMatrixID");
-    QMatrix4x4 Q_modelMatrix(glm::value_ptr(glm::transpose(finalTransformation)));
-    m_program->setUniformValue("ModelMatrixID", Q_modelMatrix);
-
+    // 3.调用MeshEntry的绘制函数:
+    // 3.1 切换vao
+    // 3.2 绘制三角形
     m_vao.bind();
-    glDrawElements(GL_TRIANGLES, elementCount, GL_UNSIGNED_INT, NULL);
+    // glDrawElements第三个参数似乎不对，一直crash；修改后也无法显示模型
+    // glDrawElements(GL_TRIANGLES, elementCount, GL_UNSIGNED_INT, NULL);
+    glDrawArrays(GL_TRIANGLES, 0, mesh->mNumVertices);
     m_vao.release();
 }
 
