@@ -292,6 +292,8 @@ void GModel::drawNormalizedModel(const glm::mat4 &inheritModelView, const glm::m
     glEnable(GL_TEXTURE_2D);
     glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
 
+    QOpenGLFunctions *f = QOpenGLContext::currentContext()->functions();
+
     // 下面这个过程可以认作硬件实现的点变换
     // 对模型进行移中和缩放
     float scale = drawScale();
@@ -316,7 +318,9 @@ void GModel::drawNormalizedModel(const glm::mat4 &inheritModelView, const glm::m
 
         const aiMesh *mesh = (*it)->mesh;
         // 一个aiMesh拥有一致的纹理和材质
+//        f->glActiveTexture(GL_TEXTURE0);
         apply_material(scene->mMaterials[mesh->mMaterialIndex]);
+//        m_program->setUniformValue("myTextureSampler", 0);
         if (mesh->HasNormals())
         {
             glDisable(GL_LIGHTING);

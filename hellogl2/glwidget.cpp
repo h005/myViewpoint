@@ -120,7 +120,7 @@ void GLWidget::paintGL()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
-    glEnable(GL_CULL_FACE);
+    glDisable(GL_CULL_FACE);
 
     // 计算modelView矩阵
     glm::mat4 worldTransform = glm::rotate(glm::mat4(1.f), m_angle, m_rotateN);
