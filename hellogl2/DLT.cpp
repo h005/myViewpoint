@@ -1,6 +1,7 @@
 ﻿#include <stdio.h>
 #include <iostream>
 
+#include <gl/glew.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/string_cast.hpp>
@@ -310,7 +311,7 @@ void phase2ExtractParametersFromP(cv::Mat &P, cv::Mat &modelView, cv::Mat &K) {
 	cv::Mat A3 = A.row(2).t();
 
 	cv::Mat t3 = A3;
-	float f = cv::norm(t3, cv::NORM_L2);
+    float f = cv::norm(t3, cv::NORM_L2);
 	cv::Mat R3 = t3 / f;
 
 	float e = A2.dot(R3);

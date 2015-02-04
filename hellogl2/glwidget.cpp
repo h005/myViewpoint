@@ -95,6 +95,8 @@ void GLWidget::cleanup()
 
 void GLWidget::initializeGL()
 {
+    GLenum err = glewInit();
+    assert(err == GLEW_OK);
     // In this example the widget's corresponding top-level window can change
     // several times during the widget's lifetime. Whenever this happens, the
     // QOpenGLWidget's associated context is destroyed and a new one is created.
@@ -103,7 +105,6 @@ void GLWidget::initializeGL()
     // the signal will be followed by an invocation of initializeGL() where we
     // can recreate all resources.
     connect(context(), &QOpenGLContext::aboutToBeDestroyed, this, &GLWidget::cleanup);
-
     initializeOpenGLFunctions();
     glClearColor(0, 0, 0, m_transparent ? 0 : 1);
 

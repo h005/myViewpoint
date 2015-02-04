@@ -1,5 +1,5 @@
 ﻿#include <iostream>
-#include <gl/glut.h>
+#include <gl/glew.h>
 #include <math.h>
 #include <opencv2/opencv.hpp>
 #include <stdlib.h>
@@ -59,7 +59,7 @@ void drawCamera(const cv::Mat &lookAt) {
 
 	cv::Mat PA = lookAt.col(0);
 	glTranslatef(PA.at<float>(0, 0), PA.at<float>(1, 0), PA.at<float>(2, 0));
-	glutSolidSphere(0.1, 10, 10);
+    //glutSolidSphere(0.1, 10, 10);
 
 	glDisable(GL_COLOR_MATERIAL);
 	glPopMatrix();

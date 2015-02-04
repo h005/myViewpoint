@@ -41,6 +41,7 @@
 #ifndef GLWIDGET_H
 #define GLWIDGET_H
 
+#include <GL/glew.h>
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions>
 #include <QOpenGLVertexArrayObject>

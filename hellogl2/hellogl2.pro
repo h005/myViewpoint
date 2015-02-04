@@ -1,22 +1,22 @@
 HEADERS       = glwidget.h \
                 window.h \
                 mainwindow.h \
-                logo.h \
     custom.h \
     DLT.h \
     GModel.h \
     trackball.h \
-    imageandpoint.h
+    imageandpoint.h \
+    shader.hpp
 SOURCES       = glwidget.cpp \
                 main.cpp \
                 window.cpp \
                 mainwindow.cpp \
-                logo.cpp \
     custom.cpp \
     DLT.cpp \
     GModel.cpp \
     trackball.cpp \
-    imageandpoint.cpp
+    imageandpoint.cpp \
+    shader.cpp
 
 QT           += widgets
 
@@ -32,6 +32,6 @@ LIBS += -L$$DP_TOOLS_DIR/assimp-3.1.1-win-binaries/build/code/Release -lassimp
 INCLUDEPATH += $$DP_TOOLS_DIR/assimp-3.1.1-win-binaries/include
 # glm
 INCLUDEPATH += $$_PRO_FILE_PWD_/../vendor/glm
-# glut
-INCLUDEPATH += $$DP_TOOLS_DIR/glut
-LIBS += -L$$DP_TOOLS_DIR/glut -lglut32
+# glew
+INCLUDEPATH += $$DP_TOOLS_DIR/glew/include
+LIBS += -L$$DP_TOOLS_DIR/glew/lib/Release/Win32 -lglew32

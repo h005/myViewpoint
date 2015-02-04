@@ -1,9 +1,6 @@
 #pragma once
 #include <map>
-#include <QOpenGLShaderProgram>
-#include <QOpenGLFunctions>
-#include <QOpenGLVertexArrayObject>
-#include <QOpenGLBuffer>
+#include <GL/glew.h>
 #include <glm/glm.hpp>
 
 #include "assimp/Importer.hpp"
@@ -17,28 +14,25 @@ typedef std::map<std::string, GLuint *> TextureIdMapType;
 #define aisgl_min(x,y) (x<y?x:y)
 #define aisgl_max(x,y) (y>x?y:x)
 
-class QOpenGLFunctions;
 void *imgData(const char *texturePath, int &width, int &height);
 
 class GModel
 {
     class MeshEntry {
+        static enum BUFFERS {
+            VERTEX_BUFFER, TEXCOORD_BUFFER, NORMAL_BUFFER, INDEX_BUFFER, BUFFER_COUNT
+        };
     private:
-        // 用于描述OpenGLContext
-        QOpenGLFunctions *f;
         // 该mesh最终的Model矩阵
-        QOpenGLVertexArrayObject m_vao;
-        QOpenGLBuffer *m_vbo[4];
+        GLuint m_vao;
+        GLuint m_vbo[BUFFER_COUNT];
         int elementCount;
 
     public:
-        static enum BUFFERS {
-            VERTEX_BUFFER, TEXCOORD_BUFFER, NORMAL_BUFFER, INDEX_BUFFER
-        };
         const aiMesh *mesh;
         glm::mat4 finalTransformation;
 
-        MeshEntry(const aiMesh *mesh, const glm::mat4 &transformation, QOpenGLFunctions *f);
+        MeshEntry(const aiMesh *mesh, const glm::mat4 &transformation);
         ~MeshEntry();
         void render();
     };
@@ -50,7 +44,7 @@ private:
 	TextureIdMapType textureIdMap;
 	GLuint *textureIds;
     std::vector<MeshEntry *> meshEntries;
-    QOpenGLShaderProgram *m_program;
+    GLuint m_programID;
 
 public:
 	aiVector3D scene_min, scene_max, scene_center;

@@ -1,9 +1,11 @@
 ﻿#include "GModel.h"
+
 #include <opencv2/opencv.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/matrix_inverse.hpp>
-#include <qopenglfunctions.h>
+
+#include "shader.hpp"
 
 void *imgData(const char *texturePath, int &width, int &height) {
 	cv::Mat img = cv::imread(texturePath);
@@ -185,14 +187,13 @@ void GModel::recursive_create(const aiScene *sc, const aiNode* nd, const glm::ma
     glm::mat4 mTransformation = glm::transpose(glm::make_mat4((float *)&nd->mTransformation));
     glm::mat4 absoluteTransformation = inheritedTransformation * mTransformation;
     // 设置shader中的model view矩阵
-    QOpenGLFunctions *f = QOpenGLContext::currentContext()->functions();
 
 	for (; n < nd->mNumMeshes; ++n)
 	{
         // 一个aiNode中存有其mesh的索引，
         // 在aiScene中可以用这个索引拿到真正的aiMesh
 		const struct aiMesh* mesh = sc->mMeshes[nd->mMeshes[n]];
-        meshEntries.push_back(new GModel::MeshEntry(mesh, absoluteTransformation, f));
+        meshEntries.push_back(new GModel::MeshEntry(mesh, absoluteTransformation));
     }
 
 
@@ -208,7 +209,7 @@ GModel::GModel()
 	pImporter = NULL;
 	scene = NULL;
     textureIds = NULL;
-    m_program = NULL;
+    m_programID = 0;
 }
 
 bool GModel::load(const char *modelPath) {
@@ -233,10 +234,7 @@ bool GModel::load(const char *modelPath) {
 void GModel::bindDataToGL() {
     // 读入shader程序并编译
     // 需要在OpenGL环境下调用，放在这里合适
-    m_program = new QOpenGLShaderProgram;
-    m_program->addShaderFromSourceFile(QOpenGLShader::Vertex, QString("shader/simpleShader.vert"));
-    m_program->addShaderFromSourceFile(QOpenGLShader::Fragment, QString("shader/simpleShader.frag"));
-    m_program->link();
+    m_programID = LoadShaders( "shader/simpleShader.vert", "shader/simpleShader.frag" );
 
     // 1.将纹理读取到显存
     // 2.递归创建meshEntry
@@ -292,8 +290,6 @@ void GModel::drawNormalizedModel(const glm::mat4 &inheritModelView, const glm::m
     glEnable(GL_TEXTURE_2D);
     glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
 
-    QOpenGLFunctions *f = QOpenGLContext::currentContext()->functions();
-
     // 下面这个过程可以认作硬件实现的点变换
     // 对模型进行移中和缩放
     float scale = drawScale();
@@ -301,9 +297,12 @@ void GModel::drawNormalizedModel(const glm::mat4 &inheritModelView, const glm::m
     transformation = glm::translate(transformation, glm::vec3(-scene_center.x, -scene_center.y, -scene_center.z));
 
     // 绑定使用的shader并设置其中的投影矩阵
-    m_program->bind();
-    QMatrix4x4 Q_projMatrix(glm::value_ptr(glm::transpose(projection)));
-    m_program->setUniformValue("projMatrix", Q_projMatrix);
+    glUseProgram(m_programID);
+    GLuint projMatrixID = glGetUniformLocation(m_programID, "projMatrix");
+    GLuint mvMatrixID = glGetUniformLocation(m_programID, "mvMatrix");
+    GLuint normalMatrixID = glGetUniformLocation(m_programID, "normalMatrix");
+    GLuint TextureID = glGetUniformLocation(m_programID, "myTextureSampler");
+    glUniformMatrix4fv(projMatrixID, 1, GL_FALSE, glm::value_ptr(projection));
 
     std::vector<GModel::MeshEntry *>::iterator it;
     for (it = meshEntries.begin(); it != meshEntries.end(); it++) {
@@ -314,13 +313,13 @@ void GModel::drawNormalizedModel(const glm::mat4 &inheritModelView, const glm::m
         // 3.调用MeshEntry的绘制函数:
         // 3.1 切换vao
         // 3.2 绘制三角形
-        //
 
         const aiMesh *mesh = (*it)->mesh;
         // 一个aiMesh拥有一致的纹理和材质
-        f->glActiveTexture(GL_TEXTURE0);
+        glActiveTexture(GL_TEXTURE0);
         apply_material(scene->mMaterials[mesh->mMaterialIndex]);
-        m_program->setUniformValue("myTextureSampler", 0);
+        glUniform1i(TextureID, 0);
+
         if (mesh->HasNormals())
         {
             glDisable(GL_LIGHTING);
@@ -341,16 +340,12 @@ void GModel::drawNormalizedModel(const glm::mat4 &inheritModelView, const glm::m
         // 计算最终的model view矩阵以及对应的法向变换矩阵
         glm::mat4 modelViewMatrix = transformation * (*it)->finalTransformation;
         glm::mat3 gl_NormalMatrix = glm::inverseTranspose(glm::mat3(modelViewMatrix));
-        // 转换成Qt中的OpenGL类型
-        QMatrix4x4 Q_modelViewMatrix(glm::value_ptr(glm::transpose(modelViewMatrix)));
-        QMatrix3x3 Q_normalMatrix(glm::value_ptr(glm::transpose(gl_NormalMatrix)));
         // 在shader程序中设置
-        m_program->setUniformValue("mvMatrix", Q_modelViewMatrix);
-        m_program->setUniformValue("normalMatrix", Q_normalMatrix);
+        glUniformMatrix4fv(mvMatrixID, 1, GL_FALSE, glm::value_ptr(modelViewMatrix));
+        glUniformMatrix4fv(normalMatrixID, 1, GL_FALSE, glm::value_ptr(gl_NormalMatrix));
 
         (*it)->render();
     }
-    m_program->release();
 
     glPopAttrib();
 
@@ -367,9 +362,8 @@ void GModel::cleanUp() {
 		delete textureIds;
 		textureIds = NULL;
 	}
-    if (m_program) {
-        delete m_program;
-        m_program = NULL;
+    if (m_programID) {
+        glDeleteProgram(m_programID);
     }
 
 	scene = NULL;
@@ -400,73 +394,70 @@ GModel::~GModel()
 	cleanUp();
 }
 
-GModel::MeshEntry::MeshEntry(const aiMesh *mesh, const glm::mat4 &transformation, QOpenGLFunctions *f)
-    : f(f), finalTransformation(transformation), mesh(mesh) {
-    m_vao.create();
-    m_vao.bind();
+GModel::MeshEntry::MeshEntry(const aiMesh *mesh, const glm::mat4 &transformation)
+    : finalTransformation(transformation), mesh(mesh) {
+    m_vbo[VERTEX_BUFFER] = 0;
+    m_vbo[TEXCOORD_BUFFER] = 0;
+    m_vbo[NORMAL_BUFFER] = 0;
+    m_vbo[INDEX_BUFFER] = 0;
 
-    // 由于采用了vbo索引，元素数目一般大于mesh->mNumVertices
-    elementCount = mesh->mNumFaces * 3;
-    m_vbo[VERTEX_BUFFER] = NULL;
+    glGenVertexArrays(1, &m_vao);
+    glBindVertexArray(m_vao);
+
     if(mesh->HasPositions()) {
         float *vertices = new float[mesh->mNumVertices * 3];
-        for(uint32_t i = 0; i < mesh->mNumVertices; ++i) {
+        for(int i = 0; i < mesh->mNumVertices; ++i) {
             vertices[i * 3] = mesh->mVertices[i].x;
             vertices[i * 3 + 1] = mesh->mVertices[i].y;
             vertices[i * 3 + 2] = mesh->mVertices[i].z;
         }
 
-        m_vbo[VERTEX_BUFFER] = new QOpenGLBuffer();
-        m_vbo[VERTEX_BUFFER]->create();
-        m_vbo[VERTEX_BUFFER]->bind();
-        m_vbo[VERTEX_BUFFER]->allocate(vertices, 3 * mesh->mNumVertices * sizeof(GLfloat));
+        glGenBuffers(1, &m_vbo[VERTEX_BUFFER]);
+        glBindBuffer(GL_ARRAY_BUFFER, m_vbo[VERTEX_BUFFER]);
+        glBufferData(GL_ARRAY_BUFFER, 3 * mesh->mNumVertices * sizeof(GLfloat), vertices, GL_STATIC_DRAW);
 
-        f->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
-        f->glEnableVertexAttribArray (0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+        glEnableVertexAttribArray (0);
 
         delete vertices;
     }
 
-    m_vbo[TEXCOORD_BUFFER] = NULL;
+
     if(mesh->HasTextureCoords(0)) {
         float *texCoords = new float[mesh->mNumVertices * 2];
-        for(uint32_t i = 0; i < mesh->mNumVertices; ++i) {
+        for(int i = 0; i < mesh->mNumVertices; ++i) {
             texCoords[i * 2] = mesh->mTextureCoords[0][i].x;
             texCoords[i * 2 + 1] = 1 - mesh->mTextureCoords[0][i].y;
         }
 
-        m_vbo[TEXCOORD_BUFFER] = new QOpenGLBuffer();
-        m_vbo[TEXCOORD_BUFFER]->create();
-        m_vbo[TEXCOORD_BUFFER]->bind();
-        m_vbo[TEXCOORD_BUFFER]->allocate(texCoords, 2 * mesh->mNumVertices * sizeof(GLfloat));
+        glGenBuffers(1, &m_vbo[TEXCOORD_BUFFER]);
+        glBindBuffer(GL_ARRAY_BUFFER, m_vbo[TEXCOORD_BUFFER]);
+        glBufferData(GL_ARRAY_BUFFER, 2 * mesh->mNumVertices * sizeof(GLfloat), texCoords, GL_STATIC_DRAW);
 
-        f->glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, NULL);
-        f->glEnableVertexAttribArray (1);
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, NULL);
+        glEnableVertexAttribArray (1);
 
         delete texCoords;
     }
 
-    m_vbo[NORMAL_BUFFER] = NULL;
     if(mesh->HasNormals()) {
         float *normals = new float[mesh->mNumVertices * 3];
-        for(uint32_t i = 0; i < mesh->mNumVertices; ++i) {
+        for(int i = 0; i < mesh->mNumVertices; ++i) {
             normals[i * 3] = mesh->mNormals[i].x;
             normals[i * 3 + 1] = mesh->mNormals[i].y;
             normals[i * 3 + 2] = mesh->mNormals[i].z;
         }
 
-        m_vbo[NORMAL_BUFFER] = new QOpenGLBuffer();
-        m_vbo[NORMAL_BUFFER]->create();
-        m_vbo[NORMAL_BUFFER]->bind();
-        m_vbo[NORMAL_BUFFER]->allocate(normals, 3 * mesh->mNumVertices * sizeof(GLfloat));
+        glGenBuffers(1, &m_vbo[NORMAL_BUFFER]);
+        glBindBuffer(GL_ARRAY_BUFFER, m_vbo[NORMAL_BUFFER]);
+        glBufferData(GL_ARRAY_BUFFER, 3 * mesh->mNumVertices * sizeof(GLfloat), normals, GL_STATIC_DRAW);
 
-        f->glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, NULL);
-        f->glEnableVertexAttribArray (2);
+        glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+        glEnableVertexAttribArray (2);
 
         delete normals;
     }
 
-    m_vbo[INDEX_BUFFER] = NULL;
     if(mesh->HasFaces()) {
         unsigned int *indices = new unsigned int[mesh->mNumFaces * 3];
         int count = 0;
@@ -479,57 +470,46 @@ GModel::MeshEntry::MeshEntry(const aiMesh *mesh, const glm::mat4 &transformation
             indices[i * 3] = mesh->mFaces[i].mIndices[0];
             indices[i * 3 + 1] = mesh->mFaces[i].mIndices[1];
             indices[i * 3 + 2] = mesh->mFaces[i].mIndices[2];
-            assert(mesh->mFaces[i].mNumIndices == 3);
         }
 
+        // 由于采用了vbo索引，元素数目一般大于mesh->mNumVertices
+        // count是三角面片的数目， elementCount是顶点的数目
         elementCount = 3 * count;
-        // 注意索引的声明方式
-        m_vbo[INDEX_BUFFER] = new QOpenGLBuffer(QOpenGLBuffer::IndexBuffer);
-        m_vbo[INDEX_BUFFER]->create();
-        m_vbo[INDEX_BUFFER]->bind();
-        m_vbo[INDEX_BUFFER]->allocate(indices, elementCount * sizeof(GLuint));
 
-        f->glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 0, NULL);
-        f->glEnableVertexAttribArray (3);
+        // 注意索引缓存的声明方式, GL_ELEMENT_ARRAY_BUFFER，上面是GL_ARRAY_BUFFER
+        glGenBuffers(1, &m_vbo[INDEX_BUFFER]);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_vbo[INDEX_BUFFER]);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, elementCount * sizeof(GLuint), indices, GL_STATIC_DRAW);
+        // 索引不需要调用 glVertexAttribPointer 和 glEnableVertexAttribArray
 
         delete indices;
     }
 
-    m_vao.release();
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
 }
 
 /**
 *	Deletes the allocated OpenGL buffers
 **/
 GModel::MeshEntry::~MeshEntry() {
-    if(m_vbo[VERTEX_BUFFER]
-            && m_vbo[VERTEX_BUFFER]->isCreated()) {
-        m_vbo[VERTEX_BUFFER]->destroy();
-        delete m_vbo[VERTEX_BUFFER];
+    if(m_vbo[VERTEX_BUFFER]) {
+        glDeleteBuffers(1, &m_vbo[VERTEX_BUFFER]);
     }
 
-    if(m_vbo[TEXCOORD_BUFFER]
-            && m_vbo[TEXCOORD_BUFFER]->isCreated()) {
-        m_vbo[TEXCOORD_BUFFER]->destroy();
-        delete m_vbo[TEXCOORD_BUFFER];
+    if(m_vbo[TEXCOORD_BUFFER]) {
+        glDeleteBuffers(1, &m_vbo[TEXCOORD_BUFFER]);
     }
 
-    if(m_vbo[NORMAL_BUFFER]
-            && m_vbo[NORMAL_BUFFER]->isCreated()) {
-        m_vbo[NORMAL_BUFFER]->destroy();
-        delete m_vbo[NORMAL_BUFFER];
+    if(m_vbo[NORMAL_BUFFER]) {
+        glDeleteBuffers(1, &m_vbo[NORMAL_BUFFER]);
     }
 
-    if(m_vbo[INDEX_BUFFER]
-            && m_vbo[INDEX_BUFFER]->isCreated()) {
-        m_vbo[INDEX_BUFFER]->destroy();
-        delete m_vbo[INDEX_BUFFER];
+    if(m_vbo[INDEX_BUFFER]) {
+        glDeleteBuffers(1, &m_vbo[INDEX_BUFFER]);
     }
 
-    if (m_vao.isCreated()) {
-        m_vao.release();
-        m_vao.destroy();
-    }
+    glDeleteVertexArrays(1, &m_vao);
 }
 
 /**
@@ -539,11 +519,19 @@ void GModel::MeshEntry::render() {
     // 3.调用MeshEntry的绘制函数:
     // 3.1 切换vao
     // 3.2 绘制三角形
-    m_vao.bind();
+    // 3.3 绘制多边形
+    glBindVertexArray(m_vao);
+
+    // 绘制三角形前关闭重置选项，因为三角形绘制不需要“隔板”
+    // 若开启且不设置PrimitiveIndex可能会造成面绘制错乱
+    // http://stackoverflow.com/questions/26944959/opengl-separating-polygons-inside-vbo
+    glDisable(GL_PRIMITIVE_RESTART);
     glDrawElements(GL_TRIANGLES, elementCount, GL_UNSIGNED_INT, NULL);
     // 注意和下面的区别，上面的使用顶点索引，下面的不使用顶点索引
     //glDrawArrays(GL_TRIANGLES, 0, mesh->mNumVertices);
-    m_vao.release();
+
+    glEnable(GL_PRIMITIVE_RESTART);
+    glBindVertexArray(0);
 }
 
 

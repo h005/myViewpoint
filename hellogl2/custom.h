@@ -1,5 +1,4 @@
 ﻿#pragma once
-#include <QOpenGLShaderProgram>
 
 typedef struct {
 	float mx, my, mz;
