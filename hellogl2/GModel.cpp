@@ -13,23 +13,19 @@ void *imgData(const char *texturePath, int &width, int &height) {
 		return NULL;
 	}
 	assert(img.channels() == 3);
-	
-	cv::Mat fliped;
-	cv::flip(img, fliped, 0);
-	cv::Mat out;
-	cv::cvtColor(fliped, out, CV_RGB2BGR);
-	size_t mem = out.rows * out.cols * out.channels();
+
+    size_t mem = img.rows * img.cols * img.channels();
 	uchar *data = new uchar[mem];
-	size_t rowSize = out.cols * out.channels();
+    size_t rowSize = img.cols * img.channels();
 	uchar *pivot = data;
-	for (int i = 0; i < out.rows; i++) {
-		uchar *ptr = img.ptr(i);
+    for (int i = 0; i < img.rows; i++) {
+        uchar *ptr = img.ptr(i);
 		memcpy(pivot, ptr, rowSize);
 		pivot += rowSize;
 	}
 	assert(pivot - data == mem);
-	width = out.size().width;
-	height = out.size().height;
+    width = img.size().width;
+    height = img.size().height;
 	return data;
 }
 
@@ -267,11 +263,15 @@ void GModel::bindDataToGL() {
 																		  interpolation for minifying filter */
 
 		int width, height;
+        // 读入数据是b,g,r依次排列的
 		void *data = imgData(filename.c_str(), width, height);
 		if (data) {
 			glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+            // https://www.opengl.org/sdk/docs/man/html/glTexImage2D.xhtml
+            // 参数中的第一个GL_RGB表示，数据有三个通道
+            // 第二个GL_BGR表示数据是b,g,r排列的，它会将bgr分别放在显存中的bgr分量上，方便shader使用
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width,
-				height, 0, GL_RGB, GL_UNSIGNED_BYTE,
+                height, 0, GL_BGR, GL_UNSIGNED_BYTE,
 				data); /* Texture specification */
 			delete data;
 
@@ -537,6 +537,10 @@ GModel::MeshEntry::~MeshEntry() {
         glDeleteBuffers(1, &m_vbo[TRIANGLE_INDEX_BUFFER]);
     }
 
+    if(m_vbo[POLYGON_INDEX_BUFFER]) {
+        glDeleteBuffers(1, &m_vbo[POLYGON_INDEX_BUFFER]);
+    }
+
     glDeleteVertexArrays(1, &m_vao);
 }
 
@@ -549,6 +553,7 @@ void GModel::MeshEntry::render() {
     // 3.2 绘制三角形
     // 3.3 绘制多边形
     glBindVertexArray(m_vao);
+    glDisable(GL_CULL_FACE);
 
     if (m_vbo[TRIANGLE_INDEX_BUFFER]) {
         // 绘制三角形前关闭重置选项，因为三角形绘制不需要“隔板”
