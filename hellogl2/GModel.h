@@ -20,13 +20,13 @@ class GModel
 {
     class MeshEntry {
         static enum BUFFERS {
-            VERTEX_BUFFER, TEXCOORD_BUFFER, NORMAL_BUFFER, INDEX_BUFFER, BUFFER_COUNT
+            VERTEX_BUFFER, TEXCOORD_BUFFER, NORMAL_BUFFER, TRIANGLE_INDEX_BUFFER, POLYGON_INDEX_BUFFER, BUFFER_COUNT
         };
     private:
         // 该mesh最终的Model矩阵
         GLuint m_vao;
         GLuint m_vbo[BUFFER_COUNT];
-        int elementCount;
+        int triangular_vertex_count;
 
     public:
         const aiMesh *mesh;
