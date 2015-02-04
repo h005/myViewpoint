@@ -493,7 +493,6 @@ GModel::MeshEntry::MeshEntry(const aiMesh *mesh, const glm::mat4 &transformation
         // 多边形，使用线性buffer存储
         // 用"隔板"分割各个多边形
         std::vector<GLuint> indices;
-        int count = 0;
         for(uint32_t i = 0; i < mesh->mNumFaces; ++i) {
             if (mesh->mFaces[i].mNumIndices > 3) {
                 for (uint32_t j = 0; j < mesh->mFaces[i].mNumIndices; j++) {
@@ -504,6 +503,7 @@ GModel::MeshEntry::MeshEntry(const aiMesh *mesh, const glm::mat4 &transformation
             }
         }
 
+        polygon_vertex_count = indices.size();
         if (indices.size() > 0) {
             std::cout << "aaa" << std::endl;
             // 注意索引缓存的声明方式
@@ -561,11 +561,12 @@ void GModel::MeshEntry::render() {
         //glDrawArrays(GL_TRIANGLES, 0, mesh->mNumVertices);
     }
 
-//    if (m_vbo[POLYGON_INDEX_BUFFER]) {
-//        glEnable(GL_PRIMITIVE_RESTART);
-//        glPrimitiveRestartIndex(GL_PRIMITIVE_RESTART_FIXED_INDEX);
-//        glDrawElements(GL_TRIANGLES_FAN, triangular_vertex_count, GL_UNSIGNED_INT, NULL);
-//    }
+    if (m_vbo[POLYGON_INDEX_BUFFER]) {
+        glEnable(GL_PRIMITIVE_RESTART);
+        glPrimitiveRestartIndex(GL_PRIMITIVE_RESTART_FIXED_INDEX);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_vbo[POLYGON_INDEX_BUFFER]);
+        glDrawElements(GL_TRIANGLE_FAN, polygon_vertex_count, GL_UNSIGNED_INT, NULL);
+    }
 
     glBindVertexArray(0);
 }

@@ -27,6 +27,7 @@ class GModel
         GLuint m_vao;
         GLuint m_vbo[BUFFER_COUNT];
         int triangular_vertex_count;
+        int polygon_vertex_count;
 
     public:
         const aiMesh *mesh;
