@@ -109,10 +109,10 @@ void GLWidget::initializeGL()
 
     // Our camera never changes in this example.
     // Equal to:
-    // m_camera = glm::translate(glm::mat4(), glm::vec3(0.f, 0.f, -2.f));
-    m_camera = glm::lookAt(glm::vec3(0.f, 0.f, 2.f), glm::vec3(0.f), glm::vec3(0.f, 1.f, 0.f));
+    // m_camera = glm::translate(glm::mat4(), glm::vec3(0.f, 0.f, -3.f));
+    m_camera = glm::lookAt(glm::vec3(0.f, 0.f, 3.f), glm::vec3(0.f), glm::vec3(0.f, 1.f, 0.f));
 
-    model.load("F:\\no4\\models\\model.dae");
+    model.load("D:\\no3\\models\\model.dae");
     model.bindDataToGL();
 }
 
@@ -120,7 +120,7 @@ void GLWidget::paintGL()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
-    glDisable(GL_CULL_FACE);
+    // 默认开启背面剔除:GL_CULL_FACE
 
     // 计算modelView矩阵
     glm::mat4 worldTransform = glm::rotate(glm::mat4(1.f), m_angle, m_rotateN);
