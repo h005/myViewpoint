@@ -95,6 +95,9 @@ void GLWidget::cleanup()
 
 void GLWidget::initializeGL()
 {
+    // http://stackoverflow.com/a/8303331
+    glewExperimental = GL_TRUE;
+    
     GLenum err = glewInit();
     assert(err == GLEW_OK);
     // In this example the widget's corresponding top-level window can change
@@ -113,7 +116,7 @@ void GLWidget::initializeGL()
     // m_camera = glm::translate(glm::mat4(), glm::vec3(0.f, 0.f, -3.f));
     m_camera = glm::lookAt(glm::vec3(0.f, 0.f, 3.f), glm::vec3(0.f), glm::vec3(0.f, 1.f, 0.f));
 
-    model.load("D:\\no3\\models\\model.dae");
+    model.load("/Users/macbook/Downloads/CDI_du_lyc_e_Notre_Dame_du_Grandchamp/models/untitled.dae");
     model.bindDataToGL();
 }
 

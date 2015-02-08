@@ -33,7 +33,7 @@ class GModel
         const aiMesh *mesh;
         glm::mat4 finalTransformation;
 
-        MeshEntry(const aiMesh *mesh, const glm::mat4 &transformation);
+        MeshEntry(const aiMesh *mesh, const glm::mat4 &transformation, GLuint programID);
         ~MeshEntry();
         void render();
     };

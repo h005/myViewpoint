@@ -1,16 +1,14 @@
-#version 330 core
-
+#version 120
 // Input vertex data, different for all executions of this shader.
-layout(location = 0) in vec3 vertexPosition_modelspace;
-layout(location = 1) in vec2 vertexUV;
-layout(location = 2) in vec3 vertexNormal_modelspace;
-layout(location = 3) in vec3 indice;
+attribute vec3 vertexPosition_modelspace;
+attribute vec2 vertexUV;
+attribute vec3 vertexNormal_modelspace;
 
 // Output data ; will be interpolated for each fragment.
-out vec2 UV;
+varying vec2 UV;
 
-uniform mat4 mvMatrix;
 uniform mat4 projMatrix;
+uniform mat4 mvMatrix;
 
 void main()
 {

@@ -189,7 +189,7 @@ void GModel::recursive_create(const aiScene *sc, const aiNode* nd, const glm::ma
         // 一个aiNode中存有其mesh的索引，
         // 在aiScene中可以用这个索引拿到真正的aiMesh
 		const struct aiMesh* mesh = sc->mMeshes[nd->mMeshes[n]];
-        meshEntries.push_back(new GModel::MeshEntry(mesh, absoluteTransformation));
+        meshEntries.push_back(new GModel::MeshEntry(mesh, absoluteTransformation, m_programID));
     }
 
 
@@ -395,7 +395,7 @@ GModel::~GModel()
 	cleanUp();
 }
 
-GModel::MeshEntry::MeshEntry(const aiMesh *mesh, const glm::mat4 &transformation)
+GModel::MeshEntry::MeshEntry(const aiMesh *mesh, const glm::mat4 &transformation, GLuint programID)
     : finalTransformation(transformation), mesh(mesh) {
     m_vbo[VERTEX_BUFFER] = 0;
     m_vbo[TEXCOORD_BUFFER] = 0;
@@ -420,7 +420,8 @@ GModel::MeshEntry::MeshEntry(const aiMesh *mesh, const glm::mat4 &transformation
             glBindBuffer(GL_ARRAY_BUFFER, m_vbo[VERTEX_BUFFER]);
             glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(GLfloat), &vertices[0], GL_STATIC_DRAW);
 
-            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+            GLuint vertexPosition_modelspaceID = glGetAttribLocation(programID, "vertexPosition_modelspace");
+            glVertexAttribPointer(vertexPosition_modelspaceID, 3, GL_FLOAT, GL_FALSE, 0, NULL);
             glEnableVertexAttribArray (0);
         }
     }
@@ -439,7 +440,8 @@ GModel::MeshEntry::MeshEntry(const aiMesh *mesh, const glm::mat4 &transformation
             glBindBuffer(GL_ARRAY_BUFFER, m_vbo[TEXCOORD_BUFFER]);
             glBufferData(GL_ARRAY_BUFFER, texCoords.size() * sizeof(GLfloat), &texCoords[0], GL_STATIC_DRAW);
 
-            glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, NULL);
+            GLuint vertexUVID = glGetAttribLocation(programID, "vertexUV");
+            glVertexAttribPointer(vertexUVID, 2, GL_FLOAT, GL_FALSE, 0, NULL);
             glEnableVertexAttribArray (1);
         }
     }
@@ -459,7 +461,8 @@ GModel::MeshEntry::MeshEntry(const aiMesh *mesh, const glm::mat4 &transformation
             glBindBuffer(GL_ARRAY_BUFFER, m_vbo[NORMAL_BUFFER]);
             glBufferData(GL_ARRAY_BUFFER, normals.size() * sizeof(GLfloat), &normals[0], GL_STATIC_DRAW);
 
-            glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+            GLuint vertexNormal_modelspaceID = glGetAttribLocation(programID, "vertexNormal_modelspace");
+            glVertexAttribPointer(vertexNormal_modelspaceID, 3, GL_FLOAT, GL_FALSE, 0, NULL);
             glEnableVertexAttribArray (2);
         }
     }
@@ -505,7 +508,6 @@ GModel::MeshEntry::MeshEntry(const aiMesh *mesh, const glm::mat4 &transformation
 
         polygon_vertex_count = indices.size();
         if (indices.size() > 0) {
-            std::cout << "aaa" << std::endl;
             // 注意索引缓存的声明方式
             glGenBuffers(1, &m_vbo[POLYGON_INDEX_BUFFER]);
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_vbo[POLYGON_INDEX_BUFFER]);
