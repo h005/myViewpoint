@@ -116,7 +116,7 @@ void GLWidget::initializeGL()
     // m_camera = glm::translate(glm::mat4(), glm::vec3(0.f, 0.f, -3.f));
     m_camera = glm::lookAt(glm::vec3(0.f, 0.f, 3.f), glm::vec3(0.f), glm::vec3(0.f, 1.f, 0.f));
 
-    model.load("/Users/macbook/Downloads/CDI_du_lyc_e_Notre_Dame_du_Grandchamp/models/untitled.dae");
+    model.load("D:\\no2\\models\\model.dae");
     model.bindDataToGL();
 }
 
