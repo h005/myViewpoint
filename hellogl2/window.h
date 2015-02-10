@@ -51,6 +51,7 @@ QT_END_NAMESPACE
 
 class GLWidget;
 class MainWindow;
+class ImageAndPoint;
 
 class Window : public QWidget
 {
@@ -68,7 +69,7 @@ private slots:
 private:
     QSlider *createSlider();
 
-    QLabel *left;
+    ImageAndPoint *left;
     GLWidget *right;
     QPushButton *dockBtn;
     MainWindow *mainWindow;

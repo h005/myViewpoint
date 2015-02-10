@@ -62,6 +62,9 @@ public:
 
     QSize minimumSizeHint() const Q_DECL_OVERRIDE;
     QSize sizeHint() const Q_DECL_OVERRIDE;
+    int addPoint(const QPoint &p);
+    bool removeLastPoint();
+    std::vector<glm::vec3> getAllPoints();
 
 public slots:
     void cleanup();
@@ -86,6 +89,7 @@ private:
     glm::mat4 m_proj;
     glm::mat4 m_camera;
     bool m_transparent;
+    std::vector<glm::vec3> points;
 };
 
 #endif

@@ -52,19 +52,13 @@
 #include <QApplication>
 #include <QMessageBox>
 
+#include "imageandpoint.h"
+
 Window::Window(MainWindow *mw, const QString imagePath, const QString modelPath)
     : mainWindow(mw)
 {
-    left = new QLabel;
-    left->setBackgroundRole(QPalette::Base);
-    left->setScaledContents(true);
-//    QString filename = QString("H:/aa.jpg");
-//    QImage image(filename);
-//    left->setPixmap(QPixmap::fromImage(image));
-//    std::cout << image.width() << image.height() << std::endl;
-    left->setStyleSheet("border: 1px solid black");
-
-    right = new GLWidget;
+    right = new GLWidget(this);
+    left = new ImageAndPoint(QString("D:\\Koalaa.jpg"), this);
 
     // 将左右窗口加入布局管理器
     QHBoxLayout *container = new QHBoxLayout;
@@ -107,6 +101,21 @@ void Window::keyPressEvent(QKeyEvent *e)
 {
     if (e->key() == Qt::Key_Escape)
         close();
+    else if (e->key() == Qt::Key_0) {
+        QSize rsize = right->size();
+        QSize lsize = left->size();
+        QPoint p = right->mapFromGlobal(QCursor::pos());
+        if ((p.x() >= 0 && p.x() < rsize.width())
+                && (p.y() >= 0 && p.y() < rsize.height())) {
+            std::cout << p.x() << std::endl;
+        }
+
+        p = left->mapFromGlobal(QCursor::pos());
+        if ((p.x() >= 0 && p.x() < rsize.width())
+                      && (p.y() >= 0 && p.y() < rsize.height())) {
+            std::cout << "left" << std::endl;
+        }
+    }
     else
         QWidget::keyPressEvent(e);
 }

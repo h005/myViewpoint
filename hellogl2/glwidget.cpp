@@ -62,10 +62,12 @@ GLWidget::GLWidget(QWidget *parent)
     m_transparent = QCoreApplication::arguments().contains(QStringLiteral("--transparent"));
     if (m_transparent)
         setAttribute(Qt::WA_TranslucentBackground);
+    points.clear();
 }
 
 GLWidget::~GLWidget()
 {
+    std::cout << "GLWidget clean" << std::endl;
     cleanup();
 }
 
@@ -166,4 +168,24 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
 
     computeRotation(a, b, m_rotateN, m_angle);
     update();
+}
+
+int GLWidget::addPoint(const QPoint &p) {
+    GLfloat x = p.x();
+    GLfloat y = p.y();
+    GLfloat z;
+    points.push_back(glm::vec3(x, y, z));
+    return points.size();
+}
+
+bool GLWidget::removeLastPoint() {
+    if (points.size() > 0) {
+        points.pop_back();
+        return true;
+    } else
+        return false;
+}
+
+std::vector<glm::vec3> GLWidget::getAllPoints() {
+    return points;
 }
