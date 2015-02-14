@@ -2,12 +2,12 @@
 #define IMAGEANDPOINT_H
 
 #include <QObject>
-#include <QWidget>
+#include <QLabel>
 #include <QString>
 #include <glm/glm.hpp>
 
 class QLabel;
-class ImageAndPoint : public QWidget
+class ImageAndPoint : public QLabel
 {
     Q_OBJECT
 public:
@@ -21,9 +21,10 @@ signals:
 
 public slots:
 private:
-    QLabel *label;
     QImage *image;
     std::vector<glm::vec2> points;
+
+    void redisplay();
 };
 
 #endif // IMAGEANDPOINT_H

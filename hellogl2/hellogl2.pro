@@ -6,7 +6,8 @@ HEADERS       = glwidget.h \
     GModel.h \
     trackball.h \
     imageandpoint.h \
-    shader.hpp
+    shader.hpp \
+    pointsmatchrelation.h
 SOURCES       = glwidget.cpp \
                 main.cpp \
                 window.cpp \
@@ -16,7 +17,8 @@ SOURCES       = glwidget.cpp \
     GModel.cpp \
     trackball.cpp \
     imageandpoint.cpp \
-    shader.cpp
+    shader.cpp \
+    pointsmatchrelation.cpp
 
 QT           += widgets
 

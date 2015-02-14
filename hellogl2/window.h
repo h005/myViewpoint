@@ -52,13 +52,15 @@ QT_END_NAMESPACE
 class GLWidget;
 class MainWindow;
 class ImageAndPoint;
+class PointsMatchRelation;
 
 class Window : public QWidget
 {
     Q_OBJECT
 
 public:
-    Window(MainWindow *mw, const QString imagePath, const QString modelPath);
+    Window(MainWindow *mw, const QString &imagePath, const QString &modelPath, const QString &saveTo);
+    ~Window();
 
 protected:
     void keyPressEvent(QKeyEvent *event) Q_DECL_OVERRIDE;
@@ -73,6 +75,8 @@ private:
     GLWidget *right;
     QPushButton *dockBtn;
     MainWindow *mainWindow;
+    PointsMatchRelation *relation;
+
 };
 
 #endif

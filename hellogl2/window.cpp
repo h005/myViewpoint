@@ -53,12 +53,15 @@
 #include <QMessageBox>
 
 #include "imageandpoint.h"
+#include "pointsmatchrelation.h"
 
-Window::Window(MainWindow *mw, const QString imagePath, const QString modelPath)
+Window::Window(MainWindow *mw, const QString &imagePath, const QString &modelPath, const QString &saveTo)
     : mainWindow(mw)
 {
+    relation = new PointsMatchRelation(saveTo);
+
     right = new GLWidget(this);
-    left = new ImageAndPoint(QString("D:\\Koalaa.jpg"), this);
+    left = new ImageAndPoint(imagePath, this);
 
     // 将左右窗口加入布局管理器
     QHBoxLayout *container = new QHBoxLayout;
@@ -80,10 +83,14 @@ Window::Window(MainWindow *mw, const QString imagePath, const QString modelPath)
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addWidget(dockBtn);
     mainLayout->addWidget(w);
-
     setLayout(mainLayout);
 
     setWindowTitle(tr("Hello GL"));
+}
+
+Window::~Window()
+{
+    delete relation;
 }
 
 QSlider *Window::createSlider()
@@ -104,16 +111,20 @@ void Window::keyPressEvent(QKeyEvent *e)
     else if (e->key() == Qt::Key_0) {
         QSize rsize = right->size();
         QSize lsize = left->size();
-        QPoint p = right->mapFromGlobal(QCursor::pos());
+        QPoint p;
+
+        // 检测鼠标是否在右侧(模型)
+        p = right->mapFromGlobal(QCursor::pos());
         if ((p.x() >= 0 && p.x() < rsize.width())
                 && (p.y() >= 0 && p.y() < rsize.height())) {
             std::cout << p.x() << std::endl;
         }
 
+        // 检测鼠标是否在左侧(图片)
         p = left->mapFromGlobal(QCursor::pos());
-        if ((p.x() >= 0 && p.x() < rsize.width())
-                      && (p.y() >= 0 && p.y() < rsize.height())) {
-            std::cout << "left" << std::endl;
+        if ((p.x() >= 0 && p.x() < lsize.width())
+                      && (p.y() >= 0 && p.y() < lsize.height())) {
+            std::cout << left->addPoint(p) << std::endl;
         }
     }
     else
