@@ -63,7 +63,7 @@ void MainWindow::onAddNew()
 {
     if (!centralWidget()) {
         PointsMatchRelation *relation = new PointsMatchRelation(QString("D:\\a.txt"));
-        setCentralWidget(new Window(this, QString("F:\\f0130741_8545899.jpg"), QString(""), *relation));
+        setCentralWidget(new Window(this, QString("F:\\f0130741_8545899.jpg"), QString("D:\\no2\\models\\model.dae"), *relation));
     }
     else
         QMessageBox::information(0, tr("Cannot add new window"), tr("Already occupied. Undock first."));

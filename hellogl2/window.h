@@ -68,6 +68,8 @@ protected:
 
 private slots:
     void dockUndock();
+    void align();
+    void confirm();
 
 private:
     QSlider *createSlider();
@@ -75,6 +77,8 @@ private:
     ImageAndPoint *left;
     GLWidget *right;
     QPushButton *dockBtn;
+    QPushButton *alignBtn;
+    QPushButton *confirmBtn;
     MainWindow *mainWindow;
     PointsMatchRelation &relation;
 

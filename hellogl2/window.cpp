@@ -58,25 +58,35 @@
 Window::Window(MainWindow *mw, const QString &imagePath, const QString &modelPath, PointsMatchRelation &relation)
     : mainWindow(mw), relation(relation)
 {
-    right = new GLWidget(relation, this);
-    left = new ImageAndPoint(this, imagePath, relation);
+    right = new GLWidget(relation, modelPath, this);
+    left = new ImageAndPoint(imagePath, relation, this);
+    dockBtn = new QPushButton(tr("Undock"), this);
+    alignBtn = new QPushButton(tr("Align && See"), this);
+    confirmBtn = new QPushButton(tr("Confirm && Uplevel"), this);
 
-    // 将左右窗口加入布局管理器
-    QHBoxLayout *container = new QHBoxLayout;
+    connect(dockBtn, SIGNAL(clicked()), this, SLOT(dockUndock()));
+    connect(alignBtn, SIGNAL(clicked()), this, SLOT(align()));
+    connect(confirmBtn, SIGNAL(clicked()), this, SLOT(confirm()));
 
     QSizePolicy cellPolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     cellPolicy.setHorizontalStretch(1);
     left->setSizePolicy(cellPolicy);
     right->setSizePolicy(cellPolicy);
-    container->addWidget(left);
-    container->addWidget(right);
 
-    // 布局用，类似于div
+    // 最中间的一列按钮
+    QVBoxLayout *middleLayout = new QVBoxLayout;
+    middleLayout->addWidget(alignBtn);
+    middleLayout->addWidget(confirmBtn);
+    QWidget *middle = new QWidget;
+    middle->setLayout(middleLayout);
+
+    // 左中右窗口加入布局管理器
+    QHBoxLayout *container = new QHBoxLayout;
+    container->addWidget(left);
+    container->addWidget(middle);
+    container->addWidget(right);
     QWidget *w = new QWidget;
     w->setLayout(container);
-
-    dockBtn = new QPushButton(tr("Undock"), this);
-    connect(dockBtn, SIGNAL(clicked()), this, SLOT(dockUndock()));
 
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addWidget(dockBtn);
@@ -175,4 +185,14 @@ void Window::dockUndock()
             QMessageBox::information(0, tr("Cannot dock"), tr("Main window already occupied"));
         }
     }
+}
+
+void Window::align()
+{
+    std::cout << "align" << std::endl;
+}
+
+void Window::confirm()
+{
+    std::cout << "confirm" << std::endl;
 }

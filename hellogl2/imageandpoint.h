@@ -12,7 +12,7 @@ class ImageAndPoint : public QLabel
 {
     Q_OBJECT
 public:
-    explicit ImageAndPoint(QWidget *parent, const QString &imagePath, PointsMatchRelation &relation);
+    explicit ImageAndPoint(const QString &imagePath, PointsMatchRelation &relation, QWidget *parent = 0);
     ~ImageAndPoint();
     int addPoint(const QPoint &p);
     bool removePoint();

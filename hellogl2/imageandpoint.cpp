@@ -11,7 +11,7 @@
 
 #include "pointsmatchrelation.h"
 
-ImageAndPoint::ImageAndPoint(QWidget *parent, const QString &imagePath, PointsMatchRelation &relation)
+ImageAndPoint::ImageAndPoint(const QString &imagePath, PointsMatchRelation &relation, QWidget *parent)
     :QLabel(parent),
       relation(relation)
 {

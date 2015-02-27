@@ -51,7 +51,7 @@
 #include "trackball.h"
 #include "pointsmatchrelation.h"
 
-GLWidget::GLWidget(PointsMatchRelation &relation, QWidget *parent)
+GLWidget::GLWidget(PointsMatchRelation &relation, const QString &modelPath, QWidget *parent)
     : QOpenGLWidget(parent),
       relation(relation),
       m_angle(0),
@@ -64,6 +64,7 @@ GLWidget::GLWidget(PointsMatchRelation &relation, QWidget *parent)
     m_transparent = QCoreApplication::arguments().contains(QStringLiteral("--transparent"));
     if (m_transparent)
         setAttribute(Qt::WA_TranslucentBackground);
+    model.load(modelPath.toLocal8Bit().data());
 }
 
 GLWidget::~GLWidget()
@@ -118,8 +119,6 @@ void GLWidget::initializeGL()
     // Equal to:
     // m_camera = glm::translate(glm::mat4(), glm::vec3(0.f, 0.f, -3.f));
     m_camera = glm::lookAt(glm::vec3(0.f, 0.f, 3.f), glm::vec3(0.f), glm::vec3(0.f, 1.f, 0.f));
-
-    model.load("F:\\no2\\models\\model.dae");
     model.bindDataToGL();
 }
 

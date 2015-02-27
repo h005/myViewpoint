@@ -53,12 +53,13 @@
 QT_FORWARD_DECLARE_CLASS(QOpenGLShaderProgram)
 
 class PointsMatchRelation;
+class QString;
 class GLWidget : public QOpenGLWidget, protected QOpenGLFunctions
 {
     Q_OBJECT
 
 public:
-    GLWidget(PointsMatchRelation &relation, QWidget *parent = 0);
+    GLWidget(PointsMatchRelation &relation, const QString &modelPath, QWidget *parent = 0);
     ~GLWidget();
 
     QSize minimumSizeHint() const Q_DECL_OVERRIDE;
