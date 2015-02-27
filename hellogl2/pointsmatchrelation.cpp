@@ -7,7 +7,8 @@
 PointsMatchRelation::PointsMatchRelation(const QString &filepath)
     : filepath(filepath)
 {
-
+    points2d.clear();
+    points3d.clear();
 }
 
 PointsMatchRelation::~PointsMatchRelation()

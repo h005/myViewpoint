@@ -52,19 +52,19 @@
 
 QT_FORWARD_DECLARE_CLASS(QOpenGLShaderProgram)
 
+class PointsMatchRelation;
 class GLWidget : public QOpenGLWidget, protected QOpenGLFunctions
 {
     Q_OBJECT
 
 public:
-    GLWidget(QWidget *parent = 0);
+    GLWidget(PointsMatchRelation &relation, QWidget *parent = 0);
     ~GLWidget();
 
     QSize minimumSizeHint() const Q_DECL_OVERRIDE;
     QSize sizeHint() const Q_DECL_OVERRIDE;
     int addPoint(const QPoint &p);
     bool removeLastPoint();
-    std::vector<glm::vec3> getAllPoints();
 
 public slots:
     void cleanup();
@@ -89,7 +89,7 @@ private:
     glm::mat4 m_proj;
     glm::mat4 m_camera;
     bool m_transparent;
-    std::vector<glm::vec3> points;
+    PointsMatchRelation &relation;
 };
 
 #endif

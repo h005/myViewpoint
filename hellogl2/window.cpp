@@ -55,13 +55,11 @@
 #include "imageandpoint.h"
 #include "pointsmatchrelation.h"
 
-Window::Window(MainWindow *mw, const QString &imagePath, const QString &modelPath, const QString &saveTo)
-    : mainWindow(mw)
+Window::Window(MainWindow *mw, const QString &imagePath, const QString &modelPath, PointsMatchRelation &relation)
+    : mainWindow(mw), relation(relation)
 {
-    relation = new PointsMatchRelation(saveTo);
-
-    right = new GLWidget(this);
-    left = new ImageAndPoint(imagePath, this);
+    right = new GLWidget(relation, this);
+    left = new ImageAndPoint(this, imagePath, relation);
 
     // 将左右窗口加入布局管理器
     QHBoxLayout *container = new QHBoxLayout;
@@ -90,7 +88,6 @@ Window::Window(MainWindow *mw, const QString &imagePath, const QString &modelPat
 
 Window::~Window()
 {
-    delete relation;
 }
 
 QSlider *Window::createSlider()
@@ -109,6 +106,7 @@ void Window::keyPressEvent(QKeyEvent *e)
     if (e->key() == Qt::Key_Escape)
         close();
     else if (e->key() == Qt::Key_0) {
+        // 增加一个点
         QSize rsize = right->size();
         QSize lsize = left->size();
         QPoint p;
@@ -126,9 +124,32 @@ void Window::keyPressEvent(QKeyEvent *e)
                       && (p.y() >= 0 && p.y() < lsize.height())) {
             std::cout << left->addPoint(p) << std::endl;
         }
-    }
-    else
+    } else if (e->key() == Qt::Key_Minus) {
+        // 删除一个点
+        QSize rsize = right->size();
+        QSize lsize = left->size();
+        QPoint p;
+
+        // 检测鼠标是否在右侧(模型)
+        p = right->mapFromGlobal(QCursor::pos());
+        if ((p.x() >= 0 && p.x() < rsize.width())
+                && (p.y() >= 0 && p.y() < rsize.height())) {
+            std::cout << p.x() << std::endl;
+        }
+
+        // 检测鼠标是否在左侧(图片)
+        p = left->mapFromGlobal(QCursor::pos());
+        if ((p.x() >= 0 && p.x() < lsize.width())
+                      && (p.y() >= 0 && p.y() < lsize.height())) {
+            std::cout << left->removePoint() << std::endl;
+        }
+    } else
         QWidget::keyPressEvent(e);
+}
+
+void Window::closeEvent(QCloseEvent *event)
+{
+    event->accept();
 }
 
 void Window::dockUndock()

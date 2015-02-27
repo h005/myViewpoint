@@ -59,11 +59,12 @@ class Window : public QWidget
     Q_OBJECT
 
 public:
-    Window(MainWindow *mw, const QString &imagePath, const QString &modelPath, const QString &saveTo);
+    Window(MainWindow *mw, const QString &imagePath, const QString &modelPath, PointsMatchRelation &releation);
     ~Window();
 
 protected:
     void keyPressEvent(QKeyEvent *event) Q_DECL_OVERRIDE;
+    void closeEvent(QCloseEvent * event) Q_DECL_OVERRIDE;
 
 private slots:
     void dockUndock();
@@ -75,7 +76,7 @@ private:
     GLWidget *right;
     QPushButton *dockBtn;
     MainWindow *mainWindow;
-    PointsMatchRelation *relation;
+    PointsMatchRelation &relation;
 
 };
 

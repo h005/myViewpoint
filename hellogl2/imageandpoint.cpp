@@ -9,7 +9,11 @@
 #include <QPainter>
 #include <glm/gtx/string_cast.hpp>
 
-ImageAndPoint::ImageAndPoint(const QString &imagePath, QWidget *parent) :  QLabel(parent)
+#include "pointsmatchrelation.h"
+
+ImageAndPoint::ImageAndPoint(QWidget *parent, const QString &imagePath, PointsMatchRelation &relation)
+    :QLabel(parent),
+      relation(relation)
 {
     image = new QImage(imagePath);
     if (image->width() == 0) {
@@ -37,6 +41,7 @@ ImageAndPoint::ImageAndPoint(const QString &imagePath, QWidget *parent) :  QLabe
 int ImageAndPoint::addPoint(const QPoint &p) {
     // 将窗口坐标系（原点在左上角）转换为图像坐标系（原点在左下角）
     // 由于图片在控件中不是一对一显示，所以还存在尺度缩放变换
+    std::vector<glm::vec2> &points = relation.getPoints2d();
     float x = p.x() * 1.f / this->size().width() * image->size().width();
     float y = (this->size().height() - p.y()) * 1.f / this->size().height() * image->size().height();
     glm::vec2 point = glm::vec2(x, y);
@@ -47,19 +52,19 @@ int ImageAndPoint::addPoint(const QPoint &p) {
 }
 
 bool ImageAndPoint::removePoint() {
+    std::vector<glm::vec2> &points = relation.getPoints2d();
     if (points.size() > 0) {
         points.pop_back();
+        redisplay();
         return true;
     }
     return false;
 }
 
-std::vector<glm::vec2> ImageAndPoint::getPoints() {
-    return points;
-}
-
 void ImageAndPoint::redisplay()
 {
+    std::vector<glm::vec2> &points = relation.getPoints2d();
+
     QImage tmp(*image);
     QPainter painter( &tmp );
     painter.setRenderHint( QPainter::Antialiasing );

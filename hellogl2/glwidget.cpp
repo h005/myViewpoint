@@ -49,9 +49,11 @@
 #include <glm/gtx/string_cast.hpp>
 
 #include "trackball.h"
+#include "pointsmatchrelation.h"
 
-GLWidget::GLWidget(QWidget *parent)
+GLWidget::GLWidget(PointsMatchRelation &relation, QWidget *parent)
     : QOpenGLWidget(parent),
+      relation(relation),
       m_angle(0),
       m_rotateN(1.f),
       m_baseRotate(1.f)
@@ -62,7 +64,6 @@ GLWidget::GLWidget(QWidget *parent)
     m_transparent = QCoreApplication::arguments().contains(QStringLiteral("--transparent"));
     if (m_transparent)
         setAttribute(Qt::WA_TranslucentBackground);
-    points.clear();
 }
 
 GLWidget::~GLWidget()
@@ -118,7 +119,7 @@ void GLWidget::initializeGL()
     // m_camera = glm::translate(glm::mat4(), glm::vec3(0.f, 0.f, -3.f));
     m_camera = glm::lookAt(glm::vec3(0.f, 0.f, 3.f), glm::vec3(0.f), glm::vec3(0.f, 1.f, 0.f));
 
-    model.load("D:\\no2\\models\\model.dae");
+    model.load("F:\\no2\\models\\model.dae");
     model.bindDataToGL();
 }
 
@@ -171,6 +172,7 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
 }
 
 int GLWidget::addPoint(const QPoint &p) {
+    std::vector<glm::vec3> &points = relation.getPoints3d();
     GLfloat x = p.x();
     GLfloat y = p.y();
     GLfloat z;
@@ -179,13 +181,10 @@ int GLWidget::addPoint(const QPoint &p) {
 }
 
 bool GLWidget::removeLastPoint() {
+    std::vector<glm::vec3> &points = relation.getPoints3d();
     if (points.size() > 0) {
         points.pop_back();
         return true;
     } else
         return false;
-}
-
-std::vector<glm::vec3> GLWidget::getAllPoints() {
-    return points;
 }

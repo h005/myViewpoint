@@ -7,23 +7,22 @@
 #include <glm/glm.hpp>
 
 class QLabel;
+class PointsMatchRelation;
 class ImageAndPoint : public QLabel
 {
     Q_OBJECT
 public:
-    explicit ImageAndPoint(const QString &imagePath, QWidget *parent = 0);
+    explicit ImageAndPoint(QWidget *parent, const QString &imagePath, PointsMatchRelation &relation);
     ~ImageAndPoint();
     int addPoint(const QPoint &p);
     bool removePoint();
-    std::vector<glm::vec2> getPoints();
 
 signals:
 
 public slots:
 private:
     QImage *image;
-    std::vector<glm::vec2> points;
-
+    PointsMatchRelation &relation;
     void redisplay();
 };
 

@@ -40,9 +40,11 @@
 
 #include "mainwindow.h"
 #include "window.h"
+#include <iostream>
 #include <QMenuBar>
 #include <QMenu>
 #include <QMessageBox>
+#include "pointsmatchrelation.h"
 
 MainWindow::MainWindow()
 {
@@ -59,8 +61,10 @@ MainWindow::MainWindow()
 
 void MainWindow::onAddNew()
 {
-    if (!centralWidget())
-        setCentralWidget(new Window(this, QString("D:\\Koala.jpg"), QString(""), QString("D:\\a.txt")));
+    if (!centralWidget()) {
+        PointsMatchRelation *relation = new PointsMatchRelation(QString("D:\\a.txt"));
+        setCentralWidget(new Window(this, QString("F:\\f0130741_8545899.jpg"), QString(""), *relation));
+    }
     else
         QMessageBox::information(0, tr("Cannot add new window"), tr("Already occupied. Undock first."));
 }
