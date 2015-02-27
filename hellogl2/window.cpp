@@ -149,6 +149,7 @@ void Window::keyPressEvent(QKeyEvent *e)
 
 void Window::closeEvent(QCloseEvent *event)
 {
+    assert(relation.isPointsEqual());
     event->accept();
 }
 

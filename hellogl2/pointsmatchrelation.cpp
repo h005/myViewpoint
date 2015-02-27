@@ -62,6 +62,15 @@ bool PointsMatchRelation::saveToFile()
     }
 }
 
+/**
+ * @brief PointsMatchRelation::isPointsEqual
+ * @return 其中保存的三维点和二维点数目是否一致
+ */
+bool PointsMatchRelation::isPointsEqual()
+{
+    return points2d.size() == points3d.size();
+}
+
 std::vector<glm::vec2>& PointsMatchRelation::getPoints2d()
 {
     return points2d;

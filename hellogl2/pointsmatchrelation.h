@@ -13,6 +13,7 @@ public:
 
     bool loadFromFile();
     bool saveToFile();
+    bool isPointsEqual();
 
     std::vector<glm::vec2>& getPoints2d();
     void setPoints2d(const std::vector<glm::vec2> &value);
