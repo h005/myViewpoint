@@ -125,7 +125,7 @@ void Window::keyPressEvent(QKeyEvent *e)
         p = right->mapFromGlobal(QCursor::pos());
         if ((p.x() >= 0 && p.x() < rsize.width())
                 && (p.y() >= 0 && p.y() < rsize.height())) {
-            std::cout << p.x() << std::endl;
+            std::cout << right->addPoint(p) << std::endl;
         }
 
         // 检测鼠标是否在左侧(图片)

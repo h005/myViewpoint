@@ -175,6 +175,31 @@ int GLWidget::addPoint(const QPoint &p) {
     GLfloat x = p.x();
     GLfloat y = p.y();
     GLfloat z;
+    {
+        GLint viewport[4];
+        GLdouble modelview[16];
+        GLdouble projection[16];
+        GLdouble object_x,object_y,object_z;
+        GLfloat realy, winZ = 0;
+
+        glGetIntegerv(GL_VIEWPORT, viewport);
+        glGetDoublev(GL_MODELVIEW_MATRIX, modelview);
+        glGetDoublev(GL_PROJECTION_MATRIX, projection);
+
+        glm::mat4 aa, bb;
+        glGetFloatv(GL_MODELVIEW_MATRIX, glm::value_ptr(aa));
+        glGetFloatv(GL_MODELVIEW_MATRIX, glm::value_ptr(bb));
+        std::cout << glm::to_string(aa) << std::endl;
+        std::cout << glm::to_string(bb) << std::endl;
+
+        realy=(GLfloat)viewport[3] - (GLfloat)y;
+
+        glReadBuffer(GL_BACK);
+        glReadPixels(x,int(realy),1,1,GL_DEPTH_COMPONENT,GL_FLOAT,&winZ);
+        std::cout << "winZ: " << winZ << std::endl;
+        gluUnProject((GLdouble)x,(GLdouble)realy,winZ,modelview,projection,viewport,&object_x,&object_y,&object_z);
+        printf("World Coordinates of Object are (%f,%f,%f)\n",object_x,object_y,object_z);
+    }
     points.push_back(glm::vec3(x, y, z));
     return points.size();
 }
