@@ -422,7 +422,7 @@ GModel::MeshEntry::MeshEntry(const aiMesh *mesh, const glm::mat4 &transformation
 
             GLuint vertexPosition_modelspaceID = glGetAttribLocation(programID, "vertexPosition_modelspace");
             glVertexAttribPointer(vertexPosition_modelspaceID, 3, GL_FLOAT, GL_FALSE, 0, NULL);
-            glEnableVertexAttribArray (0);
+            glEnableVertexAttribArray (vertexPosition_modelspaceID);
         }
     }
 
@@ -442,7 +442,7 @@ GModel::MeshEntry::MeshEntry(const aiMesh *mesh, const glm::mat4 &transformation
 
             GLuint vertexUVID = glGetAttribLocation(programID, "vertexUV");
             glVertexAttribPointer(vertexUVID, 2, GL_FLOAT, GL_FALSE, 0, NULL);
-            glEnableVertexAttribArray (1);
+            glEnableVertexAttribArray (vertexUVID);
         }
     }
 
@@ -463,7 +463,7 @@ GModel::MeshEntry::MeshEntry(const aiMesh *mesh, const glm::mat4 &transformation
 
             GLuint vertexNormal_modelspaceID = glGetAttribLocation(programID, "vertexNormal_modelspace");
             glVertexAttribPointer(vertexNormal_modelspaceID, 3, GL_FLOAT, GL_FALSE, 0, NULL);
-            glEnableVertexAttribArray (2);
+            glEnableVertexAttribArray (vertexNormal_modelspaceID);
         }
     }
 
