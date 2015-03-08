@@ -319,7 +319,7 @@ void GModel::drawNormalizedModel(const glm::mat4 &inheritModelView, const glm::m
         // 一个aiMesh拥有一致的纹理和材质
         glActiveTexture(GL_TEXTURE0);
         apply_material(scene->mMaterials[mesh->mMaterialIndex]);
-        glUniform1i(TextureID, 0);
+        glUniform1i(TextureID, GL_TEXTURE0);
 
         if (mesh->HasNormals())
         {
