@@ -171,6 +171,8 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
 }
 
 int GLWidget::addPoint(const QPoint &p) {
+    makeCurrent();
+
     std::vector<glm::vec3> &points = relation.getPoints3d();
     GLfloat x = p.x();
     GLfloat y = p.y();
@@ -182,25 +184,19 @@ int GLWidget::addPoint(const QPoint &p) {
         GLdouble object_x,object_y,object_z;
         GLfloat realy, winZ = 0;
 
-        glGetIntegerv(GL_VIEWPORT, viewport);
-        glGetDoublev(GL_MODELVIEW_MATRIX, modelview);
-        glGetDoublev(GL_PROJECTION_MATRIX, projection);
-
-        glm::mat4 aa, bb;
-        glGetFloatv(GL_MODELVIEW_MATRIX, glm::value_ptr(aa));
-        glGetFloatv(GL_MODELVIEW_MATRIX, glm::value_ptr(bb));
-        std::cout << glm::to_string(aa) << std::endl;
-        std::cout << glm::to_string(bb) << std::endl;
-
+        glGetIntegerv(GL_VIEWPORT, viewport);   
         realy=(GLfloat)viewport[3] - (GLfloat)y;
-
         glReadBuffer(GL_BACK);
         glReadPixels(x,int(realy),1,1,GL_DEPTH_COMPONENT,GL_FLOAT,&winZ);
         std::cout << "winZ: " << winZ << std::endl;
-        gluUnProject((GLdouble)x,(GLdouble)realy,winZ,modelview,projection,viewport,&object_x,&object_y,&object_z);
+
+        glm::mat4 modelViewMatrix = m_camera * m_baseRotate;
+        gluUnProject((GLdouble)x,(GLdouble)realy,winZ, glm::value_ptr(modelViewMatrix), glm::value_ptr(m_proj),viewport,&object_x,&object_y,&object_z);
         printf("World Coordinates of Object are (%f,%f,%f)\n",object_x,object_y,object_z);
     }
     points.push_back(glm::vec3(x, y, z));
+
+    doneCurrent();
     return points.size();
 }
 
