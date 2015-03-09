@@ -49,6 +49,7 @@
 #include <QMatrix4x4>
 #include <glm/glm.hpp>
 #include "GModel.h"
+#include "sphere.h"
 
 QT_FORWARD_DECLARE_CLASS(QOpenGLShaderProgram)
 
@@ -90,7 +91,9 @@ private:
     glm::mat4 m_proj;
     glm::mat4 m_camera;
     bool m_transparent;
+    GLuint m_sphereProgramID;
     PointsMatchRelation &relation;
+    Sphere sphere;
 };
 
 #endif

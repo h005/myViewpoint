@@ -50,13 +50,15 @@
 
 #include "trackball.h"
 #include "pointsmatchrelation.h"
+#include "shader.hpp"
 
 GLWidget::GLWidget(PointsMatchRelation &relation, const QString &modelPath, QWidget *parent)
     : QOpenGLWidget(parent),
       relation(relation),
       m_angle(0),
       m_rotateN(1.f),
-      m_baseRotate(1.f)
+      m_baseRotate(1.f),
+      m_sphereProgramID(0)
 {
     m_core = QCoreApplication::arguments().contains(QStringLiteral("--coreprofile"));
     // --transparent causes the clear color to be transparent. Therefore, on systems that
@@ -94,6 +96,10 @@ static void qNormalizeAngle(int &angle)
 void GLWidget::cleanup()
 {
     makeCurrent();
+    if (m_sphereProgramID) {
+        glDeleteProgram(m_sphereProgramID);
+    }
+    sphere.cleanup();
     doneCurrent();
 }
 
@@ -119,7 +125,14 @@ void GLWidget::initializeGL()
     // Equal to:
     // m_camera = glm::translate(glm::mat4(), glm::vec3(0.f, 0.f, -3.f));
     m_camera = glm::lookAt(glm::vec3(0.f, 0.f, 3.f), glm::vec3(0.f), glm::vec3(0.f, 1.f, 0.f));
+
+    // load data for model rendering
     model.bindDataToGL();
+
+    // link program for drawing sphere
+    m_sphereProgramID = LoadShaders("shader/sphereShader.vert", "shader/sphereShader.frag");
+    GLuint vertexPosition_modelspaceID = glGetAttribLocation(m_sphereProgramID, "vertexPosition_modelspace");
+    sphere.init(vertexPosition_modelspaceID);
 }
 
 void GLWidget::paintGL()
@@ -129,10 +142,29 @@ void GLWidget::paintGL()
     // 默认开启背面剔除:GL_CULL_FACE
 
     // 计算modelView矩阵
-    glm::mat4 worldTransform = glm::rotate(glm::mat4(1.f), m_angle, m_rotateN);
-    worldTransform *= m_baseRotate;
-    glm::mat4 modelViewMatrix = m_camera * worldTransform;
+    glm::mat4 modelViewMatrix = m_camera * glm::rotate(glm::mat4(1.f), m_angle, m_rotateN) * m_baseRotate;
+
+    // 绘制模型
     model.drawNormalizedModel(modelViewMatrix, m_proj);
+
+    // 绘制模型上被选择的点
+    std::vector<glm::vec3> &points = relation.getPoints3d();
+    if (points.size() > 0) {
+        glUseProgram(m_sphereProgramID);
+        GLuint projMatrixID = glGetUniformLocation(m_sphereProgramID, "projMatrix");
+        GLuint mvMatrixID = glGetUniformLocation(m_sphereProgramID, "mvMatrix");
+        glUniformMatrix4fv(projMatrixID, 1, GL_FALSE, glm::value_ptr(m_proj));
+
+        std::vector<glm::vec3>::iterator it;
+        for (it = points.begin(); it != points.end(); it++) {
+            // multiple point's position
+            glm::mat4 pointMV = glm::translate(modelViewMatrix, *it);
+            pointMV = glm::scale(pointMV, glm::vec3(0.1, 0.1, 0.1));
+            glUniformMatrix4fv(mvMatrixID, 1, GL_FALSE, glm::value_ptr(pointMV));
+            sphere.draw();
+        }
+    }
+
 }
 
 void GLWidget::resizeGL(int w, int h)
@@ -179,8 +211,6 @@ int GLWidget::addPoint(const QPoint &p) {
     GLfloat z;
     {
         GLint viewport[4];
-        GLdouble modelview[16];
-        GLdouble projection[16];
         GLdouble object_x,object_y,object_z;
         GLfloat realy, winZ = 0;
 
@@ -188,15 +218,22 @@ int GLWidget::addPoint(const QPoint &p) {
         realy=(GLfloat)viewport[3] - (GLfloat)y;
         glReadBuffer(GL_BACK);
         glReadPixels(x,int(realy),1,1,GL_DEPTH_COMPONENT,GL_FLOAT,&winZ);
-        std::cout << "winZ: " << winZ << std::endl;
 
         glm::mat4 modelViewMatrix = m_camera * m_baseRotate;
-        gluUnProject((GLdouble)x,(GLdouble)realy,winZ, glm::value_ptr(modelViewMatrix), glm::value_ptr(m_proj),viewport,&object_x,&object_y,&object_z);
+        glm::dmat4 mvDouble, projDouble;
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 4; j++) {
+                mvDouble[i][j] = modelViewMatrix[i][j];
+                projDouble[i][j] = m_proj[i][j];
+            }
+        }
+        gluUnProject((GLdouble)x,(GLdouble)realy,winZ, glm::value_ptr(mvDouble), glm::value_ptr(projDouble),viewport,&object_x,&object_y,&object_z);
         printf("World Coordinates of Object are (%f,%f,%f)\n",object_x,object_y,object_z);
     }
     points.push_back(glm::vec3(x, y, z));
 
     doneCurrent();
+    update();
     return points.size();
 }
 
