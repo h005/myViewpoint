@@ -159,7 +159,7 @@ void GLWidget::paintGL()
         for (it = points.begin(); it != points.end(); it++) {
             // multiple point's position
             glm::mat4 pointMV = glm::translate(modelViewMatrix, *it);
-            pointMV = glm::scale(pointMV, glm::vec3(0.1, 0.1, 0.1));
+            pointMV = glm::scale(pointMV, glm::vec3(0.02, 0.02, 0.02));
             glUniformMatrix4fv(mvMatrixID, 1, GL_FALSE, glm::value_ptr(pointMV));
             sphere.draw();
         }
@@ -208,29 +208,27 @@ int GLWidget::addPoint(const QPoint &p) {
     std::vector<glm::vec3> &points = relation.getPoints3d();
     GLfloat x = p.x();
     GLfloat y = p.y();
-    GLfloat z;
-    {
-        GLint viewport[4];
-        GLdouble object_x,object_y,object_z;
-        GLfloat realy, winZ = 0;
 
-        glGetIntegerv(GL_VIEWPORT, viewport);   
-        realy=(GLfloat)viewport[3] - (GLfloat)y;
-        glReadBuffer(GL_BACK);
-        glReadPixels(x,int(realy),1,1,GL_DEPTH_COMPONENT,GL_FLOAT,&winZ);
+    GLint viewport[4];
+    GLdouble object_x,object_y,object_z;
+    GLfloat realy, winZ = 0;
 
-        glm::mat4 modelViewMatrix = m_camera * m_baseRotate;
-        glm::dmat4 mvDouble, projDouble;
-        for (int i = 0; i < 4; i++) {
-            for (int j = 0; j < 4; j++) {
-                mvDouble[i][j] = modelViewMatrix[i][j];
-                projDouble[i][j] = m_proj[i][j];
-            }
+    glGetIntegerv(GL_VIEWPORT, viewport);
+    realy=(GLfloat)viewport[3] - (GLfloat)y;
+    glReadBuffer(GL_BACK);
+    glReadPixels(x,int(realy),1,1,GL_DEPTH_COMPONENT,GL_FLOAT,&winZ);
+
+    glm::mat4 modelViewMatrix = m_camera * m_baseRotate;
+    glm::dmat4 mvDouble, projDouble;
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++) {
+            mvDouble[i][j] = modelViewMatrix[i][j];
+            projDouble[i][j] = m_proj[i][j];
         }
-        gluUnProject((GLdouble)x,(GLdouble)realy,winZ, glm::value_ptr(mvDouble), glm::value_ptr(projDouble),viewport,&object_x,&object_y,&object_z);
-        printf("World Coordinates of Object are (%f,%f,%f)\n",object_x,object_y,object_z);
     }
-    points.push_back(glm::vec3(x, y, z));
+    gluUnProject((GLdouble)x,(GLdouble)realy,winZ, glm::value_ptr(mvDouble), glm::value_ptr(projDouble),viewport,&object_x,&object_y,&object_z);
+    printf("World Coordinates of Object are (%f,%f,%f)\n",object_x,object_y,object_z);
+    points.push_back(glm::vec3(object_x, object_y, object_z));
 
     doneCurrent();
     update();
@@ -241,6 +239,7 @@ bool GLWidget::removeLastPoint() {
     std::vector<glm::vec3> &points = relation.getPoints3d();
     if (points.size() > 0) {
         points.pop_back();
+        update();
         return true;
     } else
         return false;
