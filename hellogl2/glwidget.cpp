@@ -217,18 +217,18 @@ int GLWidget::addPoint(const QPoint &p) {
     realy=(GLfloat)viewport[3] - (GLfloat)y;
     glReadBuffer(GL_BACK);
     glReadPixels(x,int(realy),1,1,GL_DEPTH_COMPONENT,GL_FLOAT,&winZ);
-
-    glm::mat4 modelViewMatrix = m_camera * m_baseRotate;
-    glm::dmat4 mvDouble, projDouble;
-    for (int i = 0; i < 4; i++) {
-        for (int j = 0; j < 4; j++) {
-            mvDouble[i][j] = modelViewMatrix[i][j];
-            projDouble[i][j] = m_proj[i][j];
+    if (winZ < 1 - 1e-5) {
+        glm::mat4 modelViewMatrix = m_camera * m_baseRotate;
+        glm::dmat4 mvDouble, projDouble;
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 4; j++) {
+                mvDouble[i][j] = modelViewMatrix[i][j];
+                projDouble[i][j] = m_proj[i][j];
+            }
         }
+        gluUnProject((GLdouble)x,(GLdouble)realy,winZ, glm::value_ptr(mvDouble), glm::value_ptr(projDouble),viewport,&object_x,&object_y,&object_z);
+        points.push_back(glm::vec3(object_x, object_y, object_z));
     }
-    gluUnProject((GLdouble)x,(GLdouble)realy,winZ, glm::value_ptr(mvDouble), glm::value_ptr(projDouble),viewport,&object_x,&object_y,&object_z);
-    printf("World Coordinates of Object are (%f,%f,%f)\n",object_x,object_y,object_z);
-    points.push_back(glm::vec3(object_x, object_y, object_z));
 
     doneCurrent();
     update();
