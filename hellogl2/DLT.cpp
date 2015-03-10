@@ -59,7 +59,7 @@ static void normalize_3D(float original[][NDIM], float processed[][NDIM], size_t
 #undef NDIM
 
 #define NDIM 2
-static void normalize_2D(int original[][NDIM], float processed[][NDIM], size_t n, float param[NDIM + 1]) {
+static void normalize_2D(float original[][NDIM], float processed[][NDIM], size_t n, float param[NDIM + 1]) {
 	for (size_t i = 0; i < n; i++) {
 		for (int j = 0; j < NDIM; j++) {
 			processed[i][j] = original[i][j];
@@ -216,7 +216,7 @@ static cv::Mat constructProjectionMatrixWithoutPrinciplePoint(cv::Mat &K, GLfloa
 	return result;
 }
 
-cv::Mat phase1CalculateP(int imClick, int objClick, int imCords[][2], float objCords[][3]) {
+cv::Mat phase1CalculateP(int imClick, int objClick, float imCords[][2], float objCords[][3]) {
 	float *cords3d = new float[imClick * 3];
 	float *cords2d = new float[imClick * 2];
 	float param2d[3], param3d[4];

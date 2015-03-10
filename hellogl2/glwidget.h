@@ -46,7 +46,6 @@
 #include <QOpenGLFunctions>
 #include <QOpenGLVertexArrayObject>
 #include <QOpenGLBuffer>
-#include <QMatrix4x4>
 #include <glm/glm.hpp>
 #include "GModel.h"
 #include "sphere.h"
@@ -70,6 +69,7 @@ public:
 
 public slots:
     void cleanup();
+    void setModelScale(int angle);
 
 signals:
 
@@ -81,19 +81,22 @@ protected:
     void mouseReleaseEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
     void mouseMoveEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
 
-private:
+protected:
+    glm::mat4 getModelViewMatrix();
     GModel model;
-    bool m_core;
+    glm::mat4 m_proj;
+    glm::mat4 m_camera;
+    PointsMatchRelation &relation;
     glm::mat4 m_baseRotate;
     glm::vec3 m_rotateN;
     float m_angle;
-    QPoint m_lastPos;
-    glm::mat4 m_proj;
-    glm::mat4 m_camera;
-    bool m_transparent;
+    GLfloat m_scale;
     GLuint m_sphereProgramID;
-    PointsMatchRelation &relation;
     Sphere sphere;
+
+private:
+    QPoint m_lastPos;
+    bool m_transparent;
 };
 
 #endif

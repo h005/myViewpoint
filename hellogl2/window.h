@@ -62,6 +62,8 @@ public:
     Window(MainWindow *mw, const QString &imagePath, const QString &modelPath, PointsMatchRelation &releation);
     ~Window();
 
+    QSize sizeHint() const Q_DECL_OVERRIDE;
+
 protected:
     void keyPressEvent(QKeyEvent *event) Q_DECL_OVERRIDE;
     void closeEvent(QCloseEvent * event) Q_DECL_OVERRIDE;
@@ -70,17 +72,22 @@ private slots:
     void dockUndock();
     void align();
     void confirm();
+    void clearPressed();
 
 private:
-    QSlider *createSlider();
-
+    QSlider *scaleSlider;
     ImageAndPoint *left;
     GLWidget *right;
     QPushButton *dockBtn;
     QPushButton *alignBtn;
     QPushButton *confirmBtn;
+    QPushButton *clearBtn;
     MainWindow *mainWindow;
     PointsMatchRelation &relation;
+
+    QString m_modelpath;
+    QString m_imagepath;
+    int m_iwidth, m_iheight;
 
 };
 

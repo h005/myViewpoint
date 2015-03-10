@@ -33,6 +33,7 @@ ImageAndPoint::ImageAndPoint(const QString &imagePath, PointsMatchRelation &rela
     setBackgroundRole(QPalette::Base);
     setScaledContents(true);
     setStyleSheet("border: 1px solid black");
+    redisplay();
 
     // 取消内边框
     setContentsMargins(0, 0, 0, 0);

@@ -16,6 +16,7 @@ public:
     ~ImageAndPoint();
     int addPoint(const QPoint &p);
     bool removePoint();
+    void redisplay();
 
 signals:
 
@@ -23,7 +24,6 @@ public slots:
 private:
     QImage *image;
     PointsMatchRelation &relation;
-    void redisplay();
 };
 
 #endif // IMAGEANDPOINT_H

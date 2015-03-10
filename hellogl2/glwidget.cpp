@@ -56,11 +56,11 @@ GLWidget::GLWidget(PointsMatchRelation &relation, const QString &modelPath, QWid
     : QOpenGLWidget(parent),
       relation(relation),
       m_angle(0),
+      m_scale(1),
       m_rotateN(1.f),
       m_baseRotate(1.f),
       m_sphereProgramID(0)
 {
-    m_core = QCoreApplication::arguments().contains(QStringLiteral("--coreprofile"));
     // --transparent causes the clear color to be transparent. Therefore, on systems that
     // support it, the widget will become transparent apart from the logo.
     m_transparent = QCoreApplication::arguments().contains(QStringLiteral("--transparent"));
@@ -71,7 +71,6 @@ GLWidget::GLWidget(PointsMatchRelation &relation, const QString &modelPath, QWid
 
 GLWidget::~GLWidget()
 {
-    std::cout << "GLWidget clean" << std::endl;
     cleanup();
 }
 
@@ -142,7 +141,7 @@ void GLWidget::paintGL()
     // 默认开启背面剔除:GL_CULL_FACE
 
     // 计算modelView矩阵
-    glm::mat4 modelViewMatrix = m_camera * glm::rotate(glm::mat4(1.f), m_angle, m_rotateN) * m_baseRotate;
+    glm::mat4 modelViewMatrix = getModelViewMatrix();
 
     // 绘制模型
     model.drawNormalizedModel(modelViewMatrix, m_proj);
@@ -202,6 +201,14 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
     update();
 }
 
+glm::mat4 GLWidget::getModelViewMatrix()
+{
+    return (m_camera
+            * glm::scale(glm::mat4(1.f), glm::vec3(m_scale, m_scale, m_scale))
+            * glm::rotate(glm::mat4(1.f), m_angle, m_rotateN)
+            * m_baseRotate);
+}
+
 int GLWidget::addPoint(const QPoint &p) {
     makeCurrent();
 
@@ -218,7 +225,7 @@ int GLWidget::addPoint(const QPoint &p) {
     glReadBuffer(GL_BACK);
     glReadPixels(x,int(realy),1,1,GL_DEPTH_COMPONENT,GL_FLOAT,&winZ);
     if (winZ < 1 - 1e-5) {
-        glm::mat4 modelViewMatrix = m_camera * m_baseRotate;
+        glm::mat4 modelViewMatrix = getModelViewMatrix();
         glm::dmat4 mvDouble, projDouble;
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 4; j++) {
@@ -243,4 +250,9 @@ bool GLWidget::removeLastPoint() {
         return true;
     } else
         return false;
+}
+
+void GLWidget::setModelScale(int angle) {
+    m_scale = 1 + angle / 60.f;
+    update();
 }

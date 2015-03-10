@@ -13,8 +13,8 @@ Sphere::Sphere()
     m_vboVertex = 0;
     m_vboIndex = 0;
 
-    lats = 40;
-    longs = 40;
+    lats = 20;
+    longs = 20;
 }
 
 Sphere::~Sphere()

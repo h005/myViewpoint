@@ -8,7 +8,8 @@ HEADERS       = glwidget.h \
     imageandpoint.h \
     shader.hpp \
     pointsmatchrelation.h \
-    sphere.h
+    sphere.h \
+    alignresultwidget.h
 SOURCES       = glwidget.cpp \
                 main.cpp \
                 window.cpp \
@@ -20,7 +21,8 @@ SOURCES       = glwidget.cpp \
     imageandpoint.cpp \
     shader.cpp \
     pointsmatchrelation.cpp \
-    sphere.cpp
+    sphere.cpp \
+    alignresultwidget.cpp
 
 QT           += widgets
 

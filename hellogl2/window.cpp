@@ -54,21 +54,35 @@
 
 #include "imageandpoint.h"
 #include "pointsmatchrelation.h"
+#include "alignresultwidget.h"
 
 Window::Window(MainWindow *mw, const QString &imagePath, const QString &modelPath, PointsMatchRelation &relation)
-    : mainWindow(mw), relation(relation)
+    : mainWindow(mw), relation(relation),
+      m_modelpath(modelPath), m_imagepath(imagePath)
 {
+    QImage img(imagePath);
+    m_iwidth = img.width();
+    m_iheight = img.height();
+
     right = new GLWidget(relation, modelPath, this);
     left = new ImageAndPoint(imagePath, relation, this);
     dockBtn = new QPushButton(tr("Undock"), this);
     alignBtn = new QPushButton(tr("Align && See"), this);
     confirmBtn = new QPushButton(tr("Confirm && Uplevel"), this);
+    clearBtn = new QPushButton(tr("Clear"), this);
+
+    scaleSlider = new QSlider(Qt::Vertical);
+    scaleSlider->setRange(0, 80);
+    scaleSlider->setTickPosition(QSlider::TicksRight);
 
     connect(dockBtn, SIGNAL(clicked()), this, SLOT(dockUndock()));
     connect(alignBtn, SIGNAL(clicked()), this, SLOT(align()));
     connect(confirmBtn, SIGNAL(clicked()), this, SLOT(confirm()));
+    connect(clearBtn, SIGNAL(clicked()), this, SLOT(clearPressed()));
+    connect(scaleSlider, SIGNAL(valueChanged(int)), right, SLOT(setModelScale(int)));
 
-    QSizePolicy cellPolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+
+    QSizePolicy cellPolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
     cellPolicy.setHorizontalStretch(1);
     left->setSizePolicy(cellPolicy);
     right->setSizePolicy(cellPolicy);
@@ -77,6 +91,8 @@ Window::Window(MainWindow *mw, const QString &imagePath, const QString &modelPat
     QVBoxLayout *middleLayout = new QVBoxLayout;
     middleLayout->addWidget(alignBtn);
     middleLayout->addWidget(confirmBtn);
+    middleLayout->addWidget(clearBtn);
+    middleLayout->addWidget(scaleSlider);
     QWidget *middle = new QWidget;
     middle->setLayout(middleLayout);
 
@@ -100,15 +116,9 @@ Window::~Window()
 {
 }
 
-QSlider *Window::createSlider()
+QSize Window::sizeHint() const
 {
-    QSlider *slider = new QSlider(Qt::Vertical);
-    slider->setRange(0, 360 * 16);
-    slider->setSingleStep(16);
-    slider->setPageStep(15 * 16);
-    slider->setTickInterval(15 * 16);
-    slider->setTickPosition(QSlider::TicksRight);
-    return slider;
+    return QSize(1024, 768);
 }
 
 void Window::keyPressEvent(QKeyEvent *e)
@@ -189,10 +199,23 @@ void Window::dockUndock()
 
 void Window::align()
 {
-    std::cout << "align" << std::endl;
+    AlignResultWidget *window = new AlignResultWidget(relation, m_modelpath, m_iwidth, m_iheight, 0);
+    window->show();
 }
 
 void Window::confirm()
 {
-    std::cout << "confirm" << std::endl;
+    if (relation.saveToFile()) {
+        std::cout << "saved" << std::endl;
+    } else {
+        std::cout << "failed" << std::endl;
+    }
+}
+
+void Window::clearPressed()
+{
+    relation.getPoints2d().clear();
+    relation.getPoints3d().clear();
+    left->redisplay();
+    right->update();
 }
