@@ -9,7 +9,9 @@ HEADERS       = glwidget.h \
     shader.hpp \
     pointsmatchrelation.h \
     sphere.h \
-    alignresultwidget.h
+    alignresultwidget.h \
+    entity.h \
+    entitymanager.h
 SOURCES       = glwidget.cpp \
                 main.cpp \
                 window.cpp \
@@ -22,7 +24,9 @@ SOURCES       = glwidget.cpp \
     shader.cpp \
     pointsmatchrelation.cpp \
     sphere.cpp \
-    alignresultwidget.cpp
+    alignresultwidget.cpp \
+    entity.cpp \
+    entitymanager.cpp
 
 QT           += widgets
 
