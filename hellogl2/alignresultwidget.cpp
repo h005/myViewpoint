@@ -54,12 +54,14 @@ AlignResultWidget::~AlignResultWidget()
 
 QSize AlignResultWidget::minimumSizeHint() const
 {
-    return QSize(m_iwidth, m_iheight);
+    float scale = m_iwidth * 1.f / m_iheight;
+    return QSize((int)(720 * scale), 720);
 }
 
 QSize AlignResultWidget::sizeHint() const
 {
-    return QSize(m_iwidth, m_iheight);
+    float scale = m_iwidth * 1.f / m_iheight;
+    return QSize((int)(720 * scale), 720);
 }
 
 void AlignResultWidget::paintGL()
