@@ -6,7 +6,7 @@
 
 class AlignResultWidget: public GLWidget {
 public:
-    AlignResultWidget(PointsMatchRelation *m_relation, const QString &modelPath, int iwidth, int iheight, QWidget *parent = 0);
+    AlignResultWidget(const QString &modelPath, float imgRatio, const glm::mat4 &mvMatrix, const glm::mat4 &projMatrix, QWidget *parent = 0);
     ~AlignResultWidget();
 
     QSize minimumSizeHint() const Q_DECL_OVERRIDE;
@@ -17,7 +17,7 @@ protected:
 
 protected:
     glm::mat4 m_customProj, m_customMV;
-    int m_iwidth, m_iheight;
+    float m_imgRatio;
 };
 
 #endif // ALIGNRESULTWIDGET_H

@@ -9,20 +9,13 @@
 #include "DLT.h"
 #include "pointsmatchrelation.h"
 
-AlignResultWidget::AlignResultWidget(PointsMatchRelation *relation, const QString &modelPath, int iwidth, int iheight, QWidget *parent):
+AlignResultWidget::AlignResultWidget(const QString &modelPath, float imgRatio, const glm::mat4 &mvMatrix, const glm::mat4 &projMatrix, QWidget *parent):
     GLWidget(modelPath, parent),
-    m_iheight(iheight),
-    m_iwidth(iwidth)
+    m_customMV(mvMatrix),
+    m_customProj(projMatrix),
+    m_imgRatio(imgRatio)
 {
     setWindowTitle(tr("Aligned Result"));
-
-    std::vector<glm::vec2> &points2d = relation->getPoints2d();
-    std::vector<glm::vec3> &points3d = relation->getPoints3d();
-
-    assert(points2d.size() >= 6);
-    assert(points2d.size() == points3d.size());
-    // 由点的匹配信息求出视图变换矩阵和投影矩阵
-    DLTwithPoints(points2d.size(), (float(*)[2])&points2d[0], (float(*)[3])&points3d[0], m_iwidth, m_iheight, m_customMV, m_customProj);
 }
 
 AlignResultWidget::~AlignResultWidget()
@@ -32,14 +25,12 @@ AlignResultWidget::~AlignResultWidget()
 
 QSize AlignResultWidget::minimumSizeHint() const
 {
-    float scale = m_iwidth * 1.f / m_iheight;
-    return QSize((int)(720 * scale), 720);
+    return QSize((int)(720 * m_imgRatio), 720);
 }
 
 QSize AlignResultWidget::sizeHint() const
 {
-    float scale = m_iwidth * 1.f / m_iheight;
-    return QSize((int)(720 * scale), 720);
+    return QSize((int)(720 * m_imgRatio), 720);
 }
 
 void AlignResultWidget::paintGL()
