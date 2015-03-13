@@ -380,3 +380,38 @@ void phase3GenerateLookAtAndProjection(const cv::Mat &modelView, const cv::Mat &
 	projection = constructProjectionMatrix(K, 0.1, 10, iwidth, iheight);
 	assert(verifyModelViewMatrix(modelView));
 }
+
+void DLTwithPoints(
+        int matchnum,
+        float points2d[][2],
+        float points3d[][3],
+        int imgWidth,
+        int imgHeight,
+        glm::mat4 &mvMatrix,
+        glm::mat4 &projMatrix) {
+    assert(matchnum >= 6);
+    // 第一阶段, 用点对得到P
+    cv::Mat P = phase1CalculateP(matchnum, matchnum, (float(*)[2])&points2d[0], (float(*)[3])&points3d[0]);
+
+    // 第二阶段
+    // 从P中分解出 K * [R t]
+    // 由[R t]可以得到lookat的参数，由K可以构造GL_PROJECTION_MATRIX
+    cv::Mat modelView, K;
+    phase2ExtractParametersFromP(P, modelView, K);
+
+    cv::Mat proj;
+    cv::Mat lookAtParams;
+    phase3GenerateLookAtAndProjection(modelView, K, imgWidth, imgHeight, lookAtParams, proj);
+
+    glm::vec3 eye = glm::vec3(lookAtParams.at<float>(0, 0), lookAtParams.at<float>(1, 0), lookAtParams.at<float>(2, 0));
+    glm::vec3 center = glm::vec3(lookAtParams.at<float>(0, 1), lookAtParams.at<float>(1, 1), lookAtParams.at<float>(2, 1));
+    glm::vec3 updir = glm::vec3(lookAtParams.at<float>(0, 2), lookAtParams.at<float>(1, 2), lookAtParams.at<float>(2, 2));
+    // 在物体坐标系（世界坐标系）中摆放照相机和它的朝向
+    mvMatrix = glm::lookAt(eye, center, updir);
+    // 使用生成的OpenGL投影矩阵
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++) {
+            projMatrix[j][i] = proj.at<float>(i, j);
+        }
+    }
+}

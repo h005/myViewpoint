@@ -55,6 +55,8 @@ bool EntityManager::load()
             }
         }
 
+        // TODO:
+        // read image's width and height
         entity.f = input[0][0];
         entity.K1 = input[0][1];
         entity.K2 = input[0][2];

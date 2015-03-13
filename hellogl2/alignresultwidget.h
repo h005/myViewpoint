@@ -6,7 +6,7 @@
 
 class AlignResultWidget: public GLWidget {
 public:
-    AlignResultWidget(PointsMatchRelation &relation, const QString &modelPath, int iwidth, int iheight, QWidget *parent = 0);
+    AlignResultWidget(PointsMatchRelation *m_relation, const QString &modelPath, int iwidth, int iheight, QWidget *parent = 0);
     ~AlignResultWidget();
 
     QSize minimumSizeHint() const Q_DECL_OVERRIDE;

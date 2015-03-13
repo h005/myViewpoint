@@ -59,7 +59,7 @@ class GLWidget : public QOpenGLWidget, protected QOpenGLFunctions
     Q_OBJECT
 
 public:
-    GLWidget(PointsMatchRelation &relation, const QString &modelPath, QWidget *parent = 0);
+    GLWidget(const QString &modelPath, QWidget *parent = 0);
     ~GLWidget();
 
     QSize minimumSizeHint() const Q_DECL_OVERRIDE;
@@ -67,8 +67,10 @@ public:
     int addPoint(const QPoint &p);
     bool removeLastPoint();
 
+    PointsMatchRelation *m_relation;
+
 public slots:
-    void cleanup();
+    virtual void cleanup();
     void setModelScale(int angle);
 
 signals:
@@ -86,7 +88,6 @@ protected:
     GModel model;
     glm::mat4 m_proj;
     glm::mat4 m_camera;
-    PointsMatchRelation &relation;
     glm::mat4 m_baseRotate;
     glm::vec3 m_rotateN;
     float m_angle;

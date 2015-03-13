@@ -45,6 +45,8 @@
 #include <QMenu>
 #include <QMessageBox>
 #include "pointsmatchrelation.h"
+#include "entitymanager.h"
+#include "custom.h"
 
 MainWindow::MainWindow()
 {
@@ -61,6 +63,9 @@ MainWindow::MainWindow()
 
 void MainWindow::onAddNew()
 {
+    EntityManager manager(QString("D:\\testcase"));
+    std::cout << manager.load() << std::endl;
+
     if (!centralWidget()) {
         PointsMatchRelation *relation = new PointsMatchRelation(QString("D:\\a.txt"));
         if (!relation->loadFromFile()) {
@@ -71,4 +76,5 @@ void MainWindow::onAddNew()
     }
     else
         QMessageBox::information(0, tr("Cannot add new window"), tr("Already occupied. Undock first."));
+
 }

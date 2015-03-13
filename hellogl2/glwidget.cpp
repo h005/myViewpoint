@@ -52,9 +52,9 @@
 #include "pointsmatchrelation.h"
 #include "shader.hpp"
 
-GLWidget::GLWidget(PointsMatchRelation &relation, const QString &modelPath, QWidget *parent)
+GLWidget::GLWidget(const QString &modelPath, QWidget *parent)
     : QOpenGLWidget(parent),
-      relation(relation),
+      m_relation(NULL),
       m_angle(0),
       m_scale(1),
       m_rotateN(1.f),
@@ -147,7 +147,7 @@ void GLWidget::paintGL()
     model.drawNormalizedModel(modelViewMatrix, m_proj);
 
     // 绘制模型上被选择的点
-    std::vector<glm::vec3> &points = relation.getPoints3d();
+    std::vector<glm::vec3> &points = m_relation->getPoints3d();
     if (points.size() > 0) {
         glUseProgram(m_sphereProgramID);
         GLuint projMatrixID = glGetUniformLocation(m_sphereProgramID, "projMatrix");
@@ -212,7 +212,7 @@ glm::mat4 GLWidget::getModelViewMatrix()
 int GLWidget::addPoint(const QPoint &p) {
     makeCurrent();
 
-    std::vector<glm::vec3> &points = relation.getPoints3d();
+    std::vector<glm::vec3> &points = m_relation->getPoints3d();
     GLfloat x = p.x();
     GLfloat y = p.y();
 
@@ -243,7 +243,7 @@ int GLWidget::addPoint(const QPoint &p) {
 }
 
 bool GLWidget::removeLastPoint() {
-    std::vector<glm::vec3> &points = relation.getPoints3d();
+    std::vector<glm::vec3> &points = m_relation->getPoints3d();
     if (points.size() > 0) {
         points.pop_back();
         update();

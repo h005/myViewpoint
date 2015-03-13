@@ -14,6 +14,7 @@ public:
     QString path;
     glm::mat4 mvMatrix;
     float f, K1, K2;
+    int iwidth, iheight;
 };
 
 #endif // ENTITY_H

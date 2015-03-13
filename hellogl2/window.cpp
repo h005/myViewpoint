@@ -55,6 +55,8 @@
 #include "imageandpoint.h"
 #include "pointsmatchrelation.h"
 #include "alignresultwidget.h"
+#include "camerashowwidget.h"
+#include "DLT.h"
 
 Window::Window(MainWindow *mw, const QString &imagePath, const QString &modelPath, PointsMatchRelation &relation)
     : mainWindow(mw), relation(relation),
@@ -64,7 +66,9 @@ Window::Window(MainWindow *mw, const QString &imagePath, const QString &modelPat
     m_iwidth = img.width();
     m_iheight = img.height();
 
-    right = new GLWidget(relation, modelPath, this);
+    right = new GLWidget(modelPath, this);
+    right->m_relation = &relation;
+
     left = new ImageAndPoint(imagePath, relation, this);
     dockBtn = new QPushButton(tr("Undock"), this);
     alignBtn = new QPushButton(tr("Align && See"), this);
@@ -199,8 +203,15 @@ void Window::dockUndock()
 
 void Window::align()
 {
-    AlignResultWidget *window = new AlignResultWidget(relation, m_modelpath, m_iwidth, m_iheight, 0);
-    window->show();
+    AlignResultWidget *a = new AlignResultWidget(&relation, m_modelpath, m_iwidth, m_iheight, 0);
+    a->show();
+
+    glm::mat4 mvMatrix, projMatrix;
+    std::vector<glm::vec2> &points2d = relation.getPoints2d();
+    std::vector<glm::vec3> &points3d = relation.getPoints3d();
+    DLTwithPoints(points2d.size(), (float(*)[2])&points2d[0], (float(*)[3])&points3d[0], m_iwidth, m_iheight, mvMatrix, projMatrix);
+    CameraShowWidget *b = new CameraShowWidget(m_modelpath, m_iwidth * 1.f / m_iheight, mvMatrix, 0);
+    b->show();
 }
 
 void Window::confirm()

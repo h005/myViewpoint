@@ -9,42 +9,20 @@
 #include "DLT.h"
 #include "pointsmatchrelation.h"
 
-AlignResultWidget::AlignResultWidget(PointsMatchRelation &relation, const QString &modelPath, int iwidth, int iheight, QWidget *parent):
-    GLWidget(relation, modelPath, parent),
+AlignResultWidget::AlignResultWidget(PointsMatchRelation *relation, const QString &modelPath, int iwidth, int iheight, QWidget *parent):
+    GLWidget(modelPath, parent),
     m_iheight(iheight),
     m_iwidth(iwidth)
 {
     setWindowTitle(tr("Aligned Result"));
 
-    std::vector<glm::vec2> &points2d = relation.getPoints2d();
-    std::vector<glm::vec3> &points3d = relation.getPoints3d();
+    std::vector<glm::vec2> &points2d = relation->getPoints2d();
+    std::vector<glm::vec3> &points3d = relation->getPoints3d();
 
     assert(points2d.size() >= 6);
     assert(points2d.size() == points3d.size());
-    // 第一阶段, 用点对得到P
-    cv::Mat P = phase1CalculateP(points2d.size(), points3d.size(), (float(*)[2])&points2d[0], (float(*)[3])&points3d[0]);
-
-    // 第二阶段
-    // 从P中分解出 K * [R t]
-    // 由[R t]可以得到lookat的参数，由K可以构造GL_PROJECTION_MATRIX
-    cv::Mat modelView, K;
-    phase2ExtractParametersFromP(P, modelView, K);
-
-    cv::Mat projMatrix;
-    cv::Mat lookAtParams;
-    phase3GenerateLookAtAndProjection(modelView, K, m_iwidth, m_iheight, lookAtParams, projMatrix);
-
-    glm::vec3 eye = glm::vec3(lookAtParams.at<float>(0, 0), lookAtParams.at<float>(1, 0), lookAtParams.at<float>(2, 0));
-    glm::vec3 center = glm::vec3(lookAtParams.at<float>(0, 1), lookAtParams.at<float>(1, 1), lookAtParams.at<float>(2, 1));
-    glm::vec3 updir = glm::vec3(lookAtParams.at<float>(0, 2), lookAtParams.at<float>(1, 2), lookAtParams.at<float>(2, 2));
-    // 在物体坐标系（世界坐标系）中摆放照相机和它的朝向
-    m_customMV = glm::lookAt(eye, center, updir);
-    // 使用生成的OpenGL投影矩阵
-    for (int i = 0; i < 4; i++) {
-        for (int j = 0; j < 4; j++) {
-            m_customProj[j][i] = projMatrix.at<float>(i, j);
-        }
-    }
+    // 由点的匹配信息求出视图变换矩阵和投影矩阵
+    DLTwithPoints(points2d.size(), (float(*)[2])&points2d[0], (float(*)[3])&points3d[0], m_iwidth, m_iheight, m_customMV, m_customProj);
 }
 
 AlignResultWidget::~AlignResultWidget()

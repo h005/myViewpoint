@@ -11,7 +11,9 @@ HEADERS       = glwidget.h \
     sphere.h \
     alignresultwidget.h \
     entity.h \
-    entitymanager.h
+    entitymanager.h \
+    camerashowwidget.h \
+    axis.h
 SOURCES       = glwidget.cpp \
                 main.cpp \
                 window.cpp \
@@ -26,7 +28,9 @@ SOURCES       = glwidget.cpp \
     sphere.cpp \
     alignresultwidget.cpp \
     entity.cpp \
-    entitymanager.cpp
+    entitymanager.cpp \
+    camerashowwidget.cpp \
+    axis.cpp
 
 QT           += widgets
 
