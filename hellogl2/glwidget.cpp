@@ -201,6 +201,16 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
     update();
 }
 
+void GLWidget::wheelEvent(QWheelEvent *event)
+{
+    m_scale += event->delta() / (120.f * 50);
+    if (m_scale < 1)
+        m_scale = 1;
+    if (m_scale > 3)
+        m_scale = 3;
+    update();
+}
+
 glm::mat4 GLWidget::getModelViewMatrix()
 {
     return (m_camera
@@ -250,9 +260,4 @@ bool GLWidget::removeLastPoint() {
         return true;
     } else
         return false;
-}
-
-void GLWidget::setModelScale(int angle) {
-    m_scale = 1 + angle / 60.f;
-    update();
 }

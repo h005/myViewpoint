@@ -75,7 +75,6 @@ private slots:
     void clearPressed();
 
 private:
-    QSlider *scaleSlider;
     ImageAndPoint *left;
     GLWidget *right;
     QPushButton *dockBtn;

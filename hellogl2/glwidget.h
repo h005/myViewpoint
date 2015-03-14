@@ -71,7 +71,6 @@ public:
 
 public slots:
     virtual void cleanup();
-    void setModelScale(int angle);
 
 signals:
 
@@ -82,6 +81,7 @@ protected:
     void mousePressEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
     void mouseReleaseEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
     void mouseMoveEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
+    void wheelEvent (QWheelEvent * event) Q_DECL_OVERRIDE;
 
 protected:
     glm::mat4 getModelViewMatrix();

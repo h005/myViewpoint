@@ -75,15 +75,10 @@ Window::Window(MainWindow *mw, const QString &imagePath, const QString &modelPat
     confirmBtn = new QPushButton(tr("Confirm && Uplevel"), this);
     clearBtn = new QPushButton(tr("Clear"), this);
 
-    scaleSlider = new QSlider(Qt::Vertical);
-    scaleSlider->setRange(0, 80);
-    scaleSlider->setTickPosition(QSlider::TicksRight);
-
     connect(dockBtn, SIGNAL(clicked()), this, SLOT(dockUndock()));
     connect(alignBtn, SIGNAL(clicked()), this, SLOT(align()));
     connect(confirmBtn, SIGNAL(clicked()), this, SLOT(confirm()));
     connect(clearBtn, SIGNAL(clicked()), this, SLOT(clearPressed()));
-    connect(scaleSlider, SIGNAL(valueChanged(int)), right, SLOT(setModelScale(int)));
 
 
     QSizePolicy cellPolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
@@ -96,7 +91,6 @@ Window::Window(MainWindow *mw, const QString &imagePath, const QString &modelPat
     middleLayout->addWidget(alignBtn);
     middleLayout->addWidget(confirmBtn);
     middleLayout->addWidget(clearBtn);
-    middleLayout->addWidget(scaleSlider);
     QWidget *middle = new QWidget;
     middle->setLayout(middleLayout);
 
