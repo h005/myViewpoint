@@ -61,7 +61,10 @@ bool EntityManager::load()
         entity.K1 = input[0][1];
         entity.K2 = input[0][2];
         entity.mvMatrix = giveMVMatrix(input);
-        container[entityName] = entity;
+        // some image don't have estimated camera parameters
+        if (entity.f > 1e-5) {
+            container[entityName] = entity;
+        }
     }
     listFile.close();
     bundleFile.close();
