@@ -11,6 +11,7 @@ public:
     EntityManager(const QString &basedir);
     ~EntityManager();
     bool load();
+    bool getEntity(const QString &key, Entity &out);
 
 private:
     static glm::mat4 giveMVMatrix(float input[5][3]);

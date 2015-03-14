@@ -68,22 +68,31 @@ bool EntityManager::load()
     return true;
 }
 
+bool EntityManager::getEntity(const QString &key, Entity &out)
+{
+    std::map<QString, Entity>::iterator it = container.find(key);
+    if (it != container.end()) {
+        out = it->second;
+        return true;
+    } else {
+        return false;
+    }
+}
+
 glm::mat4 EntityManager::giveMVMatrix(float input[][3])
 {
-    // firstly, consider matrix as row major
     glm::mat4 matrix(1.f);
-    // fectch rotation
+    // fetch rotation
     for (int i = 0; i < 3; i++) {
         for (int j = 0; j < 3; j++) {
-            matrix[i][j] = input[i][j];
+            matrix[j][i] = input[i + 1][j];
         }
     }
     // fetch translate
-    matrix[0][3] = input[4][0];
-    matrix[1][3] = input[4][1];
-    matrix[2][3] = input[4][2];
+    matrix[3][0] = input[4][0];
+    matrix[3][1] = input[4][1];
+    matrix[3][2] = input[4][2];
 
-    // secondly, return a column major matrix
-    return glm::transpose(matrix);
+    return matrix;
 }
 
