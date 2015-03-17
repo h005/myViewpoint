@@ -168,7 +168,7 @@ void GLWidget::paintGL()
 
 void GLWidget::resizeGL(int w, int h)
 {
-    m_proj = glm::perspective(45.0f, GLfloat(w) / h, 0.01f, 100.0f);
+    m_proj = glm::perspective(glm::pi<float>() / 3, GLfloat(w) / h, 0.01f, 100.0f);
 }
 
 void GLWidget::mousePressEvent(QMouseEvent *event)
@@ -206,8 +206,8 @@ void GLWidget::wheelEvent(QWheelEvent *event)
     m_scale += event->delta() / (120.f * 50);
     if (m_scale < 1)
         m_scale = 1;
-    if (m_scale > 3)
-        m_scale = 3;
+    if (m_scale > 5)
+        m_scale = 5;
     update();
 }
 

@@ -48,6 +48,8 @@
 #include "entitymanager.h"
 #include "custom.h"
 
+EntityManager manager(QString("D:\\testcase"));
+
 MainWindow::MainWindow()
 {
     QMenuBar *menuBar = new QMenuBar;
@@ -63,8 +65,9 @@ MainWindow::MainWindow()
 
 void MainWindow::onAddNew()
 {
-    EntityManager manager(QString("D:\\testcase"));
+
     std::cout << manager.load() << std::endl;
+    testCustom();
 
     if (!centralWidget()) {
         PointsMatchRelation *relation = new PointsMatchRelation(QString("D:\\a.txt"));

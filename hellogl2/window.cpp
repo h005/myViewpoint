@@ -51,12 +51,21 @@
 #include <QDesktopWidget>
 #include <QApplication>
 #include <QMessageBox>
+#include <glm/gtc/matrix_inverse.hpp>
+#include <glm/gtc/type_ptr.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/string_cast.hpp>
 
 #include "imageandpoint.h"
 #include "pointsmatchrelation.h"
 #include "alignresultwidget.h"
 #include "camerashowwidget.h"
 #include "DLT.h"
+#include "entitymanager.h"
+#include "entity.h"
+#include "custom.h"
+
+extern EntityManager manager;
 
 Window::Window(MainWindow *mw, const QString &imagePath, const QString &modelPath, PointsMatchRelation &relation)
     : mainWindow(mw), relation(relation),
@@ -204,11 +213,44 @@ void Window::align()
     std::vector<glm::vec3> &points3d = relation.getPoints3d();
     DLTwithPoints(points2d.size(), (float(*)[2])&points2d[0], (float(*)[3])&points3d[0], m_iwidth, m_iheight, mvMatrix, projMatrix);
 
-    AlignResultWidget *a = new AlignResultWidget(m_modelpath, m_iwidth * 1.f / m_iheight, mvMatrix, projMatrix, 0);
-    a->show();
-    \
-    CameraShowWidget *b = new CameraShowWidget(m_modelpath, m_iwidth * 1.f / m_iheight, mvMatrix, 0);
+    Entity base, want;
+    Q_ASSERT(manager.getEntity(QString("images/alex1961_2466374890.jpg"), base));
+    //Q_ASSERT(manager.getEntity(QString("images/al_9_1355240900.jpg"), want));
+    //Q_ASSERT(manager.getEntity(QString("images/alecea_2304877304.jpg"), want));
+    //Q_ASSERT(manager.getEntity(QString("images/32219531@N00_102756761.jpg"), want));
+    //Q_ASSERT(manager.getEntity(QString("images/8250661@N08_514024275.jpg"), want));
+    //Q_ASSERT(manager.getEntity(QString("images/cfuga_1435599238.jpg"), want));
+    //Q_ASSERT(manager.getEntity(QString("images/celesteh_102619571.jpg"), want));
+    //Q_ASSERT(manager.getEntity(QString("images/achtundsiebzig_196444302.jpg"), want));
+//    Q_ASSERT(manager.getEntity(QString("images/81596301@N00_248194737.jpg"), want));
+    Q_ASSERT(manager.getEntity(QString("images/58308412@N00_74499252.jpg"), want));
+//    Q_ASSERT(manager.getEntity(QString("images/_fxr_2223134257.jpg"), want));
+//    cc
+//    Q_ASSERT(manager.getEntity(QString("images/2pworth_50915720.jpg"), want));
+//    Q_ASSERT(manager.getEntity(QString("images/7437937@N06_428202066.jpg"), want));
+
+//    AlignResultWidget *a = new AlignResultWidget(m_modelpath, m_iwidth * 1.f / m_iheight, mvMatrix, projMatrix, 0);
+//    a->show();
+
+    glm::mat4 wantMVMatrix, wantProjMatrix;
+    recoveryCameraParameters(base, want, mvMatrix, projMatrix, wantMVMatrix, wantProjMatrix);
+    wantProjMatrix = glm::perspective(glm::pi<float>() / 2, m_iwidth * 1.f / m_iheight, 0.1f, 100.f);
+    CameraShowWidget *b = new CameraShowWidget(m_modelpath, m_iwidth * 1.f / m_iheight, wantMVMatrix, 0);
     b->show();
+
+    AlignResultWidget *a = new AlignResultWidget(m_modelpath, m_iwidth * 1.f / m_iheight, wantMVMatrix, wantProjMatrix, 0);
+    a->show();
+
+    {
+    glm::vec4 a(1.f, 0.f, 0.f, 0.f), b(0.f, 1.f, 0.f, 0.f), c(0.f, 0.f, 1.f, 0.f);
+    glm::vec4 aa = wantMVMatrix * a, bb = wantMVMatrix * b, cc = wantMVMatrix * c;
+    //glm::vec4 aa = base.mvMatrix * a, bb = base.mvMatrix * b, cc = base.mvMatrix * c;
+    //glm::vec4 aa = mvMatrix * a, bb = mvMatrix * b, cc = mvMatrix * c;
+    std::cout << glm::to_string(want.mvMatrix) << std::endl;
+    std::cout << glm::dot(glm::vec3(aa), glm::vec3(bb)) << std::endl;
+    std::cout << glm::dot(glm::vec3(cc), glm::vec3(bb)) << std::endl;
+    std::cout << glm::dot(glm::vec3(aa), glm::vec3(cc)) << std::endl;
+    }
 }
 
 void Window::confirm()

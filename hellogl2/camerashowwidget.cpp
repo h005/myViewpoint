@@ -43,7 +43,7 @@ void CameraShowWidget::paintGL()
     // 默认开启背面剔除:GL_CULL_FACE
 
     // 计算modelView矩阵
-    glm::mat4 modelViewMatrix = glm::scale(getModelViewMatrix(), glm::vec3(0.5, 0.5, 0.5));
+    glm::mat4 modelViewMatrix = glm::scale(getModelViewMatrix(), glm::vec3(0.3, 0.3, 0.3));
 
     // 绘制模型
     model.drawNormalizedModel(modelViewMatrix, m_proj);

@@ -48,9 +48,12 @@ void recoveryLookAtWithModelView(
     // |     | * |  | = | |
     // | 0 1 |   |1 |   |1|
     // 所以R * OC + t = 0，可以求出C在世界坐标系下的表示
-    eye = -glm::inverse(R) * t;
-    center = normalize(glm::inverse(R) * glm::vec3(0.f, 0.f, -1.f)) + eye;
-    up = glm::normalize(glm::inverse(R) * glm::vec3(0.f, 1.f, 0.f));
+    //
+    // 另外，由于旋转矩阵R是正交矩阵，所以R^(-1) = R^T
+    // 对正交矩阵用转置代替求逆能节省cpu资源
+    eye = -glm::transpose(R) * t;
+    center = normalize(glm::transpose(R) * glm::vec3(0.f, 0.f, -1.f)) + eye;
+    up = glm::normalize(glm::transpose(R) * glm::vec3(0.f, 1.f, 0.f));
 }
 
 glm::vec3 projection(
@@ -74,4 +77,11 @@ void testCustom() {
         glm::normalize(projection(a_up, a_center - a_eye))
         - glm::normalize(projection(up, center - eye)))
               << std::endl;
+
+    glm::mat4 mm(1.f);
+    glm::vec3 m1,m2,m3;
+    recoveryLookAtWithModelView(mm, m1, m2, m3);
+    std::cout << glm::to_string(m1) << std::endl;
+    std::cout << glm::to_string(m2) << std::endl;
+    std::cout << glm::to_string(m3) << std::endl;
 }
