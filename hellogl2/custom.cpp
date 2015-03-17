@@ -22,6 +22,7 @@ void recoveryCameraParameters(
         const glm::mat4 &baseAlignedProjMatrix,
         glm::mat4 &wantMVMatrix,
         glm::mat4 &wantProjMatrix) {
+    float c = 2.f;
     glm::mat3 R1 = glm::mat3(base.mvMatrix);
     glm::mat3 R2 = glm::mat3(want.mvMatrix);
     glm::mat3 Rd = glm::mat3(baseAlignedMVMatrix);
@@ -30,7 +31,7 @@ void recoveryCameraParameters(
     glm::vec3 td = glm::vec3(baseAlignedMVMatrix[3]);
 
     glm::mat3 R = R2 * glm::inverse(R1) * Rd;
-    glm::vec3 t = t2 + R2 * glm::inverse(R1) * (td - t1);
+    glm::vec3 t = (1/c) * t2 + R2 * glm::inverse(R1) * (td - t1 * (1/c));
     wantMVMatrix = glm::mat4(R);
     wantMVMatrix[3] = glm::vec4(t, 1.f);
 }
