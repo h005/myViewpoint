@@ -65,17 +65,17 @@ MainWindow::MainWindow()
 
 void MainWindow::onAddNew()
 {
-
     std::cout << manager.load() << std::endl;
-    testCustom();
 
     if (!centralWidget()) {
-        PointsMatchRelation *relation = new PointsMatchRelation(QString("D:\\a.txt"));
+        PointsMatchRelation *relation = new PointsMatchRelation(manager.baseOneImageRelation());
         if (!relation->loadFromFile()) {
             std::cout << "read failed" << std::endl;
         }
         std::cout << relation->getPoints2d().size() << std::endl;
-        setCentralWidget(new Window(this, QString("D:\\alex1961_2466374890.rd.jpg"), QString("D:\\no2\\models\\model.dae"), *relation));
+        setCentralWidget(new Window(this, manager.baseOneImagePath(), manager.modelPath(), *relation));
+        //setCentralWidget(new Window(this, QString("D:\\alex1961_2466374890.rd.jpg"), QString("D:\\no\\models\\untitled.dae"), *relation));
+//        setCentralWidget(new Window(this, QString("C:\\Users\\mzd\\Desktop\\NotreDame\\NotreDame\\images\\85428086@N00_231122289.jpg"), QString("D:\\no2\\models\\model.dae"), *relation));
     }
     else
         QMessageBox::information(0, tr("Cannot add new window"), tr("Already occupied. Undock first."));

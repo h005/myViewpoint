@@ -206,26 +206,17 @@ void Window::dockUndock()
 
 void Window::align()
 {
-
-
     glm::mat4 mvMatrix, projMatrix;
     std::vector<glm::vec2> &points2d = relation.getPoints2d();
     std::vector<glm::vec3> &points3d = relation.getPoints3d();
     DLTwithPoints(points2d.size(), (float(*)[2])&points2d[0], (float(*)[3])&points3d[0], m_iwidth, m_iheight, mvMatrix, projMatrix);
 
-    PointsMatchRelation *rb = new PointsMatchRelation(QString("D:\\c.txt"));
-    std::cout << rb->loadFromFile() << std::endl;
-    points2d = rb->getPoints2d();
-    points3d = rb->getPoints3d();
-    glm::mat4 aaMVMatrix, aaProjMatrix;
-    DLTwithPoints(points2d.size(), (float(*)[2])&points2d[0], (float(*)[3])&points3d[0], 1932, 2576, aaMVMatrix, aaProjMatrix);
-
     AlignResultWidget *a = new AlignResultWidget(m_modelpath, m_iwidth * 1.f / m_iheight, mvMatrix, projMatrix, 0);
     a->show();
 
-    Entity base, want, aa;
-    Q_ASSERT(manager.getEntity(QString("images/alex1961_2466374890.jpg"), base));
-    Q_ASSERT(manager.getEntity(QString("images/85428086@N00_231122289.jpg"), aa));
+    Entity base, second, want;
+    Q_ASSERT(manager.getEntity(manager.baseOneID(), base));
+    Q_ASSERT(manager.getEntity(manager.baseTwoID(), second));
 
     //Q_ASSERT(manager.getEntity(QString("images/alecea_2304877304.jpg"), want));
     //Q_ASSERT(manager.getEntity(QString("images/32219531@N00_102756761.jpg"), want));
@@ -235,8 +226,8 @@ void Window::align()
 //    Q_ASSERT(manager.getEntity(QString("images/81596301@N00_248194737.jpg"), want));
     // ok
 //    Q_ASSERT(manager.getEntity(QString("images/58308412@N00_74499252.jpg"), want));
-//    Q_ASSERT(manager.getEntity(QString("images/achtundsiebzig_196444302.jpg"), want));
-    Q_ASSERT(manager.getEntity(QString("images/7437937@N06_428202066.jpg"), want));
+    Q_ASSERT(manager.getEntity(QString("images/achtundsiebzig_196444302.jpg"), want));
+//    Q_ASSERT(manager.getEntity(QString("images/7437937@N06_428202066.jpg"), want));
 //    Q_ASSERT(manager.getEntity(QString("images/al_9_1355240900.jpg"), want));
 
 
@@ -245,10 +236,20 @@ void Window::align()
 //   Q_ASSERT(manager.getEntity(QString("images/2pworth_50915720.jpg"), want));
 //    Q_ASSERT(manager.getEntity(QString("images/celesteh_102619571.jpg"), want));
 
-    std::cout << "vv: " << recoveryScale(base, aa, mvMatrix, aaMVMatrix) << std::endl;
+    float scale;
+    {
+        PointsMatchRelation *rb = new PointsMatchRelation(manager.baseTwoImageRelation());
+        std::cout << rb->loadFromFile() << std::endl;
+        points2d = rb->getPoints2d();
+        points3d = rb->getPoints3d();
+        glm::mat4 secondMVMatrix, secondProjMatrix;
+        DLTwithPoints(points2d.size(), (float(*)[2])&points2d[0], (float(*)[3])&points3d[0], 1932, 2576, secondMVMatrix, secondProjMatrix);
+        scale = recoveryScale(base, second, mvMatrix, secondMVMatrix);
+    }
+
 
     glm::mat4 wantMVMatrix, wantProjMatrix;
-    recoveryCameraParameters(2.81793f, base, want, mvMatrix, projMatrix, wantMVMatrix, wantProjMatrix);
+    recoveryCameraParameters(scale, base, want, mvMatrix, projMatrix, wantMVMatrix, wantProjMatrix);
     wantProjMatrix = glm::perspective(glm::pi<float>() / 2, m_iwidth * 1.f / m_iheight, 0.1f, 100.f);
     CameraShowWidget *b = new CameraShowWidget(m_modelpath, m_iwidth * 1.f / m_iheight, wantMVMatrix, 0);
     b->show();
