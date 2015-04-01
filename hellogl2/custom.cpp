@@ -16,13 +16,13 @@
 using namespace std;
 
 void recoveryCameraParameters(
+        float c,
         Entity &base,
         Entity &want,
         const glm::mat4 &baseAlignedMVMatrix,
         const glm::mat4 &baseAlignedProjMatrix,
         glm::mat4 &wantMVMatrix,
         glm::mat4 &wantProjMatrix) {
-    float c = 2.f;
     glm::mat3 R1 = glm::mat3(base.mvMatrix);
     glm::mat3 R2 = glm::mat3(want.mvMatrix);
     glm::mat3 Rd = glm::mat3(baseAlignedMVMatrix);
@@ -30,10 +30,49 @@ void recoveryCameraParameters(
     glm::vec3 t2 = glm::vec3(want.mvMatrix[3]);
     glm::vec3 td = glm::vec3(baseAlignedMVMatrix[3]);
 
+    // DLT得到的相机坐标系和SfM得到的相机坐标系不是同一个系
+    // 假设它们的坐标之间存在一个缩放系数c
+    //
+    // 可以看到，缩放系数并不影响旋转矩阵，所以也不影响相机的朝向
+    // 相机的中心受c影响较大，尝试通过两个DLT来找到一个较好的c
     glm::mat3 R = R2 * glm::inverse(R1) * Rd;
     glm::vec3 t = (1/c) * t2 + R2 * glm::inverse(R1) * (td - t1 * (1/c));
     wantMVMatrix = glm::mat4(R);
     wantMVMatrix[3] = glm::vec4(t, 1.f);
+
+
+}
+
+static float scale(const glm::vec3 &A, const glm::vec3 &B) {
+    // 最小化目标
+    // 由于向量自身的点积大于等于0
+    // 所以要找到一个c，使得((1/c) * (1/c) * A'A + (2/c) * A'B + B'B)尽量小
+    float a = glm::dot(A, A);
+    float b = 2 * glm::dot(A, B);
+    float c = glm::dot(B, B);
+    // t = -b/2a, c = 1/t
+    return -2 * a / b;
+}
+
+float recoveryScale(
+        Entity &base,
+        Entity &want,
+        const glm::mat4 &baseAlignedMVMatrix,
+        const glm::mat4 &wantAlignedMVMatrix
+        ) {
+    glm::mat3 R1 = glm::mat3(base.mvMatrix);
+    glm::mat3 R2 = glm::mat3(want.mvMatrix);
+    glm::mat3 Rd = glm::mat3(baseAlignedMVMatrix);
+    glm::vec3 t1 = glm::vec3(base.mvMatrix[3]);
+    glm::vec3 t2 = glm::vec3(want.mvMatrix[3]);
+    glm::vec3 td = glm::vec3(baseAlignedMVMatrix[3]);
+
+    glm::vec3 tWanted = glm::vec3(wantAlignedMVMatrix[3]);
+
+    glm::vec3 A = t2 - R2 * glm::inverse(R1) * t1;
+    glm::vec3 B = R2 * glm::inverse(R1) * td - tWanted;
+
+    return scale(A, B);
 }
 
 void recoveryLookAtWithModelView(

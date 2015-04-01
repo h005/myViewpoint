@@ -280,7 +280,6 @@ void GModel::bindDataToGL() {
 	}
 
     recursive_create(scene, scene->mRootNode, glm::mat4());
-    std::cout << "Meshs: " << meshEntries.size() << std::endl;
 }
 
 
