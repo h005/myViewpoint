@@ -238,12 +238,16 @@ void Window::align()
 
     float scale;
     {
+        QImage img(manager.baseTwoImagePath());
+        int width = img.width();
+        int height = img.height();
+
         PointsMatchRelation *rb = new PointsMatchRelation(manager.baseTwoImageRelation());
         std::cout << rb->loadFromFile() << std::endl;
         points2d = rb->getPoints2d();
         points3d = rb->getPoints3d();
         glm::mat4 secondMVMatrix, secondProjMatrix;
-        DLTwithPoints(points2d.size(), (float(*)[2])&points2d[0], (float(*)[3])&points3d[0], 1932, 2576, secondMVMatrix, secondProjMatrix);
+        DLTwithPoints(points2d.size(), (float(*)[2])&points2d[0], (float(*)[3])&points3d[0], width, height, secondMVMatrix, secondProjMatrix);
         scale = recoveryScale(base, second, mvMatrix, secondMVMatrix);
     }
 
