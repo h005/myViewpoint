@@ -28,10 +28,10 @@ bool EntityManager::load()
     m_modelPath = QDir(m_basedir).filePath(settings.value("model/path").toString());
     // 读取两幅配准图像的信息
     m_baseOneID = settings.value("align/base_one_id").toString();
-    m_baseOneImagePath = QDir(m_basedir).filePath(settings.value("align/base_one_image").toString());
+    m_baseOneImagePath = QDir(m_basedir).filePath(m_baseOneID);
     m_baseOneImageRelation = QDir(m_basedir).filePath(settings.value("align/base_one_point").toString());
     m_baseTwoID = settings.value("align/base_two_id").toString();
-    m_baseTwoImagePath = QDir(m_basedir).filePath(settings.value("align/base_two_image").toString());
+    m_baseTwoImagePath = QDir(m_basedir).filePath(m_baseTwoID);
     m_baseTwoImageRelation = QDir(m_basedir).filePath(settings.value("align/base_two_point").toString());
 
     container.clear();
