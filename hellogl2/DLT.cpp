@@ -377,7 +377,7 @@ void phase3GenerateLookAtAndProjection(const cv::Mat &modelView, const cv::Mat &
 	cv::Mat md(4, 4, CV_32F, &m[0][0]);
 	md = md.t();*/
 
-	projection = constructProjectionMatrix(K, 0.1, 10, iwidth, iheight);
+    projection = constructProjectionMatrix(K, 0.1, 20, iwidth, iheight);
 	assert(verifyModelViewMatrix(modelView));
 }
 
@@ -398,6 +398,9 @@ void DLTwithPoints(
     // 由[R t]可以得到lookat的参数，由K可以构造GL_PROJECTION_MATRIX
     cv::Mat modelView, K;
     phase2ExtractParametersFromP(P, modelView, K);
+
+    std::cout << modelView << std::endl;
+    std::cout << K << std::endl;
 
     cv::Mat proj;
     cv::Mat lookAtParams;

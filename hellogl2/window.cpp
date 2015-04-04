@@ -217,25 +217,32 @@ void Window::align()
     Entity base, second, want;
     Q_ASSERT(manager.getEntity(manager.baseOneID(), base));
     Q_ASSERT(manager.getEntity(manager.baseTwoID(), second));
-    return;
 
-    //Q_ASSERT(manager.getEntity(QString("images/alecea_2304877304.jpg"), want));
-    //Q_ASSERT(manager.getEntity(QString("images/32219531@N00_102756761.jpg"), want));
-   // Q_ASSERT(manager.getEntity(QString("images/8250661@N08_514024275.jpg"), want));
-    //Q_ASSERT(manager.getEntity(QString("images/cfuga_1435599238.jpg"), want));
+//    zyns
+//    Q_ASSERT(manager.getEntity(QString("./img0075.jpg"), want));
+//    Q_ASSERT(manager.getEntity(QString("./img0613.jpg"), want));
+//    Q_ASSERT(manager.getEntity(QString("./img0777.jpg"), want));
+//    Q_ASSERT(manager.getEntity(QString("./img0819.jpg"), want));
+//    Q_ASSERT(manager.getEntity(QString("./img0820.jpg"), want));
+//    Q_ASSERT(manager.getEntity(QString("./img0834.jpg"), want));
+//    Q_ASSERT(manager.getEntity(QString("./img0832.jpg"), want));
 
+//    notre dame
+//    Q_ASSERT(manager.getEntity(QString("images/alecea_2304877304.jpg"), want));
+//    Q_ASSERT(manager.getEntity(QString("images/32219531@N00_102756761.jpg"), want));
+//    Q_ASSERT(manager.getEntity(QString("images/8250661@N08_514024275.jpg"), want));
+//    Q_ASSERT(manager.getEntity(QString("images/cfuga_1435599238.jpg"), want));
 //    Q_ASSERT(manager.getEntity(QString("images/81596301@N00_248194737.jpg"), want));
-    // ok
 //    Q_ASSERT(manager.getEntity(QString("images/58308412@N00_74499252.jpg"), want));
-    Q_ASSERT(manager.getEntity(QString("images/achtundsiebzig_196444302.jpg"), want));
+//    Q_ASSERT(manager.getEntity(QString("images/achtundsiebzig_196444302.jpg"), want));
 //    Q_ASSERT(manager.getEntity(QString("images/7437937@N06_428202066.jpg"), want));
 //    Q_ASSERT(manager.getEntity(QString("images/al_9_1355240900.jpg"), want));
-
-
 //    Q_ASSERT(manager.getEntity(QString("images/_fxr_2223134257.jpg"), want));
-//    cc
-//   Q_ASSERT(manager.getEntity(QString("images/2pworth_50915720.jpg"), want));
-//    Q_ASSERT(manager.getEntity(QString("images/celesteh_102619571.jpg"), want));
+//    Q_ASSERT(manager.getEntity(QString("images/2pworth_50915720.jpg"), want));
+    Q_ASSERT(manager.getEntity(QString("images/celesteh_102619571.jpg"), want));
+
+
+
 
     float scale;
     {
@@ -247,12 +254,24 @@ void Window::align()
         if (!rb->loadFromFile()) {
             return;
         }
-        points2d = rb->getPoints2d();
-        points3d = rb->getPoints3d();
+
+        // IMPORTANT!!
+        // reference variable don't support re-assign, 'operator =' will replace content(s)
+        // in the original vector
+        // ref http://stackoverflow.com/a/4364586/4104893
+        std::vector<glm::vec2> &points2d = rb->getPoints2d();
+        std::vector<glm::vec3> &points3d = rb->getPoints3d();
         glm::mat4 secondMVMatrix, secondProjMatrix;
         DLTwithPoints(points2d.size(), (float(*)[2])&points2d[0], (float(*)[3])&points3d[0], width, height, secondMVMatrix, secondProjMatrix);
         scale = recoveryScale(base, second, mvMatrix, secondMVMatrix);
+        std::cout << scale << std::endl;
+
+        std::cout << "aa" << std::endl;
+        std::cout << glm::to_string(mvMatrix) << std::endl;
+        std::cout << glm::to_string(secondMVMatrix) << std::endl;
     }
+
+
 
 
     glm::mat4 wantMVMatrix, wantProjMatrix;
