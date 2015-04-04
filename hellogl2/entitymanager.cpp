@@ -49,8 +49,10 @@ bool EntityManager::load()
     Q_ASSERT(bundleIn.readLine().startsWith("# Bundle file"));
     bundleIn.readLine();
 
+    int t = 0;
+
     while (!listIn.atEnd()) {
-        QString entityName = listIn.readLine();
+        QString entityName = listIn.readLine().split(' ', QString::SkipEmptyParts)[0];
 
         Entity entity;
         entity.name = entityName;
@@ -75,9 +77,11 @@ bool EntityManager::load()
         entity.mvMatrix = giveMVMatrix(input);
         // some image don't have estimated camera parameters
         if (entity.f > 1e-5) {
+            //std::cout << entityName.toLocal8Bit().constData() << std::endl;
             container[entityName] = entity;
         }
     }
+    std::cout << "vim: " << t << std::endl;
     listFile.close();
     bundleFile.close();
     return true;

@@ -217,6 +217,7 @@ void Window::align()
     Entity base, second, want;
     Q_ASSERT(manager.getEntity(manager.baseOneID(), base));
     Q_ASSERT(manager.getEntity(manager.baseTwoID(), second));
+    return;
 
     //Q_ASSERT(manager.getEntity(QString("images/alecea_2304877304.jpg"), want));
     //Q_ASSERT(manager.getEntity(QString("images/32219531@N00_102756761.jpg"), want));
@@ -243,7 +244,9 @@ void Window::align()
         int height = img.height();
 
         PointsMatchRelation *rb = new PointsMatchRelation(manager.baseTwoImageRelation());
-        std::cout << rb->loadFromFile() << std::endl;
+        if (!rb->loadFromFile()) {
+            return;
+        }
         points2d = rb->getPoints2d();
         points3d = rb->getPoints3d();
         glm::mat4 secondMVMatrix, secondProjMatrix;
