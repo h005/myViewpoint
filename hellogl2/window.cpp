@@ -218,32 +218,6 @@ void Window::align()
     Q_ASSERT(manager.getEntity(manager.baseOneID(), base));
     Q_ASSERT(manager.getEntity(manager.baseTwoID(), second));
 
-//    zyns
-//    Q_ASSERT(manager.getEntity(QString("./img0075.jpg"), want));
-//    Q_ASSERT(manager.getEntity(QString("./img0613.jpg"), want));
-//    Q_ASSERT(manager.getEntity(QString("./img0777.jpg"), want));
-//    Q_ASSERT(manager.getEntity(QString("./img0819.jpg"), want));
-//    Q_ASSERT(manager.getEntity(QString("./img0820.jpg"), want));
-//    Q_ASSERT(manager.getEntity(QString("./img0834.jpg"), want));
-//    Q_ASSERT(manager.getEntity(QString("./img0832.jpg"), want));
-
-//    notre dame
-//    Q_ASSERT(manager.getEntity(QString("images/alecea_2304877304.jpg"), want));
-//    Q_ASSERT(manager.getEntity(QString("images/32219531@N00_102756761.jpg"), want));
-//    Q_ASSERT(manager.getEntity(QString("images/8250661@N08_514024275.jpg"), want));
-//    Q_ASSERT(manager.getEntity(QString("images/cfuga_1435599238.jpg"), want));
-//    Q_ASSERT(manager.getEntity(QString("images/81596301@N00_248194737.jpg"), want));
-//    Q_ASSERT(manager.getEntity(QString("images/58308412@N00_74499252.jpg"), want));
-//    Q_ASSERT(manager.getEntity(QString("images/achtundsiebzig_196444302.jpg"), want));
-//    Q_ASSERT(manager.getEntity(QString("images/7437937@N06_428202066.jpg"), want));
-//    Q_ASSERT(manager.getEntity(QString("images/al_9_1355240900.jpg"), want));
-//    Q_ASSERT(manager.getEntity(QString("images/_fxr_2223134257.jpg"), want));
-//    Q_ASSERT(manager.getEntity(QString("images/2pworth_50915720.jpg"), want));
-    Q_ASSERT(manager.getEntity(QString("images/celesteh_102619571.jpg"), want));
-
-
-
-
     float scale;
     {
         QImage img(manager.baseTwoImagePath());
@@ -270,6 +244,38 @@ void Window::align()
         std::cout << glm::to_string(mvMatrix) << std::endl;
         std::cout << glm::to_string(secondMVMatrix) << std::endl;
     }
+
+//    zyns
+//    Q_ASSERT(manager.getEntity(QString("./img0075.jpg"), want));
+//    Q_ASSERT(manager.getEntity(QString("./img0613.jpg"), want));
+//    Q_ASSERT(manager.getEntity(QString("./img0777.jpg"), want));
+//    Q_ASSERT(manager.getEntity(QString("./img0819.jpg"), want));
+//    Q_ASSERT(manager.getEntity(QString("./img0820.jpg"), want));
+//    Q_ASSERT(manager.getEntity(QString("./img0834.jpg"), want));
+//    Q_ASSERT(manager.getEntity(QString("./img0832.jpg"), want));
+
+//    notre dame
+//    Q_ASSERT(manager.getEntity(QString("images/alecea_2304877304.jpg"), want));
+//    Q_ASSERT(manager.getEntity(QString("images/32219531@N00_102756761.jpg"), want));
+//    Q_ASSERT(manager.getEntity(QString("images/8250661@N08_514024275.jpg"), want));
+//    Q_ASSERT(manager.getEntity(QString("images/cfuga_1435599238.jpg"), want));
+//    Q_ASSERT(manager.getEntity(QString("images/81596301@N00_248194737.jpg"), want));
+//    Q_ASSERT(manager.getEntity(QString("images/58308412@N00_74499252.jpg"), want));
+//    Q_ASSERT(manager.getEntity(QString("images/achtundsiebzig_196444302.jpg"), want));
+//    Q_ASSERT(manager.getEntity(QString("images/7437937@N06_428202066.jpg"), want));
+//    Q_ASSERT(manager.getEntity(QString("images/al_9_1355240900.jpg"), want));
+//    Q_ASSERT(manager.getEntity(QString("images/_fxr_2223134257.jpg"), want));
+//    Q_ASSERT(manager.getEntity(QString("images/2pworth_50915720.jpg"), want));
+//    Q_ASSERT(manager.getEntity(QString("images/celesteh_102619571.jpg"), want));
+
+//    kxm
+//    Q_ASSERT(manager.getEntity(QString("./img0008.jpg"), want));
+//    Q_ASSERT(manager.getEntity(QString("./img0314.jpg"), want));
+//    Q_ASSERT(manager.getEntity(QString("./img0532.jpg"), want));
+//    Q_ASSERT(manager.getEntity(QString("./img0852.jpg"), want));
+//    Q_ASSERT(manager.getEntity(QString("./img0837.jpg"), want));
+//    Q_ASSERT(manager.getEntity(QString("./img0410.jpg"), want));
+    Q_ASSERT(manager.getEntity(QString("./img0386.jpg"), want));
 
 
 
