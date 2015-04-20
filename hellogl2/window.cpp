@@ -211,8 +211,8 @@ void Window::align()
     std::vector<glm::vec3> &points3d = relation.getPoints3d();
     DLTwithPoints(points2d.size(), (float(*)[2])&points2d[0], (float(*)[3])&points3d[0], m_iwidth, m_iheight, mvMatrix, projMatrix);
 
-    AlignResultWidget *a = new AlignResultWidget(m_modelpath, m_iwidth * 1.f / m_iheight, mvMatrix, projMatrix, 0);
-    a->show();
+//    AlignResultWidget *a = new AlignResultWidget(m_modelpath, m_iwidth * 1.f / m_iheight, mvMatrix, projMatrix, 0);
+//    a->show();
 
     Entity base, second, want;
     Q_ASSERT(manager.getEntity(manager.baseOneID(), base));
@@ -238,11 +238,10 @@ void Window::align()
         glm::mat4 secondMVMatrix, secondProjMatrix;
         DLTwithPoints(points2d.size(), (float(*)[2])&points2d[0], (float(*)[3])&points3d[0], width, height, secondMVMatrix, secondProjMatrix);
         scale = recoveryScale(base, second, mvMatrix, secondMVMatrix);
-        std::cout << scale << std::endl;
-
-        std::cout << "aa" << std::endl;
+        std::cout << "scale: " << scale << std::endl;
         std::cout << glm::to_string(mvMatrix) << std::endl;
         std::cout << glm::to_string(secondMVMatrix) << std::endl;
+//        scale = 1;
     }
 
 //    zyns
@@ -275,9 +274,27 @@ void Window::align()
 //    Q_ASSERT(manager.getEntity(QString("./img0852.jpg"), want));
 //    Q_ASSERT(manager.getEntity(QString("./img0837.jpg"), want));
 //    Q_ASSERT(manager.getEntity(QString("./img0410.jpg"), want));
-    Q_ASSERT(manager.getEntity(QString("./img0386.jpg"), want));
+//    Q_ASSERT(manager.getEntity(QString("./img0831.jpg"), want));
+//    Q_ASSERT(manager.getEntity(QString("./img0386.jpg"), want));
 
+//    tiananmen
+//    Q_ASSERT(manager.getEntity(QString("./61bOOOPIC53.jpg"), want));
+//    Q_ASSERT(manager.getEntity(QString("./53ad4c7b61138.jpg"), want));
+//    Q_ASSERT(manager.getEntity(QString("./OOOPIC_robbin_200910130202f5809b3c9d39.jpg"), want));
 
+//    Q_ASSERT(manager.getEntity(QString("./img0001.jpg"), want));
+//    Q_ASSERT(manager.getEntity(QString("./img0006.jpg"), want));
+//    Q_ASSERT(manager.getEntity(QString("./img0052.jpg"), want));
+//    Q_ASSERT(manager.getEntity(QString("./img0050.jpg"), want));
+//    Q_ASSERT(manager.getEntity(QString("./img0063.jpg"), want));
+//    Q_ASSERT(manager.getEntity(QString("./img0062.jpg"), want));
+//    Q_ASSERT(manager.getEntity(QString("./img0926.jpg"), want));
+    Q_ASSERT(manager.getEntity(QString("./img1188.jpg"), want));
+//    Q_ASSERT(manager.getEntity(QString("./img1185.jpg"), want));
+//        Q_ASSERT(manager.getEntity(QString("./img1260.jpg"), want));
+//    Q_ASSERT(manager.getEntity(QString("./img0058.jpg"), want));
+//    Q_ASSERT(manager.getEntity(QString("./img0108.jpg"), want));
+//    Q_ASSERT(manager.getEntity(QString("./img0081.jpg"), want));
 
 
     glm::mat4 wantMVMatrix, wantProjMatrix;

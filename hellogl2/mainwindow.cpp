@@ -44,11 +44,12 @@
 #include <QMenuBar>
 #include <QMenu>
 #include <QMessageBox>
+#include <levmar.h>
 #include "pointsmatchrelation.h"
 #include "entitymanager.h"
 #include "custom.h"
 
-EntityManager manager(QString("D:\\testcase"));
+EntityManager manager(QString("D:\\testcase\\bigben"));
 
 MainWindow::MainWindow()
 {
@@ -66,7 +67,6 @@ MainWindow::MainWindow()
 void MainWindow::onAddNew()
 {
     std::cout << manager.load() << std::endl;
-
     if (!centralWidget()) {
         PointsMatchRelation *relation = new PointsMatchRelation(manager.baseOneImageRelation());
         if (!relation->loadFromFile()) {
@@ -74,6 +74,7 @@ void MainWindow::onAddNew()
         }
         std::cout << relation->getPoints2d().size() << std::endl;
         setCentralWidget(new Window(this, manager.baseOneImagePath(), manager.modelPath(), *relation));
+//        setCentralWidget(new Window(this, manager.baseTwoImagePath(), manager.modelPath(), *relation));
         //setCentralWidget(new Window(this, QString("D:\\alex1961_2466374890.rd.jpg"), QString("D:\\no\\models\\untitled.dae"), *relation));
 //        setCentralWidget(new Window(this, QString("C:\\Users\\mzd\\Desktop\\NotreDame\\NotreDame\\images\\85428086@N00_231122289.jpg"), QString("D:\\no2\\models\\model.dae"), *relation));
     }

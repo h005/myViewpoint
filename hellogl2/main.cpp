@@ -38,6 +38,7 @@
 **
 ****************************************************************************/
 
+#ifndef __TEST_EXPFIT
 #include <QApplication>
 #include <QDesktopWidget>
 #include <QSurfaceFormat>
@@ -69,3 +70,5 @@ int main(int argc, char *argv[])
         mainWindow.showMaximized();
     return app.exec();
 }
+#endif
+

@@ -77,7 +77,6 @@ bool EntityManager::load()
         entity.mvMatrix = giveMVMatrix(input);
         // some image don't have estimated camera parameters
         if (entity.f > 1e-5) {
-            //std::cout << entityName.toLocal8Bit().constData() << std::endl;
             container[entityName] = entity;
         }
     }

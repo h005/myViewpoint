@@ -158,7 +158,7 @@ void GLWidget::paintGL()
         for (it = points.begin(); it != points.end(); it++) {
             // multiple point's position
             glm::mat4 pointMV = glm::translate(modelViewMatrix, *it);
-            pointMV = glm::scale(pointMV, glm::vec3(0.02, 0.02, 0.02));
+            pointMV = glm::scale(pointMV, glm::vec3(0.005, 0.005, 0.005));
             glUniformMatrix4fv(mvMatrixID, 1, GL_FALSE, glm::value_ptr(pointMV));
             sphere.draw();
         }

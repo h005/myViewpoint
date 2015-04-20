@@ -30,11 +30,13 @@ SOURCES       = glwidget.cpp \
     entity.cpp \
     entitymanager.cpp \
     camerashowwidget.cpp \
-    axis.cpp
+    axis.cpp \
+    expfit.cpp
 
 QT           += widgets
 
 DEFINES += _CRT_SECURE_NO_WARNINGS
+#DEFINES += __TEST_EXPFIT
 
 macx {
     LIBS += -L/usr/local/Cellar/glew/1.11.0/lib -lGLEW
@@ -57,6 +59,9 @@ win32 {
     # glew
     INCLUDEPATH += $$DP_TOOLS_DIR/glew/include
     LIBS += -L$$DP_TOOLS_DIR/glew/lib/Release/Win32 -lglew32
+
+    INCLUDEPATH += $$DP_TOOLS_DIR/levmar
+    LIBS += -L$$DP_TOOLS_DIR/levmar -llevmar
 }
 
 # glm
