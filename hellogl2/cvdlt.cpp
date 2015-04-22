@@ -34,15 +34,15 @@ void CVDLT::DLTwithPoints(int matchnum, float points2d[][2], float points3d[][3]
     std::vector<cv::Mat> rvecs,tvecs;
     cv::calibrateCamera(input3ds, input2ds, imageSize, cameraMatrix, distCoeffs, rvecs, tvecs, CV_CALIB_USE_INTRINSIC_GUESS | CV_CALIB_FIX_ASPECT_RATIO);
 
-    std::cout << "aa " << rvecs[0] << std::endl;
+    cv::Mat R;
+    cv::Rodrigues(rvecs[0], R);
 
     cv::Mat modelView = cv::Mat::zeros(4, 4, CV_32F);
-    rvecs[0].copyTo(modelView(cv::Range(0,3), cv::Range(0,3)));
-    //tvecs[0].copyTo(modelView(cv::Range(0,3), cv::Range(3,4)));
+    R.copyTo(modelView(cv::Range(0,3), cv::Range(0,3)));
+    tvecs[0].copyTo(modelView(cv::Range(0,3), cv::Range(3,4)));
     modelView.at<float>(3,3) = 1;
 
     std::cout << modelView << std::endl;
-
 
     cv::Mat proj;
     cv::Mat lookAtParams;
@@ -58,5 +58,6 @@ void CVDLT::DLTwithPoints(int matchnum, float points2d[][2], float points3d[][3]
             projMatrix[j][i] = proj.at<float>(i, j);
         }
     }
+    std::cout << "aaa" << std::endl;
 }
 
