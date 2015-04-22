@@ -28,22 +28,31 @@ void CVDLT::DLTwithPoints(int matchnum, float points2d[][2], float points3d[][3]
 
     cv::Mat cameraMatrix = initialCameraMatrix, distCoeffs;
     float f = (initialCameraMatrix.at<float>(0, 0) + initialCameraMatrix.at<float>(1, 1)) / 2;
-    cameraMatrix.at<float>(0, 1) = 0;
-    cameraMatrix.at<float>(0, 0) = f;
-    cameraMatrix.at<float>(1, 1) = f;
+    cameraMatrix.at<float>(0,1) = 0;
+    cameraMatrix.at<float>(0,2) = imgWidth / 2.f;
+    cameraMatrix.at<float>(1,2) = imgHeight / 2.f;
+//    cameraMatrix.at<float>(0, 0) = f;
+//    cameraMatrix.at<float>(1, 1) = f;
     std::vector<cv::Mat> rvecs,tvecs;
-    cv::calibrateCamera(input3ds, input2ds, imageSize, cameraMatrix, distCoeffs, rvecs, tvecs, CV_CALIB_USE_INTRINSIC_GUESS | CV_CALIB_FIX_ASPECT_RATIO);
+    cv::calibrateCamera(input3ds, input2ds, imageSize, cameraMatrix, distCoeffs, rvecs, tvecs, CV_CALIB_USE_INTRINSIC_GUESS | CV_CALIB_FIX_PRINCIPAL_POINT);
 
     cv::Mat R;
     cv::Rodrigues(rvecs[0], R);
 
+
     cv::Mat modelView = cv::Mat::zeros(4, 4, CV_32F);
     R.copyTo(modelView(cv::Range(0,3), cv::Range(0,3)));
     tvecs[0].copyTo(modelView(cv::Range(0,3), cv::Range(3,4)));
+    modelView = -modelView;
     modelView.at<float>(3,3) = 1;
 
+    std::cout << "[OpenCV]" << std::endl;
     std::cout << modelView << std::endl;
+    std::cout << cameraMatrix << std::endl;
+    std::cout << std::endl;
 
+    modelView.convertTo(modelView, CV_32F);
+    cameraMatrix.convertTo(cameraMatrix, CV_32F);
     cv::Mat proj;
     cv::Mat lookAtParams;
     phase3GenerateLookAtAndProjection(modelView, cameraMatrix, imgWidth, imgHeight, lookAtParams, proj);
@@ -58,6 +67,5 @@ void CVDLT::DLTwithPoints(int matchnum, float points2d[][2], float points3d[][3]
             projMatrix[j][i] = proj.at<float>(i, j);
         }
     }
-    std::cout << "aaa" << std::endl;
 }
 
