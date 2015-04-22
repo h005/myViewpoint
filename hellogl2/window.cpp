@@ -211,8 +211,8 @@ void Window::align()
     std::vector<glm::vec3> &points3d = relation.getPoints3d();
     DLTwithPoints(points2d.size(), (float(*)[2])&points2d[0], (float(*)[3])&points3d[0], m_iwidth, m_iheight, mvMatrix, projMatrix);
 
-//    AlignResultWidget *a = new AlignResultWidget(m_modelpath, m_iwidth * 1.f / m_iheight, mvMatrix, projMatrix, 0);
-//    a->show();
+    AlignResultWidget *a = new AlignResultWidget(m_modelpath, m_iwidth * 1.f / m_iheight, mvMatrix, projMatrix, 0);
+    a->show();
 
     Entity base, second, want;
     Q_ASSERT(manager.getEntity(manager.baseOneID(), base));

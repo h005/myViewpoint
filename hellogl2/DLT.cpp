@@ -9,6 +9,7 @@
 
 #include "DLT.h"
 #include "custom.h"
+#include "cvdlt.h"
 
 using namespace std;
 
@@ -417,4 +418,7 @@ void DLTwithPoints(
             projMatrix[j][i] = proj.at<float>(i, j);
         }
     }
+
+    CVDLT::DLTwithPoints(matchnum, points2d, points3d, imgWidth, imgHeight, K, mvMatrix, projMatrix);
+
 }
