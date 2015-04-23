@@ -211,13 +211,17 @@ void Window::align()
     std::vector<glm::vec3> &points3d = relation.getPoints3d();
     DLTwithPoints(points2d.size(), (float(*)[2])&points2d[0], (float(*)[3])&points3d[0], m_iwidth, m_iheight, mvMatrix, projMatrix);
 
+    // [GUI]把图1的DLT标定结果显示出来
     AlignResultWidget *a = new AlignResultWidget(m_modelpath, m_iwidth * 1.f / m_iheight, mvMatrix, projMatrix, 0);
     a->show();
 
+    // 这个传递算法依赖两张基准图像，base和second，这两张图像的相机参数是直接通过DLT得到的
+    // want是要求的图像，它的参数借助base和second的参数和SfM结果传递得到
     Entity base, second, want;
     Q_ASSERT(manager.getEntity(manager.baseOneID(), base));
     Q_ASSERT(manager.getEntity(manager.baseTwoID(), second));
 
+    // 下面的算法在我04-05的周报中描述了
     float scale;
     {
         QImage img(manager.baseTwoImagePath());
@@ -241,9 +245,9 @@ void Window::align()
         std::cout << "scale: " << scale << std::endl;
         std::cout << glm::to_string(mvMatrix) << std::endl;
         std::cout << glm::to_string(secondMVMatrix) << std::endl;
-//        scale = 1;
     }
 
+    // 下面是我做实验的例子（硬编码），就是选定一个want，然后看看结果
 //    zyns
 //    Q_ASSERT(manager.getEntity(QString("./img0075.jpg"), want));
 //    Q_ASSERT(manager.getEntity(QString("./img0613.jpg"), want));
@@ -279,15 +283,18 @@ void Window::align()
 
 //    tiananmen
 //    Q_ASSERT(manager.getEntity(QString("./61bOOOPIC53.jpg"), want));
+//    Q_ASSERT(manager.getEntity(QString("./105.jpg"), want));
+//    Q_ASSERT(manager.getEntity(QString("./73FB52A1-2036-48AC-B29E-EB90ED0E99F7_o.jpg"), want));
+//    Q_ASSERT(manager.getEntity(QString("./1-11112R33332647.jpg"), want));
 //    Q_ASSERT(manager.getEntity(QString("./53ad4c7b61138.jpg"), want));
-//    Q_ASSERT(manager.getEntity(QString("./OOOPIC_robbin_200910130202f5809b3c9d39.jpg"), want));
+    Q_ASSERT(manager.getEntity(QString("./OOOPIC_robbin_200910130202f5809b3c9d39.jpg"), want));
 
 //    bigben
 //    Q_ASSERT(manager.getEntity(QString("./img0001.jpg"), want));
 //    Q_ASSERT(manager.getEntity(QString("./img0006.jpg"), want));
 //    Q_ASSERT(manager.getEntity(QString("./img0052.jpg"), want));
 //    Q_ASSERT(manager.getEntity(QString("./img0050.jpg"), want)); //error
-    Q_ASSERT(manager.getEntity(QString("./img0063.jpg"), want));
+//    Q_ASSERT(manager.getEntity(QString("./img0063.jpg"), want));
 //    Q_ASSERT(manager.getEntity(QString("./img0062.jpg"), want));
 //    Q_ASSERT(manager.getEntity(QString("./img0926.jpg"), want));
 //    Q_ASSERT(manager.getEntity(QString("./img1188.jpg"), want));
@@ -301,21 +308,25 @@ void Window::align()
     glm::mat4 wantMVMatrix, wantProjMatrix;
     recoveryCameraParameters(scale, base, want, mvMatrix, projMatrix, wantMVMatrix, wantProjMatrix);
     wantProjMatrix = glm::perspective(glm::pi<float>() / 2, m_iwidth * 1.f / m_iheight, 0.1f, 100.f);
+
+    // [GUI]把目标图像的相机位置展现出来
     CameraShowWidget *b = new CameraShowWidget(m_modelpath, m_iwidth * 1.f / m_iheight, wantMVMatrix, 0);
     b->show();
 
+    // [GUI]用目标图像的相机参数，渲染模型
     AlignResultWidget *c = new AlignResultWidget(m_modelpath, m_iwidth * 1.f / m_iheight, wantMVMatrix, wantProjMatrix, 0);
     c->show();
 
     {
-    glm::vec4 a(1.f, 0.f, 0.f, 0.f), b(0.f, 1.f, 0.f, 0.f), c(0.f, 0.f, 1.f, 0.f);
-    glm::vec4 aa = wantMVMatrix * a, bb = wantMVMatrix * b, cc = wantMVMatrix * c;
-    //glm::vec4 aa = base.mvMatrix * a, bb = base.mvMatrix * b, cc = base.mvMatrix * c;
-    //glm::vec4 aa = mvMatrix * a, bb = mvMatrix * b, cc = mvMatrix * c;
-    std::cout << glm::to_string(want.mvMatrix) << std::endl;
-    std::cout << glm::dot(glm::vec3(aa), glm::vec3(bb)) << std::endl;
-    std::cout << glm::dot(glm::vec3(cc), glm::vec3(bb)) << std::endl;
-    std::cout << glm::dot(glm::vec3(aa), glm::vec3(cc)) << std::endl;
+        // 以下代码无用，不用看
+        glm::vec4 a(1.f, 0.f, 0.f, 0.f), b(0.f, 1.f, 0.f, 0.f), c(0.f, 0.f, 1.f, 0.f);
+        glm::vec4 aa = wantMVMatrix * a, bb = wantMVMatrix * b, cc = wantMVMatrix * c;
+        //glm::vec4 aa = base.mvMatrix * a, bb = base.mvMatrix * b, cc = base.mvMatrix * c;
+        //glm::vec4 aa = mvMatrix * a, bb = mvMatrix * b, cc = mvMatrix * c;
+        std::cout << glm::to_string(want.mvMatrix) << std::endl;
+        std::cout << glm::dot(glm::vec3(aa), glm::vec3(bb)) << std::endl;
+        std::cout << glm::dot(glm::vec3(cc), glm::vec3(bb)) << std::endl;
+        std::cout << glm::dot(glm::vec3(aa), glm::vec3(cc)) << std::endl;
     }
 }
 
