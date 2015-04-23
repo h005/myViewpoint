@@ -31,8 +31,8 @@ void CVDLT::DLTwithPoints(int matchnum, float points2d[][2], float points3d[][3]
     cameraMatrix.at<float>(0,1) = 0;
     cameraMatrix.at<float>(0,2) = imgWidth / 2.f;
     cameraMatrix.at<float>(1,2) = imgHeight / 2.f;
-//    cameraMatrix.at<float>(0, 0) = f;
-//    cameraMatrix.at<float>(1, 1) = f;
+    cameraMatrix.at<float>(0, 0) = f;
+    cameraMatrix.at<float>(1, 1) = f;
     std::vector<cv::Mat> rvecs,tvecs;
     cv::calibrateCamera(input3ds, input2ds, imageSize, cameraMatrix, distCoeffs, rvecs, tvecs, CV_CALIB_USE_INTRINSIC_GUESS | CV_CALIB_FIX_PRINCIPAL_POINT);
 
@@ -43,7 +43,39 @@ void CVDLT::DLTwithPoints(int matchnum, float points2d[][2], float points3d[][3]
     cv::Mat modelView = cv::Mat::zeros(4, 4, CV_32F);
     R.copyTo(modelView(cv::Range(0,3), cv::Range(0,3)));
     tvecs[0].copyTo(modelView(cv::Range(0,3), cv::Range(3,4)));
-    modelView = -modelView;
+    {
+        // 求得的modelView可能会导致变换后的深度是负数，我们变换一下，
+        // 如果结果中深度是负数，则取modelView矩阵的相反数
+        cv::Mat points = cv::Mat::zeros(4, matchnum, CV_32F);
+        for (int i = 0; i < matchnum; i++) {
+            points.at<float>(0, i) = points3d[i][0];
+            points.at<float>(1, i) = points3d[i][1];
+            points.at<float>(2, i) = points3d[i][2];
+            points.at<float>(3, i) = 1;
+        }
+
+        cv::Mat ppp = cv::Mat::zeros(2, matchnum, CV_32F);
+        for (int i = 0; i < matchnum; i++) {
+            ppp.at<float>(0, i) = points2d[i][0];
+            ppp.at<float>(1, i) = points2d[i][1];
+        }
+
+        cv::Mat transformed = modelView(cv::Range(0, 3), cv::Range::all()) * points;
+        if (cv::countNonZero(transformed(cv::Range(2, 3), cv::Range::all()) > 0) < (matchnum / 2))
+            modelView = -modelView;
+
+        // 下面打印来比对变换得到的2D结果和真实的2D结果差距，不用关注
+        cameraMatrix.convertTo(cameraMatrix, CV_32F);
+        transformed = cameraMatrix * (modelView(cv::Range(0, 3), cv::Range::all()) * points);
+        transformed.convertTo(transformed, CV_32F);
+        for (int i = 0; i < transformed.cols; i++) {
+            transformed.at<float>(0, i) /= transformed.at<float>(2, i);
+            transformed.at<float>(1, i) /= transformed.at<float>(2, i);
+            transformed.at<float>(2, i) /= transformed.at<float>(2, i);
+        }
+        std::cout << transformed(cv::Range(0,2), cv::Range::all()) << std::endl;
+        std::cout << ppp << std::endl;
+    }
     modelView.at<float>(3,3) = 1;
 
     std::cout << "[OpenCV]" << std::endl;
