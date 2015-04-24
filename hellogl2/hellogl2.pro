@@ -14,7 +14,8 @@ HEADERS       = glwidget.h \
     entitymanager.h \
     camerashowwidget.h \
     axis.h \
-    cvdlt.h
+    cvdlt.h \
+    lmdlt.h
 SOURCES       = glwidget.cpp \
                 main.cpp \
                 window.cpp \
@@ -33,7 +34,8 @@ SOURCES       = glwidget.cpp \
     camerashowwidget.cpp \
     axis.cpp \
     expfit.cpp \
-    cvdlt.cpp
+    cvdlt.cpp \
+    lmdlt.cpp
 
 QT           += widgets
 
