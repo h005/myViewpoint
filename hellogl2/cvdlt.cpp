@@ -9,8 +9,9 @@
 #include <glm/gtx/vector_angle.hpp>
 #include "DLT.h"
 
-void CVDLT::DLTwithPoints(int matchnum, float points2d[][2], float points3d[][3], int imgWidth, int imgHeight, const cv::Mat &initialCameraMatrix, glm::mat4 &mvMatrix, glm::mat4 &projMatrix)
+void CVDLT::DLTwithPoints(int matchnum, float points2d[][2], float points3d[][3], int imgWidth, int imgHeight, const cv::Mat &initialCameraMatrix, cv::Mat &modelView, cv::Mat &K)
 {
+    assert(initialCameraMatrix.rows == 3 && initialCameraMatrix.cols == 3);
     std::vector<cv::Point3f> point3ds;
     std::vector<cv::Point2f> point2ds;
     for (int i = 0; i < matchnum; i++) {
@@ -40,7 +41,7 @@ void CVDLT::DLTwithPoints(int matchnum, float points2d[][2], float points3d[][3]
     cv::Rodrigues(rvecs[0], R);
 
 
-    cv::Mat modelView = cv::Mat::zeros(4, 4, CV_32F);
+    modelView = cv::Mat::zeros(4, 4, CV_32F);
     R.copyTo(modelView(cv::Range(0,3), cv::Range(0,3)));
     tvecs[0].copyTo(modelView(cv::Range(0,3), cv::Range(3,4)));
     {
@@ -76,28 +77,30 @@ void CVDLT::DLTwithPoints(int matchnum, float points2d[][2], float points3d[][3]
         std::cout << transformed(cv::Range(0,2), cv::Range::all()) << std::endl;
         std::cout << ppp << std::endl;
     }
+
     modelView.at<float>(3,3) = 1;
+    K = cameraMatrix;
 
     std::cout << "[OpenCV]" << std::endl;
     std::cout << modelView << std::endl;
     std::cout << cameraMatrix << std::endl;
     std::cout << std::endl;
 
-    modelView.convertTo(modelView, CV_32F);
-    cameraMatrix.convertTo(cameraMatrix, CV_32F);
-    cv::Mat proj;
-    cv::Mat lookAtParams;
-    phase3GenerateLookAtAndProjection(modelView, cameraMatrix, imgWidth, imgHeight, lookAtParams, proj);
-    glm::vec3 eye = glm::vec3(lookAtParams.at<float>(0, 0), lookAtParams.at<float>(1, 0), lookAtParams.at<float>(2, 0));
-    glm::vec3 center = glm::vec3(lookAtParams.at<float>(0, 1), lookAtParams.at<float>(1, 1), lookAtParams.at<float>(2, 1));
-    glm::vec3 updir = glm::vec3(lookAtParams.at<float>(0, 2), lookAtParams.at<float>(1, 2), lookAtParams.at<float>(2, 2));
-    // 在物体坐标系（世界坐标系）中摆放照相机和它的朝向
-    mvMatrix = glm::lookAt(eye, center, updir);
-    // 使用生成的OpenGL投影矩阵
-    for (int i = 0; i < 4; i++) {
-        for (int j = 0; j < 4; j++) {
-            projMatrix[j][i] = proj.at<float>(i, j);
-        }
-    }
+//    modelView.convertTo(modelView, CV_32F);
+//    cameraMatrix.convertTo(cameraMatrix, CV_32F);
+//    cv::Mat proj;
+//    cv::Mat lookAtParams;
+//    phase3GenerateLookAtAndProjection(modelView, cameraMatrix, imgWidth, imgHeight, lookAtParams, proj);
+//    glm::vec3 eye = glm::vec3(lookAtParams.at<float>(0, 0), lookAtParams.at<float>(1, 0), lookAtParams.at<float>(2, 0));
+//    glm::vec3 center = glm::vec3(lookAtParams.at<float>(0, 1), lookAtParams.at<float>(1, 1), lookAtParams.at<float>(2, 1));
+//    glm::vec3 updir = glm::vec3(lookAtParams.at<float>(0, 2), lookAtParams.at<float>(1, 2), lookAtParams.at<float>(2, 2));
+//    // 在物体坐标系（世界坐标系）中摆放照相机和它的朝向
+//    mvMatrix = glm::lookAt(eye, center, updir);
+//    // 使用生成的OpenGL投影矩阵
+//    for (int i = 0; i < 4; i++) {
+//        for (int j = 0; j < 4; j++) {
+//            projMatrix[j][i] = proj.at<float>(i, j);
+//        }
+//    }
 }
 

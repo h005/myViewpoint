@@ -13,8 +13,7 @@ public:
             int imgWidth,
             int imgHeight,
             const cv::Mat &initialCameraMatrix,
-            glm::mat4 &mvMatrix,
-            glm::mat4 &projMatrix);
+            cv::Mat &modelView, cv::Mat &K);
 };
 
 #endif // CVDLT_H
