@@ -7,6 +7,9 @@
 #include <glm/gtx/matrix_cross_product.hpp>
 #include <glm/gtx/string_cast.hpp>
 
+using std::cout;
+using std::endl;
+
 static glm::mat3 RodtoR(const glm::vec3 &w)
 {
     // 将向量表示的 绕轴旋转 转化成 3x3的旋转矩阵
@@ -17,10 +20,18 @@ static glm::mat3 RodtoR(const glm::vec3 &w)
     return R;
 }
 
+static glm::vec3 RtoRod(const glm::mat3 &R)
+{
+    float trace = R[0][0] + R[1][1] + R[2][2];
+    float wLength = acos((trace - 1) / 2);
+    glm::vec3 w = glm::vec3(R[1][2] - R[2][1], R[2][0] - R[0][2], R[0][1] - R[1][0]) * 1.f / 2.f / sin(wLength);
+    return w * wLength;
+}
+
 // 根据相机参数计算投影后的点
 static void calcProjectedPoint(double parameter[], double newP[], int LM_m, int LM_n, void *adata)
 {
-    std::cout << "aa" << std::endl;
+    std::cout << "costCalc" << std::endl;
     bool radialDistoration = 1;
     // 内参矩阵K
     double alpha = parameter[0], beta = parameter[1];
@@ -35,7 +46,6 @@ static void calcProjectedPoint(double parameter[], double newP[], int LM_m, int 
     glm::mat3 R = RodtoR(glm::vec3(parameter[7], parameter[8], parameter[9]));
     // 平移向量
     glm::vec3 t = glm::vec3(parameter[10], parameter[11], parameter[12]);
-    std::cout << glm::to_string(R) << std::endl;
     double *p = (double *)adata;
     int matchnum = LM_n / 2;
     for (int i = 0; i < matchnum; i++) {
@@ -86,12 +96,30 @@ void LMDLT::DLTwithPoints(int matchnum, float points2d[][2], float points3d[][3]
     }
 
     memset(para, 0, LM_m*sizeof(double));
-    cv::Mat w(3, 1, CV_32F);
-    cv::Rodrigues(initialExtrinsicMatrix(cv::Range(0,3), cv::Range(0,3)), w);
-    std::cout << "w :" << w << std::endl;
-    cv::Mat zz(3, 3, CV_32F);
-    cv::Rodrigues(w, zz);
-    std::cout << zz << std::endl;
+
+
+//    glm::vec3 w;
+//    {
+//        cout << "R: " << initialExtrinsicMatrix(cv::Range(0,3), cv::Range(0,3)) << endl;
+//        glm::mat3 IR;
+//        for (int i = 0; i < 3; i++)
+//            for (int j = 0; j < 3; j++)
+//                IR[j][i] = initialExtrinsicMatrix.at<float>(i,j);
+//        // trans by our code
+//        w = RtoRod(IR);
+//        cout << "w " << glm::to_string(w) << endl;
+//        // trans by opencv
+//        cv::Mat ww(3, 1, CV_32F);
+//        cv::Rodrigues(initialExtrinsicMatrix(cv::Range(0,3), cv::Range(0,3)), ww);
+//        cout << ww << endl;
+
+//        IR = RodtoR(w);
+//        cout << "w2R " << glm::to_string(IR) << endl;
+
+//        glm::vec3 rec = RtoRod(IR);
+//        cout << "R2w " << glm::to_string(rec) << endl;
+//    }
+
     para[0] = initialCameraMatrix.at<float>(0, 0);
     para[1] = initialCameraMatrix.at<float>(1, 1);
     para[2] = 0;
@@ -99,9 +127,9 @@ void LMDLT::DLTwithPoints(int matchnum, float points2d[][2], float points3d[][3]
     para[4] = imgHeight / 2;
     para[5] = 0;
     para[6] = 0;
-    para[7] = w.at<float>(0,0);
-    para[8] = w.at<float>(1,0);
-    para[9] = w.at<float>(2,0);
+    para[7] = 1;
+    para[8] = 0;
+    para[9] = 0;
     para[10] = initialExtrinsicMatrix.at<float>(0,3);
     para[11] = initialExtrinsicMatrix.at<float>(1,3);
     para[12] = initialExtrinsicMatrix.at<float>(2,3);
