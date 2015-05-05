@@ -106,7 +106,7 @@ void LMDLT::DLTwithPoints(int matchnum, float points2d[][2], float points3d[][3]
     {
         cv::Mat RRRR;
         initialExtrinsicMatrix(cv::Range(0,3), cv::Range(0,3)).copyTo(RRRR);
-        RRRR.row(2) = -RRRR.row(2);
+        //RRRR.row(2) = -RRRR.row(2);
         cout << "R: " << cv::determinant(RRRR) << endl;
         cout << "R: " << RRRR << endl;
         glm::mat3 IR;

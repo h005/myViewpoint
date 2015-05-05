@@ -251,7 +251,7 @@ cv::Mat phase1CalculateP(int imClick, int objClick, float imCords[][2], float ob
 		}
 		M.at<float>(3 * i + 0, 12 + i) = -cords2d[i * 2 + 0];
 		M.at<float>(3 * i + 1, 12 + i) = -cords2d[i * 2 + 1];
-		M.at<float>(3 * i + 2, 12 + i) = -1;
+        M.at<float>(3 * i + 2, 12 + i) = 1;
 	}
 
 	// 执行SVD分解
