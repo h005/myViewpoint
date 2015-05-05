@@ -22,6 +22,11 @@ static glm::mat3 RodtoR(const glm::vec3 &w)
 
 static glm::vec3 RtoRod(const glm::mat3 &R)
 {
+    // As a rotation matrix, it determinant must be 1
+    // ref https://ccjou.wordpress.com/2014/04/29/%E4%B8%89%E7%B6%AD%E7%A9%BA%E9%96%93%E7%9A%84%E6%97%8B%E8%BD%89%E7%9F%A9%E9%99%A3/
+    float det = glm::determinant(R);
+    assert(abs(det - 1) < 1e-5);
+
     float trace = R[0][0] + R[1][1] + R[2][2];
     float wLength = acos((trace - 1) / 2);
     glm::vec3 w = glm::vec3(R[1][2] - R[2][1], R[2][0] - R[0][2], R[0][1] - R[1][0]) * 1.f / 2.f / sin(wLength);
@@ -94,31 +99,34 @@ void LMDLT::DLTwithPoints(int matchnum, float points2d[][2], float points3d[][3]
         ptx[i*2+0] = points2d[i][0];
         ptx[i*2+1] = points2d[i][1];
     }
-
     memset(para, 0, LM_m*sizeof(double));
 
 
-//    glm::vec3 w;
-//    {
-//        cout << "R: " << initialExtrinsicMatrix(cv::Range(0,3), cv::Range(0,3)) << endl;
-//        glm::mat3 IR;
-//        for (int i = 0; i < 3; i++)
-//            for (int j = 0; j < 3; j++)
-//                IR[j][i] = initialExtrinsicMatrix.at<float>(i,j);
-//        // trans by our code
-//        w = RtoRod(IR);
-//        cout << "w " << glm::to_string(w) << endl;
-//        // trans by opencv
-//        cv::Mat ww(3, 1, CV_32F);
-//        cv::Rodrigues(initialExtrinsicMatrix(cv::Range(0,3), cv::Range(0,3)), ww);
-//        cout << ww << endl;
+    glm::vec3 w;
+    {
+        cv::Mat RRRR;
+        initialExtrinsicMatrix(cv::Range(0,3), cv::Range(0,3)).copyTo(RRRR);
+        RRRR.row(2) = -RRRR.row(2);
+        cout << "R: " << cv::determinant(RRRR) << endl;
+        cout << "R: " << RRRR << endl;
+        glm::mat3 IR;
+        for (int i = 0; i < 3; i++)
+            for (int j = 0; j < 3; j++)
+                IR[j][i] = RRRR.at<float>(i,j);
+        // trans by our code
+        w = RtoRod(IR);
+        cout << "w " << glm::to_string(w) << endl;
+        // trans by opencv
+        cv::Mat ww(3, 1, CV_32F);
+        cv::Rodrigues(RRRR, ww);
+        cout << "w[opencv] " << ww << endl;
 
-//        IR = RodtoR(w);
-//        cout << "w2R " << glm::to_string(IR) << endl;
+        IR = RodtoR(w);
+        cout << "w2R " << glm::to_string(IR) << endl;
 
-//        glm::vec3 rec = RtoRod(IR);
-//        cout << "R2w " << glm::to_string(rec) << endl;
-//    }
+        glm::vec3 rec = RtoRod(IR);
+        cout << "R2w " << glm::to_string(rec) << endl;
+    }
 
     para[0] = initialCameraMatrix.at<float>(0, 0);
     para[1] = initialCameraMatrix.at<float>(1, 1);
