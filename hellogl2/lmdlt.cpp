@@ -104,28 +104,11 @@ void LMDLT::DLTwithPoints(int matchnum, float points2d[][2], float points3d[][3]
 
     glm::vec3 w;
     {
-        cv::Mat RRRR;
-        initialExtrinsicMatrix(cv::Range(0,3), cv::Range(0,3)).copyTo(RRRR);
-        //RRRR.row(2) = -RRRR.row(2);
-        cout << "R: " << cv::determinant(RRRR) << endl;
-        cout << "R: " << RRRR << endl;
         glm::mat3 IR;
         for (int i = 0; i < 3; i++)
             for (int j = 0; j < 3; j++)
-                IR[j][i] = RRRR.at<float>(i,j);
-        // trans by our code
+                IR[j][i] = initialExtrinsicMatrix.at<float>(i,j);
         w = RtoRod(IR);
-        cout << "w " << glm::to_string(w) << endl;
-        // trans by opencv
-        cv::Mat ww(3, 1, CV_32F);
-        cv::Rodrigues(RRRR, ww);
-        cout << "w[opencv] " << ww << endl;
-
-        IR = RodtoR(w);
-        cout << "w2R " << glm::to_string(IR) << endl;
-
-        glm::vec3 rec = RtoRod(IR);
-        cout << "R2w " << glm::to_string(rec) << endl;
     }
 
     para[0] = initialCameraMatrix.at<float>(0, 0);
@@ -135,9 +118,9 @@ void LMDLT::DLTwithPoints(int matchnum, float points2d[][2], float points3d[][3]
     para[4] = imgHeight / 2;
     para[5] = 0;
     para[6] = 0;
-    para[7] = 1;
-    para[8] = 0;
-    para[9] = 0;
+    para[7] = w[0];
+    para[8] = w[1];
+    para[9] = w[2];
     para[10] = initialExtrinsicMatrix.at<float>(0,3);
     para[11] = initialExtrinsicMatrix.at<float>(1,3);
     para[12] = initialExtrinsicMatrix.at<float>(2,3);

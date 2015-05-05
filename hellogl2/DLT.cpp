@@ -311,7 +311,7 @@ void phase2ExtractParametersFromP(cv::Mat &P, cv::Mat &modelView, cv::Mat &K) {
 
     // 若认为点在z轴的负方向，则P存在下面的关系
     // P = K * diag(1, 1, -1) * M
-    // 所以上面求得的M实际上是diag(1,1,-1)*M，下面求得真正的M
+    // 上面求得的M实际上是diag(1,1,-1)*M，下面求得真正的M
     modelView.row(2) = -modelView.row(2);
 }
 
