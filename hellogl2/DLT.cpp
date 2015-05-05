@@ -121,43 +121,6 @@ static cv::Mat removeEpsilon(cv::Mat &matrix) {
 	return result;
 }
 
-static bool verifyModelViewMatrix(const cv::Mat &modelView) {
-	assert(modelView.type() == CV_32F);
-
-	// 验证rotation是否是正交矩阵
-	cv::Mat rotation = modelView(cv::Range(0, 3), cv::Range(0, 3));
-	cv::Mat result1 = rotation.t() * rotation - cv::Mat::eye(3, 3, CV_32F);
-	result1 = removeEpsilon(result1);
-
-	// 选取相机坐标系下的一组单位正交向量，使用modelView矩阵的逆变换变换到模型坐标系下
-	// 验证得到的三个向量是否还是单位正交
-	cv::Mat aDir = cv::Mat::zeros(4, 1, CV_32F);
-	aDir.at<float>(0, 0) = 1;
-	cv::Mat bDir = cv::Mat::zeros(4, 1, CV_32F);
-	bDir.at<float>(1, 0) = 1;
-	cv::Mat cDir = cv::Mat::zeros(4, 1, CV_32F);
-	cDir.at<float>(2, 0) = 1;
-	aDir = modelView.inv() * aDir;
-	bDir = modelView.inv() * bDir;
-	cDir = modelView.inv() * cDir;
-
-	cv::Mat MMM = cv::Mat::zeros(3, 3, CV_32F);
-	aDir(cv::Range(0, 3), cv::Range::all()).copyTo(MMM.col(0));
-	bDir(cv::Range(0, 3), cv::Range::all()).copyTo(MMM.col(1));
-	cDir(cv::Range(0, 3), cv::Range::all()).copyTo(MMM.col(2));
-
-	cv::Mat result2 = MMM.t() * MMM - cv::Mat::eye(3, 3, CV_32F);
-	result2 = removeEpsilon(result2);
-
-	if (cv::countNonZero(result1) + cv::countNonZero(result2) == 0) {
-		return true;
-	}
-	else {
-		cout << "modelView is not valid:" << endl << result1 << endl << result2 << endl;
-		return false;
-	}
-}
-
 static cv::Mat constructProjectionMatrix(const cv::Mat &K, GLfloat n, GLfloat f, int iwidth, int iheight) {
 	// Hacked from this: http://www.songho.ca/opengl/gl_projectionmatrix.html
 
@@ -251,7 +214,7 @@ cv::Mat phase1CalculateP(int imClick, int objClick, float imCords[][2], float ob
 		}
 		M.at<float>(3 * i + 0, 12 + i) = -cords2d[i * 2 + 0];
 		M.at<float>(3 * i + 1, 12 + i) = -cords2d[i * 2 + 1];
-        M.at<float>(3 * i + 2, 12 + i) = 1;
+        M.at<float>(3 * i + 2, 12 + i) = -1;
 	}
 
 	// 执行SVD分解
@@ -267,10 +230,10 @@ cv::Mat phase1CalculateP(int imClick, int objClick, float imCords[][2], float ob
 		v = -v;
 	}
 
-	/*std::cout << "SV: " << S.t() << std::endl;
+    /*std::cout << "SV: " << S.t() << std::endl;
 	std::cout << "v: " << v << std::endl;
 	cv::Mat z = M * v.t();
-	std::cout << "LSR: " << cv::norm(z, cv::NORM_L2) << std::endl;*/
+    std::cout << "LSR: " << cv::norm(z, cv::NORM_L2) << std::endl;*/
 
 	// 教程中使用的公式是
 	// λx = PX，但是里面的x和X都是正规化后的，我们需要找到真实的P'
@@ -345,42 +308,11 @@ void phase2ExtractParametersFromP(cv::Mat &P, cv::Mat &modelView, cv::Mat &K) {
 	cv::Mat T = K.inv() * A4;
 	T.copyTo(modelView(cv::Range(0, 3), cv::Range(3, 4)));
 	K /= K.at<float>(2, 2);
-}
 
-void phase3GenerateLookAtAndProjection(const cv::Mat &modelView, const cv::Mat &K, int iwidth, int iheight, cv::Mat &lookat, cv::Mat &projection) {
-	// 在相机坐标系下选择相机点和其方向上的一个点
-	// PA = (0, 0, 0), PB = (0, 0, 1)
-	cv::Mat PA = cv::Mat::zeros(4, 1, CV_32F);
-	PA.at<float>(3, 0) = 1;
-	cv::Mat PB = cv::Mat::zeros(4, 1, CV_32F);
-	PB.at<float>(2, 0) = 1;
-	PB.at<float>(3, 0) = 1;
-	// 相机坐标系下，相机头部的方向（向量）
-	cv::Mat UpDir = cv::Mat::zeros(4, 1, CV_32F);
-	UpDir.at<float>(1, 0) = 1;
-
-	// 求取它们在世界坐标系下的表示
-	PA = modelView.inv() * PA;
-	PB = modelView.inv() * PB;
-	UpDir = modelView.inv() * UpDir;
-
-	// | from.x to.x upDir.x |
-	// | from.y to.y upDir.y |
-	// | from.z to.z upDir.z |
-	lookat = cv::Mat::zeros(3, 3, CV_32F);
-	PA(cv::Range(0, 3), cv::Range::all()).copyTo(lookat.col(0));
-	PB(cv::Range(0, 3), cv::Range::all()).copyTo(lookat.col(1));
-	UpDir(cv::Range(0, 3), cv::Range::all()).copyTo(lookat.col(2));
-
-	/*glm::vec3 from(PA.at<float>(0, 0), PA.at<float>(1, 0), PA.at<float>(2, 0));
-	glm::vec3 to(PB.at<float>(0, 0), PB.at<float>(1, 0), PB.at<float>(2, 0));
-	glm::vec3 up(UpDir.at<float>(0, 0), UpDir.at<float>(1, 0), UpDir.at<float>(2, 0));
-	glm::mat4 m = glm::lookAt(from, to, up);
-	cv::Mat md(4, 4, CV_32F, &m[0][0]);
-	md = md.t();*/
-
-    projection = constructProjectionMatrix(K, 0.1, 20, iwidth, iheight);
-	assert(verifyModelViewMatrix(modelView));
+    // 若认为点在z轴的负方向，则P存在下面的关系
+    // P = K * diag(1, 1, -1) * M
+    // 所以上面求得的M实际上是diag(1,1,-1)*M，下面求得真正的M
+    modelView.row(2) = -modelView.row(2);
 }
 
 void DLTwithPoints(
@@ -394,7 +326,6 @@ void DLTwithPoints(
     assert(matchnum >= 6);
     // 第一阶段, 用点对得到P
     cv::Mat P = phase1CalculateP(matchnum, matchnum, (float(*)[2])&points2d[0], (float(*)[3])&points3d[0]);
-
     // 第二阶段
     // 从P中分解出 K * [R t]
     // 由[R t]可以得到lookat的参数，由K可以构造GL_PROJECTION_MATRIX
@@ -408,15 +339,12 @@ void DLTwithPoints(
     CVDLT::DLTwithPoints(matchnum, points2d, points3d, imgWidth, imgHeight, K, modelView, K);
 
     cv::Mat proj;
-    cv::Mat lookAtParams;
-    phase3GenerateLookAtAndProjection(modelView, K, imgWidth, imgHeight, lookAtParams, proj);
+    for (int i = 0; i < 4; i++)
+        for (int j = 0; j < 4; j++)
+            mvMatrix[j][i] = modelView.at<float>(i,j);
 
-    glm::vec3 eye = glm::vec3(lookAtParams.at<float>(0, 0), lookAtParams.at<float>(1, 0), lookAtParams.at<float>(2, 0));
-    glm::vec3 center = glm::vec3(lookAtParams.at<float>(0, 1), lookAtParams.at<float>(1, 1), lookAtParams.at<float>(2, 1));
-    glm::vec3 updir = glm::vec3(lookAtParams.at<float>(0, 2), lookAtParams.at<float>(1, 2), lookAtParams.at<float>(2, 2));
-    // 在物体坐标系（世界坐标系）中摆放照相机和它的朝向
-    mvMatrix = glm::lookAt(eye, center, updir);
     // 使用生成的OpenGL投影矩阵
+    proj = constructProjectionMatrix(K, 0.1, 20, imgWidth, imgHeight);
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 4; j++) {
             projMatrix[j][i] = proj.at<float>(i, j);
