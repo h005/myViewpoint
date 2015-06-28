@@ -10,5 +10,6 @@ uniform mat4 mvMatrix;
 
 void main()
 {
-	gl_Position = projMatrix * mvMatrix * vec4(vertexPosition_modelspace, 1);
+	vec4 viewSpacePos = mvMatrix * vec4(vertexPosition_modelspace, 1);
+	gl_Position = projMatrix * viewSpacePos;
 }
