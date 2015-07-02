@@ -287,14 +287,16 @@ void Window::align()
 //    Q_ASSERT(manager.getEntity(QString("./73FB52A1-2036-48AC-B29E-EB90ED0E99F7_o.jpg"), want));
 //    Q_ASSERT(manager.getEntity(QString("./1-11112R33332647.jpg"), want));
 //    Q_ASSERT(manager.getEntity(QString("./53ad4c7b61138.jpg"), want));
-    Q_ASSERT(manager.getEntity(QString("./OOOPIC_robbin_200910130202f5809b3c9d39.jpg"), want));
+//    Q_ASSERT(manager.getEntity(QString("./OOOPIC_robbin_200910130202f5809b3c9d39.jpg"), want));
+//    Q_ASSERT(manager.getEntity(QString("./540c51252704bbf541e0307f28851506.jpg"), want));
+
 
 //    bigben
 //    Q_ASSERT(manager.getEntity(QString("./img0001.jpg"), want));
 //    Q_ASSERT(manager.getEntity(QString("./img0006.jpg"), want));
 //    Q_ASSERT(manager.getEntity(QString("./img0052.jpg"), want));
 //    Q_ASSERT(manager.getEntity(QString("./img0050.jpg"), want)); //error
-//    Q_ASSERT(manager.getEntity(QString("./img0063.jpg"), want));
+    Q_ASSERT(manager.getEntity(QString("./img0063.jpg"), want));
 //    Q_ASSERT(manager.getEntity(QString("./img0062.jpg"), want));
 //    Q_ASSERT(manager.getEntity(QString("./img0926.jpg"), want));
 //    Q_ASSERT(manager.getEntity(QString("./img1188.jpg"), want));

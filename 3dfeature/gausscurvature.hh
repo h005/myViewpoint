@@ -1,8 +1,11 @@
 #ifndef GAUSSCURVATURE_H
 #define GAUSSCURVATURE_H
 
+#include <limits>
+
 #include "common.hh"
 #include "Curvature.hh"
+#include "colormap.hh"
 
 template <typename MeshT>
 class GaussCurvature
@@ -17,12 +20,38 @@ public:
         typename MeshT::VertexIter v_it, v_end(m_mesh.vertices_end());
         for (v_it = m_mesh.vertices_begin(); v_it != v_end; v_it++) {
             double curv = curvature::gauss_curvature<MeshT>(m_mesh, *v_it);
-            m_mesh.property(m_vPropHandle, *v_it) = curv;
+            m_mesh.property(m_vPropHandle, *v_it) = abs(curv);
         }
     }
 
     ~GaussCurvature()
     {
+    }
+
+    void assignVertexColor()
+    {
+        if (!m_mesh.has_vertex_colors())
+            m_mesh.request_vertex_colors();
+
+        typename MeshT::VertexIter v_it, v_end(m_mesh.vertices_end());
+
+        double curvatureMax = -1, curvatureMin = std::numeric_limits<double>::max();
+        for (v_it = m_mesh.vertices_begin(); v_it != v_end; v_it++) {
+            if (curvatureMax < m_mesh.property(m_vPropHandle, *v_it)) {
+                curvatureMax = m_mesh.property(m_vPropHandle, *v_it);
+            }
+            if (curvatureMin > m_mesh.property(m_vPropHandle, *v_it)) {
+                curvatureMin = m_mesh.property(m_vPropHandle, *v_it);
+            }
+        }
+
+        for (v_it = m_mesh.vertices_begin(); v_it != v_end; v_it++) {
+            double rgb[3];
+            double v = m_mesh.property(m_vPropHandle, *v_it);
+            ColorMap::jet(rgb, v, curvatureMin, curvatureMax);
+            typename MeshT::Color color(rgb[0], rgb[1], rgb[2]);
+            m_mesh.set_color(*v_it, color);
+        }
     }
 
     double compute(const glm::mat3 &K, const glm::mat3 &R, const glm::vec3 &t)

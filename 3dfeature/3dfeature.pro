@@ -6,10 +6,11 @@
 
 DIRECTORIES = .
 
-SOURCES += cube.cc
+SOURCES += cube.cc colormap.cc
 HEADERS += Curvature.hh \
     gausscurvature.hh \
     meancurvature.hh \
+    colormap.hh \
     common.hh
 
 DEFINES += _USE_MATH_DEFINES

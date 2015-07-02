@@ -3,13 +3,14 @@
 
 #include "common.hh"
 #include "Curvature.hh"
+#include "colormap.hh"
 
 template <typename MeshT>
 class MeanCurvature
 {
 public:
-    MeanCurvature(MeshT &mesh)
-        : m_mesh(mesh), m_PropertyKeyword("Mean Curvature")
+    MeanCurvature(MeshT &in_mesh)
+        : m_mesh(in_mesh), m_PropertyKeyword("Mean Curvature")
     {
         if(!m_mesh.get_property_handle(m_vPropHandle, m_PropertyKeyword)) {
             m_mesh.add_property(m_vPropHandle, m_PropertyKeyword);
@@ -33,15 +34,16 @@ public:
             // 这里可能存在问题，由于包围面积过小，除法后结果值过大
             double curvatureMax = -1;
             for (v_it = m_mesh.vertices_begin(); v_it != v_end; v_it++)
-                if (m_mesh.property(vertexBoundingArea, *v_it) > 1e-3
-                        && curvatureMax < m_mesh.property(valuePerArea, *v_it)) {
+                if (curvatureMax < m_mesh.property(valuePerArea, *v_it)) {
                     curvatureMax = m_mesh.property(valuePerArea, *v_it);
                     std::cout << m_mesh.property(valuePerArea, *v_it) << " " <<  m_mesh.property(vertexBoundingArea, *v_it) << std::endl;
                 }
 
-            for (v_it = m_mesh.vertices_begin(); v_it != v_end; v_it++)
+            for (v_it = m_mesh.vertices_begin(); v_it != v_end; v_it++) {
                 m_mesh.property(m_vPropHandle, *v_it) =
-                        m_mesh.property(valuePerArea, *v_it) / curvatureMax * m_mesh.property(vertexBoundingArea, *v_it);
+                        m_mesh.property(valuePerArea, *v_it) / curvatureMax;
+
+            }
 
             m_mesh.remove_property(valuePerArea);
             m_mesh.remove_property(vertexBoundingArea);
@@ -50,6 +52,21 @@ public:
 
     ~MeanCurvature()
     {
+    }
+
+    void assignVertexColor()
+    {
+        if (!m_mesh.has_vertex_colors())
+            m_mesh.request_vertex_colors();
+
+        typename MeshT::VertexIter v_it, v_end(m_mesh.vertices_end());
+        for (v_it = m_mesh.vertices_begin(); v_it != v_end; v_it++) {
+            double rgb[3];
+            double v = m_mesh.property(m_vPropHandle, *v_it);
+            ColorMap::jet(rgb, v, 0, 1);
+            typename MeshT::Color color(rgb[0], rgb[1], rgb[2]);
+            m_mesh.set_color(*v_it, color);
+        }
     }
 
     double compute(const glm::mat3 &K, const glm::mat3 &R, const glm::vec3 &t)
