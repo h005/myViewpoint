@@ -45,9 +45,8 @@ int main()
         return 1;
     }
 
-    std::cout << "enter" << std::endl;
     GaussCurvature<MyMesh> a(mesh);
     MeanCurvature<MyMesh> b(mesh);
-    std::cout << "ok" << std::endl;
+    std::cout << "finished" << std::endl;
     return 0;
 }

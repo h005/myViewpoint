@@ -18,7 +18,6 @@ public:
         for (v_it = m_mesh.vertices_begin(); v_it != v_end; v_it++) {
             double curv = curvature::gauss_curvature<MeshT>(m_mesh, *v_it);
             m_mesh.property(m_vPropHandle, *v_it) = curv;
-            std::cout << m_mesh.property(m_vPropHandle, *v_it) << std::endl;
         }
     }
 
