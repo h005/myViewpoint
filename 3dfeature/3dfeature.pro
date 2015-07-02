@@ -7,10 +7,14 @@
 DIRECTORIES = .
 
 SOURCES += cube.cc
+HEADERS += Curvature.hh \
+    gausscurvature.hh \
+    meancurvature.hh \
+    common.hh
 
 DEFINES += _USE_MATH_DEFINES
 
-CONFIG += console
+#CONFIG += console
 
 win32 {
     DP_TOOLS_DIR = $$(DP_TOOLS_DIR)
@@ -18,3 +22,6 @@ win32 {
     INCLUDEPATH += $$DP_TOOLS_DIR/openmesh/include
     LIBS += -L$$DP_TOOLS_DIR/openmesh/lib/vs2013 -lOpenMeshCored
 }
+
+# glm
+INCLUDEPATH += $$_PRO_FILE_PWD_/../vendor/glm
