@@ -42,6 +42,8 @@
 #define GLWIDGET_H
 
 #include <GL/glew.h>
+#include "meshglhelper.hh"
+
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions>
 #include <QOpenGLVertexArrayObject>
@@ -53,9 +55,6 @@ QT_FORWARD_DECLARE_CLASS(QOpenGLShaderProgram)
 
 class PointsMatchRelation;
 class QString;
-
-template <typename MeshT>
-class MeshGLHelper;
 
 class GLWidget : public QOpenGLWidget, protected QOpenGLFunctions
 {
@@ -87,7 +86,7 @@ protected:
     float m_angle;
     GLfloat m_scale;
     GLuint m_programID;
-    MeshGLHelper<MyMesh> *m_helper;
+    MeshGLHelper<MyMesh> m_helper;
     MyMesh &m_mesh;
 
 

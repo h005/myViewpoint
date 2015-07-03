@@ -38,8 +38,6 @@
 **
 ****************************************************************************/
 
-// 注意下面这个头文件，必须放在最前
-#include "meshglhelper.hh"
 
 #include "glwidget.hh"
 #include <iostream>
@@ -52,7 +50,6 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/string_cast.hpp>
 #include "shader.hh"
-#include "meshglhelper.hh"
 
 GLWidget::GLWidget(MyMesh &in_mesh, QWidget *parent)
     : QOpenGLWidget(parent),
@@ -61,15 +58,14 @@ GLWidget::GLWidget(MyMesh &in_mesh, QWidget *parent)
       m_scale(1),
       m_rotateN(1.f),
       m_baseRotate(1.f),
-      m_programID(0)
+      m_programID(0),
+      m_helper(in_mesh)
 {
     // --transparent causes the clear color to be transparent. Therefore, on systems that
     // support it, the widget will become transparent apart from the logo.
     m_transparent = QCoreApplication::arguments().contains(QStringLiteral("--transparent"));
     if (m_transparent)
         setAttribute(Qt::WA_TranslucentBackground);
-
-    m_helper = new MeshGLHelper<MyMesh>(in_mesh);
 }
 
 GLWidget::~GLWidget()
@@ -101,11 +97,7 @@ void GLWidget::cleanup()
     if (m_programID) {
         glDeleteProgram(m_programID);
     }
-    if (m_helper) {
-        m_helper->cleanup();
-        delete m_helper;
-    }
-    glGenBuffers(1, (GLuint *)0);
+    m_helper.cleanup();
     doneCurrent();
 }
 
@@ -135,7 +127,7 @@ void GLWidget::initializeGL()
     // link program for drawing sphere
     m_programID = LoadShaders( "shader/sphereShader.vert", "shader/sphereShader.frag" );
     GLuint vertexPosition_modelspaceID = glGetAttribLocation(m_programID, "vertexPosition_modelspace");
-    m_helper->init(vertexPosition_modelspaceID);
+    m_helper.init(vertexPosition_modelspaceID);
 }
 
 void GLWidget::paintGL()
@@ -152,7 +144,7 @@ void GLWidget::paintGL()
     glUniformMatrix4fv(projMatrixID, 1, GL_FALSE, glm::value_ptr(m_proj));
     glUniformMatrix4fv(mvMatrixID, 1, GL_FALSE, glm::value_ptr(modelViewMatrix));
 
-    m_helper->draw();
+    m_helper.draw();
 }
 
 void GLWidget::resizeGL(int w, int h)

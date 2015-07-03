@@ -1,11 +1,8 @@
 #ifndef MESHGLHELPER_HH
 #define MESHGLHELPER_HH
 
-#include <GL/glew.h>
-
-#include <vector>
+#include <assert.h>
 #include <map>
-#include "common.hh"
 
 template <typename MeshT>
 class MeshGLHelper {

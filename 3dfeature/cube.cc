@@ -12,10 +12,10 @@
 #include "gausscurvature.hh"
 #include "meancurvature.hh"
 #include "externalimporter.hh"
-#include "meshglhelper.hh"
 
 int main()
 {
+    return 0;
     MyMesh mesh;
     // read mesh from stdin
 //    if ( ! OpenMesh::IO::read_mesh(mesh, "94.off") )
