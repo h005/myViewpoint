@@ -4,19 +4,26 @@
 
 ################################################################################
 
+QT           += widgets opengl
 DIRECTORIES = .
 
-SOURCES += cube.cc colormap.cc
+SOURCES += cube.cc colormap.cc glwidget.cc shader.cc
 HEADERS += Curvature.hh \
     gausscurvature.hh \
     meancurvature.hh \
     colormap.hh \
     common.hh \
-    externalimporter.hh
+    externalimporter.hh \
+    surfacevisibility.hh \
+    abstractfeature.hh \
+    viewpointentropy.hh \
+    projectedarea.hh \
+    renderinterface.hh \
+    glwidget.hh \
+    shader.hh \
+    meshglhelper.hh
 
 DEFINES += _USE_MATH_DEFINES
-
-#CONFIG += console
 
 win32 {
     DP_TOOLS_DIR = $$(DP_TOOLS_DIR)
@@ -28,6 +35,10 @@ win32 {
     # assimp
     LIBS += -L$$DP_TOOLS_DIR/assimp-3.1.1-win-binaries/build/code/Release -lassimp
     INCLUDEPATH += $$DP_TOOLS_DIR/assimp-3.1.1-win-binaries/include
+
+    # glew
+    INCLUDEPATH += $$DP_TOOLS_DIR/glew/include
+    LIBS += -L$$DP_TOOLS_DIR/glew/lib/Release/Win32 -lglew32
 }
 
 # glm

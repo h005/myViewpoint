@@ -6,13 +6,14 @@
 #include "common.hh"
 #include "Curvature.hh"
 #include "colormap.hh"
+#include "abstractfeature.hh"
 
 template <typename MeshT>
-class GaussCurvature
+class GaussCurvature: public AbstractFeature<MeshT>
 {
 public:
-    GaussCurvature(MeshT &mesh)
-        : m_mesh(mesh), m_PropertyKeyword("Gauss Curvature")
+    GaussCurvature(MeshT &in_mesh)
+        : m_mesh(in_mesh), m_PropertyKeyword("Gauss Curvature")
     {
         if(!m_mesh.get_property_handle(m_vPropHandle, m_PropertyKeyword))
             m_mesh.add_property(m_vPropHandle, m_PropertyKeyword);
@@ -28,6 +29,9 @@ public:
     {
     }
 
+    /**
+     * @brief 将各个顶点的曲率结果，以颜色形式保存到绑定的mesh对象中，便于后续输出到文件
+     */
     void assignVertexColor()
     {
         if (!m_mesh.has_vertex_colors())

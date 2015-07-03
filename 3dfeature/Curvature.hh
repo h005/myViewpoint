@@ -219,7 +219,7 @@ void discrete_mean_curv_op( const MeshT&                        _m,
     }
   }
 
-  _n /= 2.0*_area;
+  _n /= (float)(2.0*_area);
 }
 
 template <typename T>

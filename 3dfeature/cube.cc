@@ -12,6 +12,7 @@
 #include "gausscurvature.hh"
 #include "meancurvature.hh"
 #include "externalimporter.hh"
+#include "meshglhelper.hh"
 
 int main()
 {
@@ -22,7 +23,7 @@ int main()
 //        std::cerr << "Error: Cannot read mesh from " << std::endl;
 //        return 1;
 //    }
-    if (!ExternalImporter<MyMesh>::read_mesh(mesh, "94.off") )
+    if (!ExternalImporter<MyMesh>::read_mesh(mesh, "1.off") )
     {
         std::cerr << "Error: Cannot read mesh from " << std::endl;
         return 1;

@@ -4,9 +4,10 @@
 #include "common.hh"
 #include "Curvature.hh"
 #include "colormap.hh"
+#include "abstractfeature.hh"
 
 template <typename MeshT>
-class MeanCurvature
+class MeanCurvature: public AbstractFeature<MeshT>
 {
 public:
     MeanCurvature(MeshT &in_mesh)
@@ -54,6 +55,9 @@ public:
     {
     }
 
+    /**
+     * @brief 将各个顶点的曲率结果，以颜色形式保存到绑定的mesh对象中，便于后续输出到文件
+     */
     void assignVertexColor()
     {
         if (!m_mesh.has_vertex_colors())
