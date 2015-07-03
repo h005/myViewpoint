@@ -4,7 +4,7 @@
 
 ################################################################################
 
-QT           += widgets opengl
+QT           += widgets
 DIRECTORIES = .
 
 SOURCES += cube.cc colormap.cc glwidget.cc shader.cc

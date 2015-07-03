@@ -48,16 +48,16 @@ public:
         glGenVertexArrays(1, &m_vao);
         glBindVertexArray(m_vao);
 
-//        glGenBuffers(1, &m_vboVertex);
-//        glBindBuffer(GL_ARRAY_BUFFER, m_vboVertex);
-//        glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(GLfloat), &vertices[0], GL_STATIC_DRAW);
+        glGenBuffers(1, &m_vboVertex);
+        glBindBuffer(GL_ARRAY_BUFFER, m_vboVertex);
+        glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(GLfloat), &vertices[0], GL_STATIC_DRAW);
 
-//        glVertexAttribPointer(vertexPositionID, 3, GL_FLOAT, GL_FALSE, 0, NULL);
-//        glEnableVertexAttribArray (vertexPositionID);
+        glVertexAttribPointer(vertexPositionID, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+        glEnableVertexAttribArray (vertexPositionID);
 
-//        glGenBuffers(1, &m_vboIndex);
-//        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_vboIndex);
-//        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLuint), &indices[0], GL_STATIC_DRAW);
+        glGenBuffers(1, &m_vboIndex);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_vboIndex);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLuint), &indices[0], GL_STATIC_DRAW);
 
         numsToDraw = indices.size();
         m_isInited = true;
@@ -65,36 +65,36 @@ public:
 
     void draw()
     {
-//        if (!m_isInited) {
-//            std::cout << "please call init() before draw()" << std::endl;
-//            assert(0);
-//        }
+        if (!m_isInited) {
+            std::cout << "please call init() before draw()" << std::endl;
+            assert(0);
+        }
 
-//        // draw sphere
-//        glBindVertexArray(m_vao);
-//        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_vboIndex);
-//        glDrawElements(GL_TRIANGLES, numsToDraw, GL_UNSIGNED_INT, NULL);
+        // draw sphere
+        glBindVertexArray(m_vao);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_vboIndex);
+        glDrawElements(GL_TRIANGLES, numsToDraw, GL_UNSIGNED_INT, NULL);
     }
 
     void cleanup()
     {
-//        if (!m_isInited) {
-//            return;
-//        }
-//        if(m_vboVertex) {
-//            glDeleteBuffers(1, &m_vboVertex);
-//        }
-//        if(m_vboIndex) {
-//            glDeleteBuffers(1, &m_vboIndex);
-//        }
-//        if (m_vao) {
-//            glDeleteVertexArrays(1, &m_vao);
-//        }
+        if (!m_isInited) {
+            return;
+        }
+        if(m_vboVertex) {
+            glDeleteBuffers(1, &m_vboVertex);
+        }
+        if(m_vboIndex) {
+            glDeleteBuffers(1, &m_vboIndex);
+        }
+        if (m_vao) {
+            glDeleteVertexArrays(1, &m_vao);
+        }
 
-//        m_isInited = false;
-//        m_vao = 0;
-//        m_vboVertex = 0;
-//        m_vboIndex = 0;
+        m_isInited = false;
+        m_vao = 0;
+        m_vboVertex = 0;
+        m_vboIndex = 0;
     }
 
 private:

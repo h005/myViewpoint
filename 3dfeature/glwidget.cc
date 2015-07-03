@@ -38,6 +38,9 @@
 **
 ****************************************************************************/
 
+// 注意下面这个头文件，必须放在最前
+#include "meshglhelper.hh"
+
 #include "glwidget.hh"
 #include <iostream>
 #include <QMouseEvent>
