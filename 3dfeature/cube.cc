@@ -15,7 +15,6 @@
 
 int main()
 {
-    return 0;
     MyMesh mesh;
     // read mesh from stdin
 //    if ( ! OpenMesh::IO::read_mesh(mesh, "94.off") )
