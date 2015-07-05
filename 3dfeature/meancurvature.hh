@@ -35,10 +35,8 @@ public:
             // 这里可能存在问题，由于包围面积过小，除法后结果值过大
             double curvatureMax = -1;
             for (v_it = m_mesh.vertices_begin(); v_it != v_end; v_it++)
-                if (curvatureMax < m_mesh.property(valuePerArea, *v_it)) {
+                if (curvatureMax < m_mesh.property(valuePerArea, *v_it))
                     curvatureMax = m_mesh.property(valuePerArea, *v_it);
-                    std::cout << m_mesh.property(valuePerArea, *v_it) << " " <<  m_mesh.property(vertexBoundingArea, *v_it) << std::endl;
-                }
 
             for (v_it = m_mesh.vertices_begin(); v_it != v_end; v_it++) {
                 m_mesh.property(m_vPropHandle, *v_it) =
