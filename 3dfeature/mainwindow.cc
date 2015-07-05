@@ -1,29 +1,17 @@
 #include "mainwindow.hh"
-#include <QMenuBar>
-#include <QMenu>
-#include <QMessageBox>
+#include <QVBoxLayout>
+#include <QPushButton>
 #include "glwidget.hh"
 #include "externalimporter.hh"
 #include "gausscurvature.hh"
 #include "meancurvature.hh"
 
-MyMesh mesh;
-
-MainWindow::MainWindow()
+/**
+ * @brief MainWindow::startMyProcess 主要的代码写在这里
+ */
+void MainWindow::startMyProcess()
 {
-    QMenuBar *menuBar = new QMenuBar;
-    QMenu *menuWindow = menuBar->addMenu(tr("&Window"));
-    QAction *addNew = new QAction(menuWindow);
-    addNew->setText(tr("Add new"));
-    menuWindow->addAction(addNew);
-    connect(addNew, SIGNAL(triggered()), this, SLOT(onAddNew()));
-    setMenuBar(menuBar);
-
-    onAddNew();
-}
-
-void MainWindow::onAddNew()
-{
+    MyMesh mesh;
     // 从文件中读入mesh。ExternalImporter是我实现的模版类，支持的格式更多些
 #ifdef BUILDIN_READER
     if ( ! OpenMesh::IO::read_mesh(mesh, "1.off") )
@@ -46,13 +34,29 @@ void MainWindow::onAddNew()
     OpenMesh::IO::Options opt(OpenMesh::IO::Options::VertexColor);
     OpenMesh::IO::write_mesh(mesh, "temp.off", opt);
 
-    if (!centralWidget()) {
-        setCentralWidget(new GLWidget(mesh, this));
-    }
-    else
-        QMessageBox::information(0, tr("Cannot add new window"), tr("Already occupied. Undock first."));
+    GLWidget *window = new GLWidget(mesh, 0);
+    window->show();
+}
 
-    std::cout << "finished" << std::endl;
 
+// 下面的代码不用看
+MainWindow::MainWindow(QWidget *parent) : QWidget(parent)
+{
+    dockBtn = new QPushButton(tr("Start"), this);
+    connect(dockBtn, SIGNAL(clicked()), this, SLOT(startMyProcess()));
+
+    // 最中间的一列按钮
+    QVBoxLayout *middleLayout = new QVBoxLayout;
+    middleLayout->addWidget(dockBtn);
+    setLayout(middleLayout);
+}
+
+MainWindow::~MainWindow()
+{
+}
+
+QSize MainWindow::sizeHint() const
+{
+    return QSize(100, 100);
 }
 

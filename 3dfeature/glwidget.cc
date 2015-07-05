@@ -79,7 +79,7 @@ QSize GLWidget::minimumSizeHint() const
 
 QSize GLWidget::sizeHint() const
 {
-    return QSize(400, 400);
+    return QSize(800, 800);
 }
 
 static void qNormalizeAngle(int &angle)
@@ -103,17 +103,10 @@ void GLWidget::cleanup()
 void GLWidget::initializeGL()
 {
     // http://stackoverflow.com/a/8303331
-    glewExperimental = GL_TRUE;
-    
+    glewExperimental = GL_TRUE;    
     GLenum err = glewInit();
     assert(err == GLEW_OK);
-    // In this example the widget's corresponding top-level window can change
-    // several times during the widget's lifetime. Whenever this happens, the
-    // QOpenGLWidget's associated context is destroyed and a new one is created.
-    // Therefore we have to be prepared to clean up the resources on the
-    // aboutToBeDestroyed() signal, instead of the destructor. The emission of
-    // the signal will be followed by an invocation of initializeGL() where we
-    // can recreate all resources.
+
     connect(context(), &QOpenGLContext::aboutToBeDestroyed, this, &GLWidget::cleanup);
     initializeOpenGLFunctions();
     glClearColor(0, 0, 0, m_transparent ? 0 : 1);
@@ -154,6 +147,10 @@ void GLWidget::resizeGL(int w, int h)
     m_proj = glm::perspective(glm::pi<float>() / 3, GLfloat(w) / h, 0.01f, 100.0f);
 }
 
+/**
+ * @brief GLWidget::getModelViewMatrix 由于这个窗口支持鼠标拖拽和缩放，所以m_camera并不是最终的变换矩阵
+ * @return 渲染时使用的ModelView矩阵
+ */
 glm::mat4 GLWidget::getModelViewMatrix()
 {
     return (m_camera

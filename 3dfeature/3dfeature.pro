@@ -8,8 +8,8 @@ QT           += widgets
 DIRECTORIES = .
 
 SOURCES += colormap.cc glwidget.cc shader.cc trackball.cc \
-    mainwindow.cc \
-    main.cc
+    main.cc \
+    mainwindow.cc
 HEADERS += Curvature.hh \
     gausscurvature.hh \
     meancurvature.hh \

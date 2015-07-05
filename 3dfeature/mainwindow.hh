@@ -1,17 +1,27 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <QMainWindow>
+#include <QObject>
+#include <QWidget>
 
-class MainWindow : public QMainWindow
+class QPushButton;
+
+class MainWindow : public QWidget
 {
     Q_OBJECT
-
 public:
-    MainWindow();
+    explicit MainWindow(QWidget *parent = 0);
+    ~MainWindow();
+    QSize sizeHint() const Q_DECL_OVERRIDE;
+
+private:
+    QPushButton *dockBtn;
+
+signals:
 
 private slots:
-    void onAddNew();
+    void startMyProcess();
+
 };
 
 #endif // MAINWINDOW_H
