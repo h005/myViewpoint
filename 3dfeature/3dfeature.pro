@@ -7,7 +7,8 @@
 QT           += widgets
 DIRECTORIES = .
 
-SOURCES += cube.cc colormap.cc glwidget.cc shader.cc
+SOURCES += cube.cc colormap.cc glwidget.cc shader.cc \
+    mainwindow.cc
 HEADERS += Curvature.hh \
     gausscurvature.hh \
     meancurvature.hh \
@@ -21,7 +22,9 @@ HEADERS += Curvature.hh \
     renderinterface.hh \
     glwidget.hh \
     shader.hh \
-    meshglhelper.hh
+    meshglhelper.hh \
+    mainwindow.hh
+OTHER_FILES += shader/*.vert shader/*.frag
 
 DEFINES += _USE_MATH_DEFINES
 
@@ -43,3 +46,20 @@ win32 {
 
 # glm
 INCLUDEPATH += $$_PRO_FILE_PWD_/../vendor/glm
+
+defineTest(copyToDestdir) {
+    files = $$1
+
+    for(FILE, files) {
+        DDIR = $$OUT_PWD
+
+        # Replace slashes in paths with backslashes for Windows
+        win32:FILE ~= s,/,\\,g
+        win32:DDIR ~= s,/,\\,g
+
+        QMAKE_POST_LINK += $$QMAKE_COPY $$quote($$FILE) $$quote($$DDIR) $$escape_expand(\\n\\t)
+    }
+
+    export(QMAKE_POST_LINK)
+}
+copyToDestdir($$_PRO_FILE_PWD_/shader)

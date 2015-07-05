@@ -1,39 +1,39 @@
 #include <iostream>
 
-
-#include "assimp/Importer.hpp"
-#include "assimp/postprocess.h"
-#include "assimp/scene.h"
-#include "assimp/DefaultLogger.hpp"
-#include "assimp/LogStream.hpp"
-
+#include <QApplication>
+#include <QDesktopWidget>
+#include <QSurfaceFormat>
 
 #include "common.hh"
-#include "gausscurvature.hh"
-#include "meancurvature.hh"
 #include "externalimporter.hh"
+#include "mainwindow.hh"
 
-int main()
+int main(int argc, char *argv[])
 {
-    MyMesh mesh;
-    // read mesh from stdin
-//    if ( ! OpenMesh::IO::read_mesh(mesh, "94.off") )
-//    {
-//        std::cerr << "Error: Cannot read mesh from " << std::endl;
-//        return 1;
-//    }
-    if (!ExternalImporter<MyMesh>::read_mesh(mesh, "1.off") )
-    {
-        std::cerr << "Error: Cannot read mesh from " << std::endl;
-        return 1;
+    // Qt App
+    QApplication app(argc, argv);
+
+    QSurfaceFormat fmt;
+    fmt.setDepthBufferSize(24);
+    if (QCoreApplication::arguments().contains(QStringLiteral("--multisample")))
+        fmt.setSamples(4);
+    if (QCoreApplication::arguments().contains(QStringLiteral("--coreprofile"))) {
+        fmt.setVersion(3, 2);
+        fmt.setProfile(QSurfaceFormat::CoreProfile);
     }
+    QSurfaceFormat::setDefaultFormat(fmt);
 
-    GaussCurvature<MyMesh> a(mesh);
-    MeanCurvature<MyMesh> b(mesh);
-    std::cout << "finished" << std::endl;
+    MainWindow mainWindow;
+    mainWindow.resize(mainWindow.sizeHint());
+    int desktopArea = QApplication::desktop()->width() *
+                     QApplication::desktop()->height();
+    int widgetArea = mainWindow.width() * mainWindow.height();
+    if (((float)widgetArea / (float)desktopArea) < 0.75f)
+        mainWindow.show();
+    else
+        mainWindow.showMaximized();
 
-    a.assignVertexColor();
-    OpenMesh::IO::Options opt(OpenMesh::IO::Options::VertexColor);
-    OpenMesh::IO::write_mesh(mesh, "temp.off", opt);
-    return 0;
+    std::cout << "MainWindow: show complete" << std::endl;
+
+    return app.exec();
 }

@@ -61,8 +61,6 @@ GLWidget::GLWidget(MyMesh &in_mesh, QWidget *parent)
       m_programID(0),
       m_helper(in_mesh)
 {
-    // --transparent causes the clear color to be transparent. Therefore, on systems that
-    // support it, the widget will become transparent apart from the logo.
     m_transparent = QCoreApplication::arguments().contains(QStringLiteral("--transparent"));
     if (m_transparent)
         setAttribute(Qt::WA_TranslucentBackground);
@@ -125,7 +123,7 @@ void GLWidget::initializeGL()
     m_camera = glm::lookAt(glm::vec3(0.f, 0.f, 3.f), glm::vec3(0.f), glm::vec3(0.f, 1.f, 0.f));
 
     // link program for drawing sphere
-    m_programID = LoadShaders( "shader/sphereShader.vert", "shader/sphereShader.frag" );
+    m_programID = LoadShaders( "sphereShader.vert", "sphereShader.frag" );
     GLuint vertexPosition_modelspaceID = glGetAttribLocation(m_programID, "vertexPosition_modelspace");
     m_helper.init(vertexPosition_modelspaceID);
 }
@@ -139,11 +137,11 @@ void GLWidget::paintGL()
     // 计算modelView矩阵
     glm::mat4 modelViewMatrix = getModelViewMatrix();
 
+    glUseProgram(m_programID);
     GLuint projMatrixID = glGetUniformLocation(m_programID, "projMatrix");
     GLuint mvMatrixID = glGetUniformLocation(m_programID, "mvMatrix");
     glUniformMatrix4fv(projMatrixID, 1, GL_FALSE, glm::value_ptr(m_proj));
     glUniformMatrix4fv(mvMatrixID, 1, GL_FALSE, glm::value_ptr(modelViewMatrix));
-
     m_helper.draw();
 }
 
