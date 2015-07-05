@@ -7,7 +7,7 @@
 QT           += widgets
 DIRECTORIES = .
 
-SOURCES += cube.cc colormap.cc glwidget.cc shader.cc \
+SOURCES += cube.cc colormap.cc glwidget.cc shader.cc trackball.cc \
     mainwindow.cc
 HEADERS += Curvature.hh \
     gausscurvature.hh \
@@ -23,6 +23,7 @@ HEADERS += Curvature.hh \
     glwidget.hh \
     shader.hh \
     meshglhelper.hh \
+    trackball.hh \
     mainwindow.hh
 OTHER_FILES += shader/*.vert shader/*.frag
 
