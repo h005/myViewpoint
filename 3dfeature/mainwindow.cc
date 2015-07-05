@@ -18,6 +18,8 @@ MainWindow::MainWindow()
     menuWindow->addAction(addNew);
     connect(addNew, SIGNAL(triggered()), this, SLOT(onAddNew()));
     setMenuBar(menuBar);
+
+    onAddNew();
 }
 
 void MainWindow::onAddNew()
