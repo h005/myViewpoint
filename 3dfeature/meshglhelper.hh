@@ -1,4 +1,4 @@
-#ifndef MESHGLHELPER_HH
+﻿#ifndef MESHGLHELPER_HH
 #define MESHGLHELPER_HH
 
 #include <assert.h>

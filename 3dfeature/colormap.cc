@@ -1,4 +1,4 @@
-#include "colormap.hh"
+﻿#include "colormap.hh"
 
 void ColorMap::jet(double *color, double x, double min, double max)
 {

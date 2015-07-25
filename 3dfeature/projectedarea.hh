@@ -1,4 +1,4 @@
-#ifndef PROJECTEDAREA_HH
+﻿#ifndef PROJECTEDAREA_HH
 #define PROJECTEDAREA_HH
 
 #include "common.hh"

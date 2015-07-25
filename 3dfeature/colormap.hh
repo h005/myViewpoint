@@ -1,4 +1,4 @@
-#ifndef COLORMAP_H
+﻿#ifndef COLORMAP_H
 #define COLORMAP_H
 
 #include <stdint.h>

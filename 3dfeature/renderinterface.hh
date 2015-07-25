@@ -1,4 +1,4 @@
-#ifndef RENDERINTERFACE_HH
+﻿#ifndef RENDERINTERFACE_HH
 #define RENDERINTERFACE_HH
 
 #include "common.hh"

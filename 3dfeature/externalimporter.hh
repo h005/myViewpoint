@@ -1,4 +1,4 @@
-#ifndef EXTERNALIMPORTER_H
+﻿#ifndef EXTERNALIMPORTER_H
 #define EXTERNALIMPORTER_H
 
 #include "common.hh"

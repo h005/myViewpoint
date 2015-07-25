@@ -1,4 +1,4 @@
-#ifndef SURFACEVISIBILITY_HH
+﻿#ifndef SURFACEVISIBILITY_HH
 #define SURFACEVISIBILITY_HH
 
 #include "common.hh"

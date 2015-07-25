@@ -1,4 +1,4 @@
-#ifndef MEANCURVATURE_HH
+﻿#ifndef MEANCURVATURE_HH
 #define MEANCURVATURE_HH
 
 #include "common.hh"

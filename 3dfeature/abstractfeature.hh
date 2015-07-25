@@ -1,4 +1,4 @@
-#ifndef ABSTRACTFEATURE_HH
+﻿#ifndef ABSTRACTFEATURE_HH
 #define ABSTRACTFEATURE_HH
 
 #include "common.hh"
