@@ -13,6 +13,7 @@ void MainWindow::startMyProcess()
 {
     MyMesh mesh;
     // 从文件中读入mesh。ExternalImporter是我实现的模版类，支持的格式更多些
+
 #ifdef BUILDIN_READER
     if ( ! OpenMesh::IO::read_mesh(mesh, "1.off") )
     {
@@ -59,6 +60,7 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent)
     connect(dockBtn, SIGNAL(clicked()), this, SLOT(startMyProcess()));
 
     // 最中间的一列按钮
+
     QVBoxLayout *middleLayout = new QVBoxLayout;
     middleLayout->addWidget(dockBtn);
     setLayout(middleLayout);

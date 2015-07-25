@@ -160,6 +160,7 @@ glm::mat4 GLWidget::getModelViewMatrix()
 }
 
 // 下面这些函数用户支持鼠标拖拽、滚轮缩放
+
 void GLWidget::mousePressEvent(QMouseEvent *event)
 {
     m_lastPos = event->pos();
@@ -168,6 +169,7 @@ void GLWidget::mousePressEvent(QMouseEvent *event)
 void GLWidget::mouseReleaseEvent(QMouseEvent *event)
 {
     // 注意新增加的旋转量是左乘，与paintGL中一致
+
     glm::mat4 leftRotationMatrix = glm::rotate(glm::mat4(1.f), m_angle, m_rotateN);
     m_baseRotate = leftRotationMatrix * m_baseRotate;
     // 重点是将m_angle清零，因为旋转已经被融合进m_baseRotate了
