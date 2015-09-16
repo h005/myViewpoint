@@ -15,7 +15,8 @@ HEADERS       = glwidget.h \
     camerashowwidget.h \
     axis.h \
     cvdlt.h \
-    lmdlt.h
+    lmdlt.h \
+    mainentrywindow.h
 SOURCES       = glwidget.cpp \
                 main.cpp \
                 window.cpp \
@@ -35,7 +36,8 @@ SOURCES       = glwidget.cpp \
     axis.cpp \
     expfit.cpp \
     cvdlt.cpp \
-    lmdlt.cpp
+    lmdlt.cpp \
+    mainentrywindow.cpp
 
 QT           += widgets
 
@@ -70,3 +72,6 @@ win32 {
 
 # glm
 INCLUDEPATH += $$_PRO_FILE_PWD_/../vendor/glm
+
+FORMS += \
+    mainentrywindow.ui
