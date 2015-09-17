@@ -65,12 +65,11 @@
 #include "entity.h"
 #include "custom.h"
 
-Window::Window(AlignWindow *mw, const QString &imagePath, const QString &modelPath, PointsMatchRelation &relation, EntityManager &manager)
+Window::Window(AlignWindow *mw, const QString &imagePath, const QString &modelPath, PointsMatchRelation &relation)
     : mainWindow(mw),
       relation(relation),
       m_modelpath(modelPath),
-      m_imagepath(imagePath),
-      m_manager(manager)
+      m_imagepath(imagePath)
 {
     QImage img(imagePath);
     m_iwidth = img.width();
@@ -188,7 +187,7 @@ void Window::align()
     std::vector<glm::vec3> &points3d = relation.getPoints3d();
     DLTwithPoints(points2d.size(), (float(*)[2])&points2d[0], (float(*)[3])&points3d[0], m_iwidth, m_iheight, mvMatrix, projMatrix);
 
-    // [GUI]把图1的DLT标定结果显示出来
+    // [GUI]把DLT标定结果显示出来
     AlignResultWidget *a = new AlignResultWidget(m_modelpath, m_iwidth * 1.f / m_iheight, mvMatrix, projMatrix, 0);
     a->show();
 }

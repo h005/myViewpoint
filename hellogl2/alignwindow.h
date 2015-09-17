@@ -50,7 +50,7 @@ class AlignWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    AlignWindow(QString imageHandler, QString modelPath, QString relationPath, EntityManager &manager);
+    AlignWindow(QString imageHandler, QString modelPath, QString relationPath);
     ~AlignWindow();
 
 private:

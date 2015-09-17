@@ -79,7 +79,7 @@ void MainEntryWindow::on_labelFirstImageBtn_clicked()
     if (manager != NULL) {
         ui->labelFirstImageBtn->setEnabled(false);
 
-        AlignWindow *window = new AlignWindow(manager->baseOneImagePath(), manager->modelPath(), manager->baseOneImageRelation(), *manager);
+        AlignWindow *window = new AlignWindow(manager->baseOneImagePath(), manager->modelPath(), manager->baseOneImageRelation());
         window->resize(window->sizeHint());
         window->show();
 
@@ -92,7 +92,7 @@ void MainEntryWindow::on_labelSecondImageBtn_clicked()
     if (manager != NULL) {
         ui->labelSecondImageBtn->setEnabled(false);
 
-        AlignWindow *window = new AlignWindow(manager->baseTwoImagePath(), manager->modelPath(), manager->baseTwoImageRelation(), *manager);
+        AlignWindow *window = new AlignWindow(manager->baseTwoImagePath(), manager->modelPath(), manager->baseTwoImageRelation());
         window->resize(window->sizeHint());
         window->show();
 
@@ -135,8 +135,9 @@ void MainEntryWindow::RecoveryMvMatrixYouWant(QString handler, glm::mat4 &wantMV
         int height = img.height();
 
         PointsMatchRelation *rb = new PointsMatchRelation(manager->baseOneImageRelation());
-        if (!rb->loadFromFile()) {
+        if (!rb->loadFromFile() || rb->getPoints2d().size() < 6) {
             delete rb;
+            QMessageBox::information(this, tr("错误"), tr("第一张图片标定未完成"));
             return;
         }
 
@@ -157,8 +158,9 @@ void MainEntryWindow::RecoveryMvMatrixYouWant(QString handler, glm::mat4 &wantMV
         int height = img.height();
 
         PointsMatchRelation *rb = new PointsMatchRelation(manager->baseTwoImageRelation());
-        if (!rb->loadFromFile()) {
+        if (!rb->loadFromFile() || rb->getPoints2d().size() < 6) {
             delete rb;
+            QMessageBox::information(this, tr("错误"), tr("第二张图片标定未完成"));
             return;
         }
 

@@ -51,14 +51,14 @@
 #include "custom.h"
 
 
-AlignWindow::AlignWindow(QString imageHandler, QString modelPath, QString relationPath, EntityManager &manager)
+AlignWindow::AlignWindow(QString imageHandler, QString modelPath, QString relationPath)
 {
     relation = new PointsMatchRelation(relationPath);
     if (!relation->loadFromFile()) {
         std::cout << "read failed" << std::endl;
     }
     qDebug() << relation->getPoints2d().size();
-    setCentralWidget(new Window(this, imageHandler, modelPath, *relation, manager));
+    setCentralWidget(new Window(this, imageHandler, modelPath, *relation));
 }
 
 AlignWindow::~AlignWindow()

@@ -60,7 +60,7 @@ class Window : public QWidget
     Q_OBJECT
 
 public:
-    Window(AlignWindow *mw, const QString &imagePath, const QString &modelPath, PointsMatchRelation &releation, EntityManager &manager);
+    Window(AlignWindow *mw, const QString &imagePath, const QString &modelPath, PointsMatchRelation &releation);
     ~Window();
 
     QSize sizeHint() const Q_DECL_OVERRIDE;
@@ -83,7 +83,6 @@ private:
     QPushButton *clearBtn;
     AlignWindow *mainWindow;
     PointsMatchRelation &relation;
-    EntityManager &m_manager;
 
     QString m_modelpath;
     QString m_imagepath;
