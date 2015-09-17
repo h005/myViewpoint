@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>332</width>
-    <height>414</height>
+    <width>330</width>
+    <height>445</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -102,7 +102,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>标定全部结果</string>
+     <string>标定全部结果并输出矩阵</string>
     </property>
    </widget>
    <widget class="QPushButton" name="changePreviewTargetBtn">
@@ -131,13 +131,39 @@
      <string>预览标定结果</string>
     </property>
    </widget>
+   <widget class="QPushButton" name="saveLabeledImages">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>360</y>
+      <width>171</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>标定全部结果并输出渲染结果</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="openOffscreenRenderBtn">
+    <property name="geometry">
+     <rect>
+      <x>220</x>
+      <y>360</y>
+      <width>81</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>打开渲染器</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>332</width>
+     <width>330</width>
      <height>23</height>
     </rect>
    </property>

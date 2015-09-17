@@ -76,7 +76,7 @@ GLWidget::~GLWidget()
 
 QSize GLWidget::minimumSizeHint() const
 {
-    return QSize(50, 50);
+    return QSize(400, 400);
 }
 
 QSize GLWidget::sizeHint() const

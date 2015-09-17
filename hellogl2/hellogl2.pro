@@ -16,7 +16,8 @@ HEADERS       = glwidget.h \
     cvdlt.h \
     lmdlt.h \
     mainentrywindow.h \
-    alignwindow.h
+    alignwindow.h \
+    render.h
 SOURCES       = glwidget.cpp \
                 main.cpp \
                 window.cpp \
@@ -37,7 +38,8 @@ SOURCES       = glwidget.cpp \
     cvdlt.cpp \
     lmdlt.cpp \
     mainentrywindow.cpp \
-    alignwindow.cpp
+    alignwindow.cpp \
+    render.cpp
 
 QT           += widgets
 

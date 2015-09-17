@@ -23,6 +23,7 @@
 #include "DLT.h"
 #include "entity.h"
 #include "custom.h"
+#include "render.h"
 
 MainEntryWindow::MainEntryWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -39,12 +40,12 @@ MainEntryWindow::~MainEntryWindow()
 
 QSize MainEntryWindow::sizeHint() const
 {
-    return QSize(400, 400);
+    return QSize(400, 500);
 }
 
 QSize MainEntryWindow::minimumSizeHint() const
 {
-    return QSize(400, 400);
+    return QSize(400, 500);
 }
 
 void MainEntryWindow::on_pushButton_clicked()
@@ -219,4 +220,26 @@ void MainEntryWindow::on_saveLabeledResultBtn_clicked()
     }
 
 
+}
+
+void MainEntryWindow::on_saveLabeledImages_clicked()
+{
+    // 根据目前标定的结果，恢复新图片的外参矩阵
+    glm::mat4 wantMVMatrix, wantProjMatrix;
+    RecoveryMvMatrixYouWant(QString("./img0063.jpg"), wantMVMatrix);
+    wantProjMatrix = glm::perspective(glm::pi<float>() / 2, 1.f, 0.1f, 100.f);
+
+    // 开辟一块缓冲区，并使用相机的内外参数渲染
+    if (offscreenRender != NULL) {
+        offscreenRender->renderToImageFile(wantMVMatrix, wantProjMatrix, "D:\\a.jpg");
+    }
+}
+
+void MainEntryWindow::on_openOffscreenRenderBtn_clicked()
+{
+    if (offscreenRender == NULL) {
+        offscreenRender = new OffscreenRender(manager->modelPath(), NULL);
+        offscreenRender->resize(offscreenRender->sizeHint());
+        offscreenRender->show();
+    }
 }

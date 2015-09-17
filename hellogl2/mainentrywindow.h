@@ -10,6 +10,7 @@ class MainEntryWindow;
 }
 
 class EntityManager;
+class OffscreenRender;
 
 class MainEntryWindow : public QMainWindow
 {
@@ -33,9 +34,14 @@ private slots:
 
     void on_saveLabeledResultBtn_clicked();
 
+    void on_saveLabeledImages_clicked();
+
+    void on_openOffscreenRenderBtn_clicked();
+
 private:
     Ui::MainEntryWindow *ui;
     EntityManager *manager;
+    OffscreenRender *offscreenRender = NULL;
     void RecoveryMvMatrixYouWant(QString handler, glm::mat4 &wantMVMatrix);
 };
 
