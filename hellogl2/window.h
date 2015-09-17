@@ -70,7 +70,6 @@ protected:
     void closeEvent(QCloseEvent * event) Q_DECL_OVERRIDE;
 
 private slots:
-    void dockUndock();
     void align();
     void confirm();
     void clearPressed();

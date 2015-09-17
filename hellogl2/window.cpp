@@ -40,7 +40,7 @@
 
 #include "glwidget.h"
 #include "window.h"
-#include "mainwindow.h"
+#include "alignwindow.h"
 #include <iostream>
 #include <QSlider>
 #include <QVBoxLayout>
@@ -181,30 +181,6 @@ void Window::closeEvent(QCloseEvent *event)
     event->accept();
 }
 
-void Window::dockUndock()
-{
-    if (parent()) {
-        setParent(0);
-        setAttribute(Qt::WA_DeleteOnClose);
-        move(QApplication::desktop()->width() / 2 - width() / 2,
-             QApplication::desktop()->height() / 2 - height() / 2);
-        dockBtn->setText(tr("Dock"));
-        show();
-    } else {
-        if (!mainWindow->centralWidget()) {
-            if (mainWindow->isVisible()) {
-                setAttribute(Qt::WA_DeleteOnClose, false);
-                dockBtn->setText(tr("Undock"));
-                mainWindow->setCentralWidget(this);
-            } else {
-                QMessageBox::information(0, tr("Cannot dock"), tr("Main window already closed"));
-            }
-        } else {
-            QMessageBox::information(0, tr("Cannot dock"), tr("Main window already occupied"));
-        }
-    }
-}
-
 void Window::align()
 {
     glm::mat4 mvMatrix, projMatrix;
@@ -215,122 +191,6 @@ void Window::align()
     // [GUI]把图1的DLT标定结果显示出来
     AlignResultWidget *a = new AlignResultWidget(m_modelpath, m_iwidth * 1.f / m_iheight, mvMatrix, projMatrix, 0);
     a->show();
-
-    // 这个传递算法依赖两张基准图像，base和second，这两张图像的相机参数是直接通过DLT得到的
-    // want是要求的图像，它的参数借助base和second的参数和SfM结果传递得到
-    Entity base, second, want;
-    Q_ASSERT(m_manager.getEntity(m_manager.baseOneID(), base));
-    Q_ASSERT(m_manager.getEntity(m_manager.baseTwoID(), second));
-
-    // 下面的算法在我04-05的周报中描述了
-    float scale;
-    {
-        QImage img(m_manager.baseTwoImagePath());
-        int width = img.width();
-        int height = img.height();
-
-        PointsMatchRelation *rb = new PointsMatchRelation(m_manager.baseTwoImageRelation());
-        if (!rb->loadFromFile()) {
-            return;
-        }
-
-        // IMPORTANT!!
-        // reference variable don't support re-assign, 'operator =' will replace content(s)
-        // in the original vector
-        // ref http://stackoverflow.com/a/4364586/4104893
-        std::vector<glm::vec2> &points2d = rb->getPoints2d();
-        std::vector<glm::vec3> &points3d = rb->getPoints3d();
-        glm::mat4 secondMVMatrix, secondProjMatrix;
-        DLTwithPoints(points2d.size(), (float(*)[2])&points2d[0], (float(*)[3])&points3d[0], width, height, secondMVMatrix, secondProjMatrix);
-        scale = recoveryScale(base, second, mvMatrix, secondMVMatrix);
-        std::cout << "scale: " << scale << std::endl;
-        std::cout << glm::to_string(mvMatrix) << std::endl;
-        std::cout << glm::to_string(secondMVMatrix) << std::endl;
-    }
-
-    // 下面是我做实验的例子（硬编码），就是选定一个want，然后看看结果
-//    zyns
-//    Q_ASSERT(manager.getEntity(QString("./img0075.jpg"), want));
-//    Q_ASSERT(manager.getEntity(QString("./img0613.jpg"), want));
-//    Q_ASSERT(manager.getEntity(QString("./img0777.jpg"), want));
-//    Q_ASSERT(manager.getEntity(QString("./img0819.jpg"), want));
-//    Q_ASSERT(manager.getEntity(QString("./img0820.jpg"), want));
-//    Q_ASSERT(manager.getEntity(QString("./img0834.jpg"), want));
-//    Q_ASSERT(manager.getEntity(QString("./img0832.jpg"), want));
-
-//    notre dame
-//    Q_ASSERT(manager.getEntity(QString("images/alecea_2304877304.jpg"), want));
-//    Q_ASSERT(manager.getEntity(QString("images/32219531@N00_102756761.jpg"), want));
-//    Q_ASSERT(manager.getEntity(QString("images/8250661@N08_514024275.jpg"), want));
-//    Q_ASSERT(manager.getEntity(QString("images/cfuga_1435599238.jpg"), want));
-//    Q_ASSERT(manager.getEntity(QString("images/81596301@N00_248194737.jpg"), want));
-//    Q_ASSERT(manager.getEntity(QString("images/58308412@N00_74499252.jpg"), want));
-//    Q_ASSERT(manager.getEntity(QString("images/achtundsiebzig_196444302.jpg"), want));
-//    Q_ASSERT(manager.getEntity(QString("images/7437937@N06_428202066.jpg"), want));
-//    Q_ASSERT(manager.getEntity(QString("images/al_9_1355240900.jpg"), want));
-//    Q_ASSERT(manager.getEntity(QString("images/_fxr_2223134257.jpg"), want));
-//    Q_ASSERT(manager.getEntity(QString("images/2pworth_50915720.jpg"), want));
-//    Q_ASSERT(manager.getEntity(QString("images/celesteh_102619571.jpg"), want));
-
-//    kxm
-//    Q_ASSERT(manager.getEntity(QString("./img0008.jpg"), want));
-//    Q_ASSERT(manager.getEntity(QString("./img0314.jpg"), want));
-//    Q_ASSERT(manager.getEntity(QString("./img0532.jpg"), want));
-//    Q_ASSERT(manager.getEntity(QString("./img0852.jpg"), want));
-//    Q_ASSERT(manager.getEntity(QString("./img0837.jpg"), want));
-//    Q_ASSERT(manager.getEntity(QString("./img0410.jpg"), want));
-//    Q_ASSERT(manager.getEntity(QString("./img0831.jpg"), want));
-//    Q_ASSERT(manager.getEntity(QString("./img0386.jpg"), want));
-
-//    tiananmen
-//    Q_ASSERT(manager.getEntity(QString("./61bOOOPIC53.jpg"), want));
-//    Q_ASSERT(manager.getEntity(QString("./105.jpg"), want));
-//    Q_ASSERT(manager.getEntity(QString("./73FB52A1-2036-48AC-B29E-EB90ED0E99F7_o.jpg"), want));
-//    Q_ASSERT(manager.getEntity(QString("./1-11112R33332647.jpg"), want));
-//    Q_ASSERT(manager.getEntity(QString("./53ad4c7b61138.jpg"), want));
-//    Q_ASSERT(manager.getEntity(QString("./OOOPIC_robbin_200910130202f5809b3c9d39.jpg"), want));
-//    Q_ASSERT(manager.getEntity(QString("./540c51252704bbf541e0307f28851506.jpg"), want));
-
-
-//    bigben
-//    Q_ASSERT(manager.getEntity(QString("./img0001.jpg"), want));
-//    Q_ASSERT(manager.getEntity(QString("./img0006.jpg"), want));
-//    Q_ASSERT(manager.getEntity(QString("./img0052.jpg"), want));
-//    Q_ASSERT(manager.getEntity(QString("./img0050.jpg"), want)); //error
-    Q_ASSERT(m_manager.getEntity(QString("./img0063.jpg"), want));
-//    Q_ASSERT(manager.getEntity(QString("./img0062.jpg"), want));
-//    Q_ASSERT(manager.getEntity(QString("./img0926.jpg"), want));
-//    Q_ASSERT(manager.getEntity(QString("./img1188.jpg"), want));
-//    Q_ASSERT(manager.getEntity(QString("./img1185.jpg"), want));
-//    Q_ASSERT(manager.getEntity(QString("./img1260.jpg"), want));
-//    Q_ASSERT(manager.getEntity(QString("./img0058.jpg"), want));
-//    Q_ASSERT(manager.getEntity(QString("./img0108.jpg"), want));
-//    Q_ASSERT(manager.getEntity(QString("./img0081.jpg"), want));
-
-
-    glm::mat4 wantMVMatrix, wantProjMatrix;
-    recoveryCameraParameters(scale, base, want, mvMatrix, projMatrix, wantMVMatrix, wantProjMatrix);
-    wantProjMatrix = glm::perspective(glm::pi<float>() / 2, m_iwidth * 1.f / m_iheight, 0.1f, 100.f);
-
-    // [GUI]把目标图像的相机位置展现出来
-    CameraShowWidget *b = new CameraShowWidget(m_modelpath, m_iwidth * 1.f / m_iheight, wantMVMatrix, 0);
-    b->show();
-
-    // [GUI]用目标图像的相机参数，渲染模型
-    AlignResultWidget *c = new AlignResultWidget(m_modelpath, m_iwidth * 1.f / m_iheight, wantMVMatrix, wantProjMatrix, 0);
-    c->show();
-
-    {
-        // 以下代码无用，不用看
-        glm::vec4 a(1.f, 0.f, 0.f, 0.f), b(0.f, 1.f, 0.f, 0.f), c(0.f, 0.f, 1.f, 0.f);
-        glm::vec4 aa = wantMVMatrix * a, bb = wantMVMatrix * b, cc = wantMVMatrix * c;
-        //glm::vec4 aa = base.mvMatrix * a, bb = base.mvMatrix * b, cc = base.mvMatrix * c;
-        //glm::vec4 aa = mvMatrix * a, bb = mvMatrix * b, cc = mvMatrix * c;
-        std::cout << glm::to_string(want.mvMatrix) << std::endl;
-        std::cout << glm::dot(glm::vec3(aa), glm::vec3(bb)) << std::endl;
-        std::cout << glm::dot(glm::vec3(cc), glm::vec3(bb)) << std::endl;
-        std::cout << glm::dot(glm::vec3(aa), glm::vec3(cc)) << std::endl;
-    }
 }
 
 void Window::confirm()

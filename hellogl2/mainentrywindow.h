@@ -2,6 +2,8 @@
 #define MAINENTRYWINDOW_H
 
 #include <QMainWindow>
+#include <Qstring>
+#include <glm/glm.hpp>
 
 namespace Ui {
 class MainEntryWindow;
@@ -27,11 +29,12 @@ private slots:
 
     void on_labelSecondImageBtn_clicked();
 
-private:
-    Ui::MainEntryWindow *ui;
+    void on_executePreviewTargetBtn_clicked();
 
 private:
+    Ui::MainEntryWindow *ui;
     EntityManager *manager;
+    void RecoveryMvMatrixYouWant(QString handler, glm::mat4 &wantMVMatrix);
 };
 
 #endif // MAINENTRYWINDOW_H

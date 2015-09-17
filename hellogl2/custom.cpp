@@ -20,9 +20,7 @@ void recoveryCameraParameters(
         Entity &base,
         Entity &want,
         const glm::mat4 &baseAlignedMVMatrix,
-        const glm::mat4 &baseAlignedProjMatrix,
-        glm::mat4 &wantMVMatrix,
-        glm::mat4 &wantProjMatrix) {
+        glm::mat4 &wantMVMatrix) {
     glm::mat3 R1 = glm::mat3(base.mvMatrix);
     glm::mat3 R2 = glm::mat3(want.mvMatrix);
     glm::mat3 Rd = glm::mat3(baseAlignedMVMatrix);
@@ -39,8 +37,6 @@ void recoveryCameraParameters(
     glm::vec3 t = (1/c) * t2 + R2 * glm::inverse(R1) * (td - t1 * (1/c));
     wantMVMatrix = glm::mat4(R);
     wantMVMatrix[3] = glm::vec4(t, 1.f);
-
-
 }
 
 static float scale(const glm::vec3 &A, const glm::vec3 &B) {
