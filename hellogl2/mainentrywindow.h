@@ -31,6 +31,8 @@ private slots:
 
     void on_executePreviewTargetBtn_clicked();
 
+    void on_saveLabeledResultBtn_clicked();
+
 private:
     Ui::MainEntryWindow *ui;
     EntityManager *manager;

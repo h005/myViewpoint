@@ -2,6 +2,7 @@
 #include "ui_mainentrywindow.h"
 
 #include <iostream>
+#include <fstream>
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QFileInfo>
@@ -175,14 +176,47 @@ void MainEntryWindow::RecoveryMvMatrixYouWant(QString handler, glm::mat4 &wantMV
     }
 
     scale = recoveryScale(base, second, firstMVMatrix, secondMVMatrix);
-    std::cout << "scale: " << scale << std::endl;
-    std::cout << glm::to_string(firstMVMatrix) << std::endl;
-    std::cout << glm::to_string(secondMVMatrix) << std::endl;
-
-
     Q_ASSERT(manager->getEntity(handler, want));
 
 
     // 在得到两个坐标系的缩放系数后，用第一张图片的DLT结果恢复出你想要的图片的结果
     recoveryCameraParameters(scale, base, want, firstMVMatrix, wantMVMatrix);
+}
+
+void MainEntryWindow::on_saveLabeledResultBtn_clicked()
+{
+    QString selfilter = tr("Model View Matrix File (*.matrix)");
+    QString fileName = QFileDialog::getSaveFileName(
+            this,
+            QString("打开配置文件"),
+            QString(),
+            tr("All files (*.*);;Model View Matrix File (*.matrix)" ),
+            &selfilter
+    );
+
+    if (!fileName.isEmpty()) {
+        qDebug() << fileName;
+        std::ofstream matrixFile;
+        matrixFile.open(fileName.toUtf8().constData());
+
+        std::vector<QString> list;
+        manager->getImageList(list);
+        std::vector<QString>::iterator it;
+        for (it = list.begin(); it != list.end(); it++) {
+            glm::mat4 wantMVMatrix;
+            qDebug() << "********************* " << it - list.begin() << " ****************";
+            RecoveryMvMatrixYouWant(*it, wantMVMatrix);
+            matrixFile << it->toUtf8().constData() << std::endl;
+            for (int i = 0; i < 4; i++) {
+                for (int j = 0; j < 4; j++)
+                    matrixFile << wantMVMatrix[j][i] << " ";
+                matrixFile << std::endl;
+            }
+        }
+
+        qDebug() << "output finished";
+        matrixFile.close();
+    }
+
+
 }

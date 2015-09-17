@@ -3,6 +3,7 @@
 
 #include <map>
 #include <QString>
+#include <vector>
 #include "entity.h"
 
 class EntityManager
@@ -12,6 +13,7 @@ public:
     ~EntityManager();
     bool load();
     bool getEntity(const QString &key, Entity &out);
+    bool getImageList(std::vector<QString> &out);
 
     QString modelPath() const;
     void setModelPath(const QString &modelPath);

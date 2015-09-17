@@ -97,6 +97,15 @@ bool EntityManager::getEntity(const QString &key, Entity &out)
     }
 }
 
+bool EntityManager::getImageList(std::vector<QString> &out)
+{
+    out.clear();
+    std::map<QString, Entity>::iterator it;
+    for (it = container.begin(); it != container.end(); it++)
+        out.push_back(it->first);
+    return true;
+}
+
 glm::mat4 EntityManager::giveMVMatrix(float input[][3])
 {
     glm::mat4 matrix(1.f);

@@ -334,9 +334,14 @@ void DLTwithPoints(
 
     std::cout << modelView << std::endl;
     std::cout << K << std::endl;
+
+    // LM优化方法目前不靠谱
+#if 0
     cv::Mat fake1, fake2;
     LMDLT::DLTwithPoints(matchnum, points2d, points3d, imgWidth, imgHeight, K, modelView, fake1, fake2);
+#else
     CVDLT::DLTwithPoints(matchnum, points2d, points3d, imgWidth, imgHeight, K, modelView, K);
+#endif
 
     cv::Mat proj;
     for (int i = 0; i < 4; i++)
