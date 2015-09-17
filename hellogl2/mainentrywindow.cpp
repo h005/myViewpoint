@@ -9,7 +9,7 @@
 
 #include "entitymanager.h"
 #include "pointsmatchrelation.h"
-#include "window.h"
+#include "alignwindow.h"
 
 MainEntryWindow::MainEntryWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -32,21 +32,6 @@ QSize MainEntryWindow::sizeHint() const
 QSize MainEntryWindow::minimumSizeHint() const
 {
     return QSize(400, 400);
-}
-
-void MainEntryWindow::on_labelFirstImageBtn_clicked()
-{
-    if (manager != NULL) {
-//        PointsMatchRelation *relation = new PointsMatchRelation(manager->baseOneImageRelation());
-//        if (!relation->loadFromFile()) {
-//            std::cout << "read failed" << std::endl;
-//            return;
-//        }
-//        std::cout << relation->getPoints2d().size() << std::endl;
-//        Window *window = new Window(this, manager->baseOneImagePath(), manager->modelPath(), *relation);
-//        window->resize(window->sizeHint());
-//        window->show();
-    }
 }
 
 void MainEntryWindow::on_pushButton_clicked()
@@ -73,5 +58,32 @@ void MainEntryWindow::on_pushButton_clicked()
         }
 
         ui->configFileLabel->setText(fileName);
+    }
+}
+
+
+void MainEntryWindow::on_labelFirstImageBtn_clicked()
+{
+    if (manager != NULL) {
+        ui->labelFirstImageBtn->setEnabled(false);
+
+        AlignWindow *window = new AlignWindow(manager->baseOneImagePath(), manager->modelPath(), manager->baseOneImageRelation(), *manager);
+        window->resize(window->sizeHint());
+        window->show();
+
+        ui->labelFirstImageBtn->setEnabled(true);
+    }
+}
+
+void MainEntryWindow::on_labelSecondImageBtn_clicked()
+{
+    if (manager != NULL) {
+        ui->labelSecondImageBtn->setEnabled(false);
+
+        AlignWindow *window = new AlignWindow(manager->baseTwoImagePath(), manager->modelPath(), manager->baseTwoImageRelation(), *manager);
+        window->resize(window->sizeHint());
+        window->show();
+
+        ui->labelSecondImageBtn->setEnabled(true);
     }
 }

@@ -50,16 +50,17 @@ class QLabel;
 QT_END_NAMESPACE
 
 class GLWidget;
-class MainWindow;
+class AlignWindow;
 class ImageAndPoint;
 class PointsMatchRelation;
+class EntityManager;
 
 class Window : public QWidget
 {
     Q_OBJECT
 
 public:
-    Window(MainWindow *mw, const QString &imagePath, const QString &modelPath, PointsMatchRelation &releation);
+    Window(AlignWindow *mw, const QString &imagePath, const QString &modelPath, PointsMatchRelation &releation, EntityManager &manager);
     ~Window();
 
     QSize sizeHint() const Q_DECL_OVERRIDE;
@@ -81,8 +82,9 @@ private:
     QPushButton *alignBtn;
     QPushButton *confirmBtn;
     QPushButton *clearBtn;
-    MainWindow *mainWindow;
+    AlignWindow *mainWindow;
     PointsMatchRelation &relation;
+    EntityManager &m_manager;
 
     QString m_modelpath;
     QString m_imagepath;

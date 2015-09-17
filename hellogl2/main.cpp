@@ -43,7 +43,6 @@
 #include <QDesktopWidget>
 #include <QSurfaceFormat>
 
-#include "mainwindow.h"
 #include "mainentrywindow.h"
 
 int main(int argc, char *argv[])
@@ -59,16 +58,6 @@ int main(int argc, char *argv[])
         fmt.setProfile(QSurfaceFormat::CoreProfile);
     }
     QSurfaceFormat::setDefaultFormat(fmt);
-
-//    MainWindow mainWindow;
-//    mainWindow.resize(mainWindow.sizeHint());
-//    int desktopArea = QApplication::desktop()->width() *
-//                     QApplication::desktop()->height();
-//    int widgetArea = mainWindow.width() * mainWindow.height();
-//    if (((float)widgetArea / (float)desktopArea) < 0.75f)
-//        mainWindow.show();
-//    else
-//        mainWindow.showMaximized();
 
     MainEntryWindow mainWindow;
     mainWindow.resize(mainWindow.sizeHint());

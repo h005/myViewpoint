@@ -1,6 +1,5 @@
 HEADERS       = glwidget.h \
                 window.h \
-                mainwindow.h \
     custom.h \
     DLT.h \
     GModel.h \
@@ -16,11 +15,11 @@ HEADERS       = glwidget.h \
     axis.h \
     cvdlt.h \
     lmdlt.h \
-    mainentrywindow.h
+    mainentrywindow.h \
+    alignwindow.h
 SOURCES       = glwidget.cpp \
                 main.cpp \
                 window.cpp \
-                mainwindow.cpp \
     custom.cpp \
     DLT.cpp \
     GModel.cpp \
@@ -37,7 +36,8 @@ SOURCES       = glwidget.cpp \
     expfit.cpp \
     cvdlt.cpp \
     lmdlt.cpp \
-    mainentrywindow.cpp
+    mainentrywindow.cpp \
+    alignwindow.cpp
 
 QT           += widgets
 

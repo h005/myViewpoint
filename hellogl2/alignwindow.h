@@ -43,15 +43,18 @@
 
 #include <QMainWindow>
 
-class MainWindow : public QMainWindow
+class PointsMatchRelation;
+class EntityManager;
+class AlignWindow : public QMainWindow
 {
     Q_OBJECT
 
 public:
-    MainWindow();
+    AlignWindow(QString imageHandler, QString modelPath, QString relationPath, EntityManager &manager);
+    ~AlignWindow();
 
-private slots:
-    void onAddNew();
+private:
+    PointsMatchRelation *relation;
 };
 
 #endif

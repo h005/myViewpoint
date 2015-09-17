@@ -38,9 +38,10 @@
 **
 ****************************************************************************/
 
-#include "mainwindow.h"
+#include "alignwindow.h"
 #include "window.h"
 #include <iostream>
+#include <QDebug>
 #include <QMenuBar>
 #include <QMenu>
 #include <QMessageBox>
@@ -49,36 +50,18 @@
 #include "entitymanager.h"
 #include "custom.h"
 
-EntityManager manager(QString("D:\\testcase\\bigben"));
 
-MainWindow::MainWindow()
+AlignWindow::AlignWindow(QString imageHandler, QString modelPath, QString relationPath, EntityManager &manager)
 {
-    QMenuBar *menuBar = new QMenuBar;
-    QMenu *menuWindow = menuBar->addMenu(tr("&Window"));
-    QAction *addNew = new QAction(menuWindow);
-    addNew->setText(tr("Add new"));
-    menuWindow->addAction(addNew);
-    connect(addNew, SIGNAL(triggered()), this, SLOT(onAddNew()));
-    setMenuBar(menuBar);
-
-    onAddNew();
+    relation = new PointsMatchRelation(relationPath);
+    if (!relation->loadFromFile()) {
+        std::cout << "read failed" << std::endl;
+    }
+    qDebug() << relation->getPoints2d().size();
+    setCentralWidget(new Window(this, imageHandler, modelPath, *relation, manager));
 }
 
-void MainWindow::onAddNew()
+AlignWindow::~AlignWindow()
 {
-    std::cout << manager.load() << std::endl;
-    if (!centralWidget()) {
-        PointsMatchRelation *relation = new PointsMatchRelation(manager.baseOneImageRelation());
-        if (!relation->loadFromFile()) {
-            std::cout << "read failed" << std::endl;
-        }
-        std::cout << relation->getPoints2d().size() << std::endl;
-        setCentralWidget(new Window(this, manager.baseOneImagePath(), manager.modelPath(), *relation));
-//        setCentralWidget(new Window(this, manager.baseTwoImagePath(), manager.modelPath(), *relation));
-        //setCentralWidget(new Window(this, QString("D:\\alex1961_2466374890.rd.jpg"), QString("D:\\no\\models\\untitled.dae"), *relation));
-//        setCentralWidget(new Window(this, QString("C:\\Users\\mzd\\Desktop\\NotreDame\\NotreDame\\images\\85428086@N00_231122289.jpg"), QString("D:\\no2\\models\\model.dae"), *relation));
-    }
-    else
-        QMessageBox::information(0, tr("Cannot add new window"), tr("Already occupied. Undock first."));
-
+    delete relation;
 }

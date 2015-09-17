@@ -65,11 +65,12 @@
 #include "entity.h"
 #include "custom.h"
 
-extern EntityManager manager;
-
-Window::Window(MainWindow *mw, const QString &imagePath, const QString &modelPath, PointsMatchRelation &relation)
-    : mainWindow(mw), relation(relation),
-      m_modelpath(modelPath), m_imagepath(imagePath)
+Window::Window(AlignWindow *mw, const QString &imagePath, const QString &modelPath, PointsMatchRelation &relation, EntityManager &manager)
+    : mainWindow(mw),
+      relation(relation),
+      m_modelpath(modelPath),
+      m_imagepath(imagePath),
+      m_manager(manager)
 {
     QImage img(imagePath);
     m_iwidth = img.width();
@@ -218,17 +219,17 @@ void Window::align()
     // 这个传递算法依赖两张基准图像，base和second，这两张图像的相机参数是直接通过DLT得到的
     // want是要求的图像，它的参数借助base和second的参数和SfM结果传递得到
     Entity base, second, want;
-    Q_ASSERT(manager.getEntity(manager.baseOneID(), base));
-    Q_ASSERT(manager.getEntity(manager.baseTwoID(), second));
+    Q_ASSERT(m_manager.getEntity(m_manager.baseOneID(), base));
+    Q_ASSERT(m_manager.getEntity(m_manager.baseTwoID(), second));
 
     // 下面的算法在我04-05的周报中描述了
     float scale;
     {
-        QImage img(manager.baseTwoImagePath());
+        QImage img(m_manager.baseTwoImagePath());
         int width = img.width();
         int height = img.height();
 
-        PointsMatchRelation *rb = new PointsMatchRelation(manager.baseTwoImageRelation());
+        PointsMatchRelation *rb = new PointsMatchRelation(m_manager.baseTwoImageRelation());
         if (!rb->loadFromFile()) {
             return;
         }
@@ -296,7 +297,7 @@ void Window::align()
 //    Q_ASSERT(manager.getEntity(QString("./img0006.jpg"), want));
 //    Q_ASSERT(manager.getEntity(QString("./img0052.jpg"), want));
 //    Q_ASSERT(manager.getEntity(QString("./img0050.jpg"), want)); //error
-    Q_ASSERT(manager.getEntity(QString("./img0063.jpg"), want));
+    Q_ASSERT(m_manager.getEntity(QString("./img0063.jpg"), want));
 //    Q_ASSERT(manager.getEntity(QString("./img0062.jpg"), want));
 //    Q_ASSERT(manager.getEntity(QString("./img0926.jpg"), want));
 //    Q_ASSERT(manager.getEntity(QString("./img1188.jpg"), want));
