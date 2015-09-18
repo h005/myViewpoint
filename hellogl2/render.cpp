@@ -10,6 +10,9 @@
 #include <opencv2/opencv.hpp>
 #include "shader.hpp"
 
+#define BUFFER_WIDTH 800
+#define BUFFER_HEIGHT 800
+
 using std::cout;
 using std::endl;
 
@@ -31,12 +34,12 @@ OffscreenRender::~OffscreenRender()
 
 QSize OffscreenRender::minimumSizeHint() const
 {
-    return QSize(400, 400);
+    return QSize(BUFFER_WIDTH, BUFFER_HEIGHT);
 }
 
 QSize OffscreenRender::sizeHint() const
 {
-    return QSize(400, 400);
+    return QSize(BUFFER_WIDTH, BUFFER_HEIGHT);
 }
 
 void OffscreenRender::cleanup()
@@ -72,6 +75,8 @@ void OffscreenRender::initializeGL()
     initializeOpenGLFunctions();
     glClearColor(0, 0, 0, m_transparent ? 0 : 1);
 
+    // 创建fbo环境
+    createFrameBufferObject();
     // load data for model rendering
     model.bindDataToGL();
 }
@@ -83,12 +88,12 @@ void OffscreenRender::createFrameBufferObject()
 
     glGenRenderbuffers(1, &depthRenderBuffer);
     glBindRenderbuffer(GL_RENDERBUFFER, depthRenderBuffer);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, 400, 400);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, BUFFER_WIDTH, BUFFER_HEIGHT);
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthRenderBuffer);
 
     glGenRenderbuffers(1, &colorRenderBuffer);
     glBindRenderbuffer(GL_RENDERBUFFER, colorRenderBuffer);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_RGBA, 400, 400);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_RGBA, BUFFER_WIDTH, BUFFER_HEIGHT);
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, colorRenderBuffer);
 
     glBindFramebuffer(GL_FRAMEBUFFER,0);
@@ -99,49 +104,48 @@ void OffscreenRender::renderToImageFile(glm::mat4 mvMatrix, glm::mat4 projMatrix
 {
     makeCurrent();
 
+    glBindFramebuffer(GL_FRAMEBUFFER, fboId);
+    GLint viewport[4];
+    glGetIntegerv(GL_VIEWPORT,viewport);
+    qDebug() << viewport[0] << viewport[1] << viewport[2] << viewport[3];
+
     // 默认开启背面剔除:GL_CULL_FACE
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
     // 绘制模型
     model.drawNormalizedModel(mvMatrix, projMatrix);
 
-    glBindFramebuffer(GL_FRAMEBUFFER, fboId);
-    GLint viewport[4];
-    glGetIntegerv(GL_VIEWPORT,viewport);
-
-    GLfloat *img0 = new GLfloat[(viewport[2]-viewport[0])*(viewport[3]-viewport[1])];
-    glReadBuffer(GL_BACK_LEFT);
-    glReadPixels(0,0,viewport[2],viewport[3],GL_DEPTH_COMPONENT,GL_FLOAT,img0);
-
-    cv::Mat image0 = cv::Mat(viewport[3],viewport[2],CV_32FC1,img0);
-    cv::namedWindow("test0");
-    imshow("test0",image0);
-
-
-    GLubyte *img =
-            new GLubyte[(viewport[2]-viewport[0])
-            *(viewport[3]-viewport[1])*4];
+    // 从fbo中读取
+    GLubyte *img = new GLubyte[BUFFER_WIDTH * BUFFER_HEIGHT * 4];
     glReadBuffer(GL_BACK_LEFT);
     glReadPixels(0,
             0,
-            viewport[2],
-            viewport[3],
+            BUFFER_WIDTH,
+            BUFFER_HEIGHT,
             GL_BGRA,
             GL_UNSIGNED_BYTE,
             img);
 
-    glBindFramebuffer(GL_FRAMEBUFFER,0);
-    qDebug()<<"show fbo info...ok"<<endl;
-
-    qDebug()<<"save to " << filePath;
-    cv::Mat image = cv::Mat(viewport[3],viewport[2],CV_8UC4,img);
-    cv::imwrite(filePath.toUtf8().constData(), image);
+    // 创建图片并写入路径
+    // 由于OpenGL坐标原点位于左下角，保存前需要沿着x轴翻转图片
+    qDebug()<<"save to" << filePath;
+    cv::Mat image = cv::Mat(BUFFER_WIDTH, BUFFER_HEIGHT,CV_8UC4,img);
+    cv::Mat flipped;
+    cv::flip(image, flipped, 0);
+    cv::imwrite(filePath.toUtf8().constData(), flipped);
     qDebug() << "...ok";
 
+    delete img;
+    glBindFramebuffer(GL_FRAMEBUFFER,0);
     doneCurrent();
 }
 
 void OffscreenRender::paintGL()
 {
     // 这个窗口纯粹是为了使用fbo而开的，所以paintGL中不需要做什么
+}
+
+void OffscreenRender::resizeGL(int width, int height)
+{
+    glViewport(0, 0, BUFFER_WIDTH, BUFFER_HEIGHT);
 }

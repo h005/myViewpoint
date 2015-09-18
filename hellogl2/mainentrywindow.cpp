@@ -241,5 +241,6 @@ void MainEntryWindow::on_openOffscreenRenderBtn_clicked()
         offscreenRender = new OffscreenRender(manager->modelPath(), NULL);
         offscreenRender->resize(offscreenRender->sizeHint());
         offscreenRender->show();
+        this->activateWindow();
     }
 }
