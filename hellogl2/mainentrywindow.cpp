@@ -224,14 +224,18 @@ void MainEntryWindow::on_saveLabeledResultBtn_clicked()
 
 void MainEntryWindow::on_saveLabeledImages_clicked()
 {
-    // 根据目前标定的结果，恢复新图片的外参矩阵
-    glm::mat4 wantMVMatrix, wantProjMatrix;
-    RecoveryMvMatrixYouWant(QString("./img0063.jpg"), wantMVMatrix);
-    wantProjMatrix = glm::perspective(glm::pi<float>() / 2, 1.f, 0.1f, 100.f);
-
-    // 开辟一块缓冲区，并使用相机的内外参数渲染
+    // 使用相机的内外参数渲染到图片
     if (offscreenRender != NULL) {
-        offscreenRender->renderToImageFile(wantMVMatrix, wantProjMatrix, "D:\\a.jpg");
+        std::vector<QString> list;
+        manager->getImageList(list);
+        std::vector<QString>::iterator it;
+        for (it = list.begin(); it != list.end(); it++) {
+            glm::mat4 wantMVMatrix, wantProjMatrix;
+            qDebug() << "********************* " << it - list.begin() << " ****************";
+            RecoveryMvMatrixYouWant(*it, wantMVMatrix);
+            wantProjMatrix = glm::perspective(glm::pi<float>() / 2, 1.f, 0.1f, 100.f);
+            offscreenRender->renderToImageFile(wantMVMatrix, wantProjMatrix, "D:\\avg\\" + *it);
+        }
     }
 }
 
