@@ -226,15 +226,30 @@ void MainEntryWindow::on_saveLabeledImages_clicked()
 {
     // 使用相机的内外参数渲染到图片
     if (offscreenRender != NULL) {
-        std::vector<QString> list;
-        manager->getImageList(list);
-        std::vector<QString>::iterator it;
-        for (it = list.begin(); it != list.end(); it++) {
-            glm::mat4 wantMVMatrix, wantProjMatrix;
-            qDebug() << "********************* " << it - list.begin() << " ****************";
-            RecoveryMvMatrixYouWant(*it, wantMVMatrix);
-            wantProjMatrix = glm::perspective(glm::pi<float>() / 2, 1.f, 0.1f, 100.f);
-            offscreenRender->renderToImageFile(wantMVMatrix, wantProjMatrix, "D:\\avg\\" + *it);
+        QString outputDir = QFileDialog::getExistingDirectory(
+                this,
+                QString("选定输出目录"),
+                QString()
+        );
+        qDebug() << "Selected Dir:" << outputDir;
+
+        if (!outputDir.isEmpty()) {
+            std::vector<QString> list;
+            manager->getImageList(list);
+            std::vector<QString>::iterator it;
+            for (it = list.begin(); it != list.end(); it++) {
+                qDebug() << "********************* " << it - list.begin() << " ****************";
+
+                glm::mat4 wantMVMatrix, wantProjMatrix;
+                RecoveryMvMatrixYouWant(*it, wantMVMatrix);
+                wantProjMatrix = glm::perspective(glm::pi<float>() / 2, 1.f, 0.1f, 100.f);
+
+                // 将图片生成到选定目录中，文件名与之前一致，但后缀改为png，方便对照
+                QFileInfo file(*it);
+                QString basename = file.baseName();
+                QString finalPath = QDir(outputDir).filePath(basename + ".png");
+                offscreenRender->renderToImageFile(wantMVMatrix, wantProjMatrix, finalPath);
+            }
         }
     }
 }
