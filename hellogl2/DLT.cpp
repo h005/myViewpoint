@@ -153,34 +153,6 @@ static cv::Mat constructProjectionMatrix(const cv::Mat &K, GLfloat n, GLfloat f,
 	return result;
 }
 
-static cv::Mat constructProjectionMatrixWithoutPrinciplePoint(cv::Mat &K, GLfloat n, GLfloat f, int iwidth, int iheight) {
-	// Hacked from this: http://www.songho.ca/opengl/gl_projectionmatrix.html
-
-	// 先将NDC中的z和w分量计算好，其中w = -z
-	cv::Mat A = cv::Mat::zeros(4, 4, CV_32F);
-	A.at<float>(0, 0) = 1;
-	A.at<float>(1, 1) = 1;
-	A.at<float>(2, 2) = -(f + n) / (f - n);
-	A.at<float>(2, 3) = -2 * f * n / (f - n);
-	A.at<float>(3, 2) = -1;
-
-	// 使用K投影和平移x和y分量
-	cv::Mat B = cv::Mat::zeros(4, 4, CV_32F);
-	B.at<float>(0, 0) = K.at<float>(0, 0);
-	B.at<float>(0, 1) = K.at<float>(0, 1);
-	B.at<float>(1, 1) = K.at<float>(1, 1);
-	B.at<float>(2, 2) = 1;
-	B.at<float>(3, 3) = 1;
-
-	// 将x和y分量规范化到NDC坐标系中
-	cv::Mat C = cv::Mat::eye(4, 4, CV_32F);
-	C.at<float>(0, 0) = 2.0 / iwidth;
-	C.at<float>(1, 1) = 2.0 / iheight;
-
-	cv::Mat result = C * B * A;
-	return result;
-}
-
 cv::Mat phase1CalculateP(int imClick, int objClick, float imCords[][2], float objCords[][3]) {
 	float *cords3d = new float[imClick * 3];
 	float *cords2d = new float[imClick * 2];

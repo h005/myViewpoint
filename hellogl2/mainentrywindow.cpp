@@ -7,6 +7,7 @@
 #include <QFileDialog>
 #include <QFileInfo>
 #include <QDebug>
+#include <opencv2/opencv.hpp>
 #include <glm/gtc/matrix_inverse.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -104,10 +105,22 @@ void MainEntryWindow::on_labelSecondImageBtn_clicked()
 
 void MainEntryWindow::on_executePreviewTargetBtn_clicked()
 {
+    QString target = "./img0063.jpg";
     // 根据目前标定的结果，恢复新图片的外参矩阵
     glm::mat4 wantMVMatrix, wantProjMatrix;
-    RecoveryMvMatrixYouWant(QString("./img0063.jpg"), wantMVMatrix);
-    wantProjMatrix = glm::perspective(glm::pi<float>() / 2, 1.f, 0.1f, 100.f);
+    RecoveryMvMatrixYouWant(target, wantMVMatrix);
+
+    Entity want;
+    Q_ASSERT(manager->getEntity(target, want));
+
+    // 获取图片宽高
+    QFileInfo fileInfo(ui->configFileLabel->text());
+    QString finalPath = QDir(fileInfo.absoluteDir()).filePath(QFileInfo(target).fileName());
+    qDebug() << finalPath;
+    cv::Mat img = cv::imread(finalPath.toUtf8().constData());
+
+    qDebug() <<  img.size().width << img.size().height;
+    wantProjMatrix = projectionMatrixWithFocalLength(want.f, img.size().width, img.size().height, 0.1f, 10.f);
 
     // [GUI]把目标图像的相机位置展现出来
     CameraShowWidget *b = new CameraShowWidget(manager->modelPath(), 1.f, wantMVMatrix, 0);
@@ -115,6 +128,7 @@ void MainEntryWindow::on_executePreviewTargetBtn_clicked()
 
     // [GUI]用目标图像的相机参数，渲染模型
     AlignResultWidget *c = new AlignResultWidget(manager->modelPath(), 1.f, wantMVMatrix, wantProjMatrix, 0);
+    c->resize(QSize(img.size().width, img.size().height));
     c->show();
 }
 
