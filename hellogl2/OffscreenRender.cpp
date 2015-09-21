@@ -1,4 +1,4 @@
-#include "render.h"
+#include "OffscreenRender.h"
 #include <iostream>
 #include <QMouseEvent>
 #include <QOpenGLShaderProgram>

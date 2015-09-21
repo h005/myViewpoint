@@ -23,7 +23,7 @@
 #include "DLT.h"
 #include "entity.h"
 #include "custom.h"
-#include "render.h"
+#include "OffscreenRender.h"
 
 MainEntryWindow::MainEntryWindow(QWidget *parent) :
     QMainWindow(parent),
