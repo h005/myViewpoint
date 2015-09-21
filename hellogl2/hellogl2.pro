@@ -1,6 +1,5 @@
 HEADERS       = glwidget.h \
                 window.h \
-    custom.h \
     DLT.h \
     GModel.h \
     trackball.h \
@@ -18,11 +17,11 @@ HEADERS       = glwidget.h \
     mainentrywindow.h \
     alignwindow.h \
     gloffscreenrenderframework.h \
-    OffscreenRender.h
+    OffscreenRender.h \
+    TransformationUtils.h
 SOURCES       = glwidget.cpp \
                 main.cpp \
                 window.cpp \
-    custom.cpp \
     DLT.cpp \
     GModel.cpp \
     trackball.cpp \
@@ -41,7 +40,8 @@ SOURCES       = glwidget.cpp \
     mainentrywindow.cpp \
     alignwindow.cpp \
     gloffscreenrenderframework.cpp \
-    OffscreenRender.cpp
+    OffscreenRender.cpp \
+    TransformationUtils.cpp
 
 QT           += widgets
 

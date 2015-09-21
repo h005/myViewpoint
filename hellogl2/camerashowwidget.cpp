@@ -5,7 +5,7 @@
 #include <glm/gtc/matrix_inverse.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/string_cast.hpp>
-#include "custom.h"
+#include "TransformationUtils.h"
 
 CameraShowWidget::CameraShowWidget(const QString &modelPath, const float imgRatio, const glm::mat4 &mvMatrix, QWidget *parent)
     :GLWidget(modelPath, parent)

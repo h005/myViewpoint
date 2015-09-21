@@ -10,7 +10,7 @@
 #include <glm/gtc/matrix_inverse.hpp>
 #include <glm/gtx/string_cast.hpp>
 
-#include "custom.h"
+#include "TransformationUtils.h"
 #include "entity.h"
 
 using namespace std;
@@ -72,12 +72,12 @@ float recoveryScale(
 }
 
 void recoveryLookAtWithModelView(
-        const glm::mat4 &mvMatrix,
+        const glm::mat4 &viewMatrix,
         glm::vec3 &eye,
         glm::vec3 &center,
         glm::vec3 &up) {
-    glm::vec3 t = glm::vec3(mvMatrix[3]);
-    glm::mat3 R = glm::mat3(mvMatrix);
+    glm::vec3 t = glm::vec3(viewMatrix[3]);
+    glm::mat3 R = glm::mat3(viewMatrix);
     // OC是世界中心指向相机中心的向量（世界坐标系下），也是相机中心在世界坐标系下的表示
     // 从公式角度看，有:
     // | R t |   |OC|   |0|

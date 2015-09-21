@@ -48,7 +48,7 @@
 #include <levmar.h>
 #include "pointsmatchrelation.h"
 #include "entitymanager.h"
-#include "custom.h"
+#include "TransformationUtils.h"
 
 
 AlignWindow::AlignWindow(QString imageHandler, QString modelPath, QString relationPath)
