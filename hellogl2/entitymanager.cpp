@@ -49,8 +49,6 @@ bool EntityManager::load()
     Q_ASSERT(bundleIn.readLine().startsWith("# Bundle file"));
     bundleIn.readLine();
 
-    int t = 0;
-
     while (!listIn.atEnd()) {
         QString entityName = listIn.readLine().split(' ', QString::SkipEmptyParts)[0];
 
@@ -80,7 +78,6 @@ bool EntityManager::load()
             container[entityName] = entity;
         }
     }
-    std::cout << "vim: " << t << std::endl;
     listFile.close();
     bundleFile.close();
     return true;
