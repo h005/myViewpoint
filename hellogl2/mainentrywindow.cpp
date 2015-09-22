@@ -26,7 +26,7 @@
 #include "TransformationUtils.h"
 #include "OffscreenRender.h"
 
-#define USE_DEFAULT_PROJECTION
+//#define USE_DEFAULT_PROJECTION
 
 MainEntryWindow::MainEntryWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -131,7 +131,6 @@ void MainEntryWindow::on_executePreviewTargetBtn_clicked()
     // [GUI]把目标图像的相机位置展现出来
     CameraShowWidget *b = new CameraShowWidget(manager->modelPath(), 1.f, wantMVMatrix, 0);
     b->show();
-    return;
 
     // [GUI]用目标图像的相机参数，渲染模型
     AlignResultWidget *c = new AlignResultWidget(manager->modelPath(), 1.f, wantMVMatrix, wantProjMatrix, 0);

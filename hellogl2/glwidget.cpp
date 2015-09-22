@@ -129,7 +129,7 @@ void GLWidget::initializeGL()
     model.bindDataToGL();
 
     // link program for drawing sphere
-    m_sphereProgramID = LoadShaders("shader/sphereShader.vert", "shader/sphereShader.frag");
+    m_sphereProgramID = LoadShaders("sphereShader.vert", "sphereShader.frag");
     GLuint vertexPosition_modelspaceID = glGetAttribLocation(m_sphereProgramID, "vertexPosition_modelspace");
     sphere.init(vertexPosition_modelspaceID);
 }

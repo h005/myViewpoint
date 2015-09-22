@@ -230,7 +230,7 @@ bool GModel::load(const char *modelPath) {
 void GModel::bindDataToGL() {
     // 读入shader程序并编译
     // 需要在OpenGL环境下调用，放在这里合适
-    m_programID = LoadShaders( "shader/simpleShader.vert", "shader/simpleShader.frag" );
+    m_programID = LoadShaders( "simpleShader.vert", "simpleShader.frag" );
 
     // 1.将纹理读取到显存
     // 2.递归创建meshEntry
