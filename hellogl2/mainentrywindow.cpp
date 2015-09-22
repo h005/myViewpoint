@@ -39,6 +39,8 @@ MainEntryWindow::MainEntryWindow(QWidget *parent) :
 MainEntryWindow::~MainEntryWindow()
 {
     delete ui;
+    if (offscreenRender != NULL)
+        delete offscreenRender;
 }
 
 QSize MainEntryWindow::sizeHint() const
@@ -248,7 +250,7 @@ void MainEntryWindow::on_saveLabeledResultBtn_clicked()
 void MainEntryWindow::on_saveLabeledImages_clicked()
 {
     // 使用相机的内外参数渲染到图片
-    if (offscreenRender != NULL) {
+    if (offscreenRender != NULL && offscreenRender->isVisible()) {
         QString outputDir = QFileDialog::getExistingDirectory(
                 this,
                 QString("选定输出目录"),
@@ -274,15 +276,20 @@ void MainEntryWindow::on_saveLabeledImages_clicked()
                 offscreenRender->renderToImageFile(wantMVMatrix, wantProjMatrix, finalPath);
             }
         }
+    } else {
+        std::cout << "Please Open A Render Window First" << std::endl;
     }
 }
 
 void MainEntryWindow::on_openOffscreenRenderBtn_clicked()
 {
-    if (offscreenRender == NULL) {
-        offscreenRender = new OffscreenRender(manager->modelPath(), NULL);
-        offscreenRender->resize(offscreenRender->sizeHint());
+    if (manager != NULL) {
+        if (offscreenRender == NULL) {
+            offscreenRender = new OffscreenRender(manager->modelPath(), NULL);
+            offscreenRender->resize(offscreenRender->sizeHint());
+        }
         offscreenRender->show();
         this->activateWindow();
-    }
+    } else
+        std::cout << "Please load config file first" << std::endl;
 }

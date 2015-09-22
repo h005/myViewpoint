@@ -61,6 +61,7 @@ GLWidget::GLWidget(const QString &modelPath, QWidget *parent)
       m_baseRotate(1.f),
       m_sphereProgramID(0)
 {
+    setAttribute(Qt::WA_DeleteOnClose);
     // --transparent causes the clear color to be transparent. Therefore, on systems that
     // support it, the widget will become transparent apart from the logo.
     m_transparent = QCoreApplication::arguments().contains(QStringLiteral("--transparent"));

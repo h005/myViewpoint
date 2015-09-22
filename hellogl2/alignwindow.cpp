@@ -53,6 +53,7 @@
 
 AlignWindow::AlignWindow(QString imageHandler, QString modelPath, QString relationPath)
 {
+    setAttribute(Qt::WA_DeleteOnClose);
     relation = new PointsMatchRelation(relationPath);
     if (!relation->loadFromFile()) {
         std::cout << "read failed" << std::endl;

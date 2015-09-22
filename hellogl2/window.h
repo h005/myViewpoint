@@ -76,7 +76,7 @@ private slots:
 
 private:
     ImageAndPoint *left;
-    GLWidget *right;
+    GLWidget *right = NULL;
     QPushButton *alignBtn;
     QPushButton *confirmBtn;
     QPushButton *clearBtn;

@@ -115,11 +115,11 @@ Window::Window(AlignWindow *mw, const QString &imagePath, const QString &modelPa
     setLayout(mainLayout);
 
     setWindowTitle(tr("Hello GL"));
-    qDebug() << "finished";
 }
 
 Window::~Window()
 {
+    qDebug() << "Window dealloc";
 }
 
 QSize Window::sizeHint() const
