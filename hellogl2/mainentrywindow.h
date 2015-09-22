@@ -43,6 +43,7 @@ private:
     EntityManager *manager;
     OffscreenRender *offscreenRender = NULL;
     void RecoveryMvMatrixYouWant(QString handler, glm::mat4 &wantMVMatrix);
+    QSize GetImageParamter(QString handler);
 };
 
 #endif // MAINENTRYWINDOW_H

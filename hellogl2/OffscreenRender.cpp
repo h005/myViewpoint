@@ -29,7 +29,7 @@ void OffscreenRender::initializeGL()
 }
 
 
-void OffscreenRender::renderToImageFile(glm::mat4 mvMatrix, glm::mat4 projMatrix, QString filePath)
+void OffscreenRender::renderToImageFile(glm::mat4 mvMatrix, glm::mat4 projMatrix, QString filePath, QSize dsize)
 {
     makeCurrent();
     glBindFramebuffer(GL_FRAMEBUFFER, fboId);
@@ -61,7 +61,10 @@ void OffscreenRender::renderToImageFile(glm::mat4 mvMatrix, glm::mat4 projMatrix
     cv::Mat image = cv::Mat(BUFFER_WIDTH, BUFFER_HEIGHT,CV_8UC4,img);
     cv::Mat flipped;
     cv::flip(image, flipped, 0);
-    cv::imwrite(filePath.toUtf8().constData(), flipped);
+
+    cv::Mat final;
+    cv::resize(flipped, final, cv::Size(dsize.width(), dsize.height()));
+    cv::imwrite(filePath.toUtf8().constData(), final);
     qDebug() << "...ok";
 
     delete img;

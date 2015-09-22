@@ -19,6 +19,7 @@ public:
 
     QSize minimumSizeHint() const Q_DECL_OVERRIDE;
     QSize sizeHint() const Q_DECL_OVERRIDE;
+    void resizeGL(int width, int height) Q_DECL_OVERRIDE;
 
 public slots:
     virtual void cleanup();
@@ -30,5 +31,5 @@ protected:
     GLuint fboId = 0, depthRenderBuffer = 0, colorRenderBuffer = 0;
     QSize m_windowSize;
     bool m_transparent;
-    void createFrameBufferObject();
+    void createOrUpdateFrameBufferObject();
 };

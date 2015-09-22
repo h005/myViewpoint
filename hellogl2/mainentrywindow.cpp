@@ -121,13 +121,9 @@ void MainEntryWindow::on_executePreviewTargetBtn_clicked()
     Q_ASSERT(manager->getEntity(target, want));
 
     // 获取图片宽高
-    QFileInfo fileInfo(ui->configFileLabel->text());
-    QString finalPath = QDir(fileInfo.absoluteDir()).filePath(QFileInfo(target).fileName());
-    qDebug() << finalPath;
-    cv::Mat img = cv::imread(finalPath.toUtf8().constData());
-
-    qDebug() <<  img.size().width << img.size().height;
-    wantProjMatrix = projectionMatrixWithFocalLength(want.f, img.size().width, img.size().height, 0.1f, 10.f);
+    QSize imgSize = GetImageParamter(target);
+    qDebug() <<  imgSize.width() << imgSize.height();
+    wantProjMatrix = projectionMatrixWithFocalLength(want.f, imgSize.width(), imgSize.height(), 0.1f, 10.f);
 #endif
 
     // [GUI]把目标图像的相机位置展现出来
@@ -138,7 +134,7 @@ void MainEntryWindow::on_executePreviewTargetBtn_clicked()
     AlignResultWidget *c = new AlignResultWidget(manager->modelPath(), 1.f, wantMVMatrix, wantProjMatrix, 0);
 #ifdef USE_DEFAULT_PROJECTION
 #else
-    c->resize(QSize(img.size().width, img.size().height));
+    c->resize(imgSize);
 #endif
     c->show();
 }
@@ -209,6 +205,17 @@ void MainEntryWindow::RecoveryMvMatrixYouWant(QString handler, glm::mat4 &wantMV
     recoveryCameraParameters(scale, base, want, firstMVMatrix, wantMVMatrix);
 }
 
+QSize MainEntryWindow::GetImageParamter(QString handler)
+{
+    // 先拼接，在去除路径中多余的信息
+    QFileInfo fileInfo(ui->configFileLabel->text());
+    QString finalPath = QDir::cleanPath(QDir(fileInfo.absoluteDir()).filePath(handler));
+    qDebug() << finalPath;
+    cv::Mat img = cv::imread(finalPath.toUtf8().constData());
+
+    return QSize(img.size().width, img.size().height);
+}
+
 void MainEntryWindow::on_saveLabeledResultBtn_clicked()
 {
     QString selfilter = tr("Model View Matrix File (*.matrix)");
@@ -267,13 +274,28 @@ void MainEntryWindow::on_saveLabeledImages_clicked()
 
                 glm::mat4 wantMVMatrix, wantProjMatrix;
                 RecoveryMvMatrixYouWant(*it, wantMVMatrix);
+
+#ifdef USE_DEFAULT_PROJECTION
                 wantProjMatrix = glm::perspective(glm::pi<float>() / 2, 1.f, 0.1f, 100.f);
+#else
+                Entity want;
+                Q_ASSERT(manager->getEntity(*it, want));
+                QSize imgSize = GetImageParamter(*it);
+                wantProjMatrix = projectionMatrixWithFocalLength(want.f, imgSize.width(), imgSize.height(), 0.1f, 10.f);
+#endif
 
                 // 将图片生成到选定目录中，文件名与之前一致，但后缀改为png，方便对照
                 QFileInfo file(*it);
                 QString basename = file.baseName();
                 QString finalPath = QDir(outputDir).filePath(basename + ".png");
-                offscreenRender->renderToImageFile(wantMVMatrix, wantProjMatrix, finalPath);
+
+                //更改窗口尺寸不可以即时生效，所以我们先渲染出图片再对图片进行缩放
+#ifdef USE_DEFAULT_PROJECTION
+                offscreenRender->renderToImageFile(wantMVMatrix, wantProjMatrix, finalPath, QSize(800, 800));
+#else
+                offscreenRender->renderToImageFile(wantMVMatrix, wantProjMatrix, finalPath, imgSize);
+#endif
+
             }
         }
     } else {

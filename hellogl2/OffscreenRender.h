@@ -14,7 +14,7 @@ class OffscreenRender : public GLOffscreenRenderFramework
 
 public:
     OffscreenRender(const QString &modelPath, QWidget *parent = 0);
-    void renderToImageFile(glm::mat4 mvMatrix, glm::mat4 projMatrix, QString filePath);
+    void renderToImageFile(glm::mat4 mvMatrix, glm::mat4 projMatrix, QString filePath, QSize dsize);
 
 protected:
     void initializeGL() Q_DECL_OVERRIDE;

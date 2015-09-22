@@ -32,6 +32,15 @@ QSize GLOffscreenRenderFramework::sizeHint() const
     return QSize(m_windowSize.width(), m_windowSize.height());
 }
 
+void GLOffscreenRenderFramework::resizeGL(int width, int height)
+{
+    m_windowSize = QSize(width, height);
+
+    //创建或更新fbo
+    // 需要根据窗口的尺寸调整fbo中帧缓冲的尺寸
+    createOrUpdateFrameBufferObject();
+}
+
 void GLOffscreenRenderFramework::cleanup()
 {
     makeCurrent();
@@ -57,22 +66,22 @@ void GLOffscreenRenderFramework::initializeGL()
     connect(context(), &QOpenGLContext::aboutToBeDestroyed, this, &GLOffscreenRenderFramework::cleanup);
     initializeOpenGLFunctions();
     glClearColor(0, 0, 0, m_transparent ? 0 : 1);
-
-    // 创建fbo环境
-    createFrameBufferObject();
 }
 
-void GLOffscreenRenderFramework::createFrameBufferObject()
+void GLOffscreenRenderFramework::createOrUpdateFrameBufferObject()
 {
-    glGenFramebuffers(1, &fboId);
+    if (fboId == 0)
+        glGenFramebuffers(1, &fboId);
     glBindFramebuffer(GL_FRAMEBUFFER, fboId);
 
-    glGenRenderbuffers(1, &depthRenderBuffer);
+    if (depthRenderBuffer == 0)
+        glGenRenderbuffers(1, &depthRenderBuffer);
     glBindRenderbuffer(GL_RENDERBUFFER, depthRenderBuffer);
     glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, m_windowSize.width(), m_windowSize.height());
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthRenderBuffer);
 
-    glGenRenderbuffers(1, &colorRenderBuffer);
+    if (colorRenderBuffer == 0)
+        glGenRenderbuffers(1, &colorRenderBuffer);
     glBindRenderbuffer(GL_RENDERBUFFER, colorRenderBuffer);
     glRenderbufferStorage(GL_RENDERBUFFER, GL_RGBA, m_windowSize.width(), m_windowSize.height());
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, colorRenderBuffer);
