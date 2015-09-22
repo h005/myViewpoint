@@ -77,7 +77,6 @@ private slots:
 private:
     ImageAndPoint *left;
     GLWidget *right;
-    QPushButton *dockBtn;
     QPushButton *alignBtn;
     QPushButton *confirmBtn;
     QPushButton *clearBtn;

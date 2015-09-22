@@ -26,6 +26,8 @@
 #include "TransformationUtils.h"
 #include "OffscreenRender.h"
 
+#define USE_DEFAULT_PROJECTION
+
 MainEntryWindow::MainEntryWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainEntryWindow),
@@ -110,6 +112,9 @@ void MainEntryWindow::on_executePreviewTargetBtn_clicked()
     glm::mat4 wantMVMatrix, wantProjMatrix;
     RecoveryMvMatrixYouWant(target, wantMVMatrix);
 
+#ifdef USE_DEFAULT_PROJECTION
+    wantProjMatrix = glm::perspective(glm::pi<float>() / 2, 1.f, 0.1f, 100.f);
+#else
     Entity want;
     Q_ASSERT(manager->getEntity(target, want));
 
@@ -121,14 +126,19 @@ void MainEntryWindow::on_executePreviewTargetBtn_clicked()
 
     qDebug() <<  img.size().width << img.size().height;
     wantProjMatrix = projectionMatrixWithFocalLength(want.f, img.size().width, img.size().height, 0.1f, 10.f);
+#endif
 
     // [GUI]把目标图像的相机位置展现出来
     CameraShowWidget *b = new CameraShowWidget(manager->modelPath(), 1.f, wantMVMatrix, 0);
     b->show();
+    return;
 
     // [GUI]用目标图像的相机参数，渲染模型
     AlignResultWidget *c = new AlignResultWidget(manager->modelPath(), 1.f, wantMVMatrix, wantProjMatrix, 0);
+#ifdef USE_DEFAULT_PROJECTION
+#else
     c->resize(QSize(img.size().width, img.size().height));
+#endif
     c->show();
 }
 

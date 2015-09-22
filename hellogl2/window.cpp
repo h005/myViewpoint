@@ -47,6 +47,7 @@
 #include <QHBoxLayout>
 #include <QKeyEvent>
 #include <QLabel>
+#include <QDebug>
 #include <QPushButton>
 #include <QDesktopWidget>
 #include <QApplication>
@@ -79,12 +80,10 @@ Window::Window(AlignWindow *mw, const QString &imagePath, const QString &modelPa
     right->m_relation = &relation;
 
     left = new ImageAndPoint(imagePath, relation, this);
-    dockBtn = new QPushButton(tr("Undock"), this);
     alignBtn = new QPushButton(tr("Align && See"), this);
     confirmBtn = new QPushButton(tr("Confirm && Uplevel"), this);
     clearBtn = new QPushButton(tr("Clear"), this);
 
-    connect(dockBtn, SIGNAL(clicked()), this, SLOT(dockUndock()));
     connect(alignBtn, SIGNAL(clicked()), this, SLOT(align()));
     connect(confirmBtn, SIGNAL(clicked()), this, SLOT(confirm()));
     connect(clearBtn, SIGNAL(clicked()), this, SLOT(clearPressed()));
@@ -112,11 +111,11 @@ Window::Window(AlignWindow *mw, const QString &imagePath, const QString &modelPa
     w->setLayout(container);
 
     QVBoxLayout *mainLayout = new QVBoxLayout;
-    mainLayout->addWidget(dockBtn);
     mainLayout->addWidget(w);
     setLayout(mainLayout);
 
     setWindowTitle(tr("Hello GL"));
+    qDebug() << "finished";
 }
 
 Window::~Window()
