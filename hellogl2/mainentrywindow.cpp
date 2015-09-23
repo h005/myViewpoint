@@ -157,7 +157,7 @@ void MainEntryWindow::RecoveryMvMatrixYouWant(QString handler, glm::mat4 &wantMV
         int width = img.width();
         int height = img.height();
 
-        PointsMatchRelation *rb = new PointsMatchRelation(manager->baseOneImageRelation());
+        PointsMatchRelation *rb = new PointsMatchRelation(manager->baseOneImageRelation(), manager->modelPath());
         if (!rb->loadFromFile() || rb->getPoints2d().size() < 6) {
             delete rb;
             QMessageBox::information(this, tr("错误"), tr("第一张图片标定未完成"));
@@ -180,7 +180,7 @@ void MainEntryWindow::RecoveryMvMatrixYouWant(QString handler, glm::mat4 &wantMV
         int width = img.width();
         int height = img.height();
 
-        PointsMatchRelation *rb = new PointsMatchRelation(manager->baseTwoImageRelation());
+        PointsMatchRelation *rb = new PointsMatchRelation(manager->baseTwoImageRelation(), manager->modelPath());
         if (!rb->loadFromFile() || rb->getPoints2d().size() < 6) {
             delete rb;
             QMessageBox::information(this, tr("错误"), tr("第二张图片标定未完成"));

@@ -1,11 +1,15 @@
 #include "pointsmatchrelation.h"
 
+#include <iostream>
 #include <QFile>
 #include <QTextStream>
 #include <QStringList>
+#include <glm/gtx/string_cast.hpp>
+#include "GModel.h"
 
-PointsMatchRelation::PointsMatchRelation(const QString &filepath)
-    : filepath(filepath)
+PointsMatchRelation::PointsMatchRelation(QString filepath, QString modelPath)
+    : filepath(filepath),
+      modelPath(modelPath)
 {
     points2d.clear();
     points3d.clear();
@@ -25,6 +29,7 @@ bool PointsMatchRelation::loadFromFile()
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
         return false;
 
+    glm::mat4 transform = getModelTranslateAndScaleTransform();
     QTextStream in(&file);
     while (!in.atEnd()) {
         QString line = in.readLine();
@@ -32,9 +37,9 @@ bool PointsMatchRelation::loadFromFile()
         if (tokens.size() != 5)
             return false;
 
-        glm::vec3 p3d = glm::vec3(tokens[2].toFloat(), tokens[3].toFloat(), tokens[4].toFloat());
+        glm::vec4 p3d = transform * glm::vec4(tokens[2].toFloat(), tokens[3].toFloat(), tokens[4].toFloat(), 1.f);
         glm::vec2 p2d = glm::vec2(tokens[0].toFloat(), tokens[1].toFloat());
-        points3d.push_back(p3d);
+        points3d.push_back(glm::vec3(p3d));
         points2d.push_back(p2d);
     }
     file.close();
@@ -48,10 +53,15 @@ bool PointsMatchRelation::saveToFile()
         if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
             return false;
 
+        glm::mat4 transform = glm::inverse(getModelTranslateAndScaleTransform());
         QTextStream out(&file);
         for (uint32_t i = 0; i < points2d.size(); i++) {
             glm::vec2 p2d = points2d[i];
-            glm::vec3 p3d = points3d[i];
+
+            // 由于模型显示前要进行移中和缩放，所以得到的3d点和模型的尺度有关
+            // 将3d点当前的坐标变换到模型坐标系下，获得尺度无关的坐标
+            glm::vec3 tmp = points3d[i];
+            glm::vec4 p3d = transform * glm::vec4(tmp, 1.f);
             out << p2d.x << " " << p2d.y << " " << p3d.x << " " << p3d.y << " " << p3d.z << "\n";
         }
         file.close();
@@ -88,6 +98,16 @@ std::vector<glm::vec3>& PointsMatchRelation::getPoints3d()
 void PointsMatchRelation::setPoints3d(const std::vector<glm::vec3> &value)
 {
     points3d = value;
+}
+
+glm::mat4 PointsMatchRelation::getModelTranslateAndScaleTransform()
+{
+    // 获取模型的"移中缩放"矩阵
+    GModel model;
+    model.load(modelPath.toUtf8().constData());
+    glm::mat4 mv = model.getInnerTransformation();
+    std::cout << glm::to_string(mv) << std::endl;
+    return mv;
 }
 
 

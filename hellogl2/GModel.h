@@ -55,10 +55,11 @@ public:
 	bool hasModel();
     void bindDataToGL();
     void drawNormalizedModel(const glm::mat4 &inheritModelView, const glm::mat4 &projection);
-	float drawScale();
+    glm::mat4 getInnerTransformation();
 	~GModel();
 
 private:
+    float drawScale();
 	void apply_material(const aiMaterial *mtl);
     void recursive_create(const aiScene *sc, const aiNode* nd, const glm::mat4 &inheritedTransformation);
 	void cleanUp();

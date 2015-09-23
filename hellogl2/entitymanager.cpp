@@ -25,7 +25,7 @@ bool EntityManager::load()
 {
     QSettings settings(QDir(m_basedir).filePath("config.ini"), QSettings::IniFormat);
     // 读取模型的信息
-    m_modelPath = QDir(m_basedir).filePath(settings.value("model/path").toString());
+    m_modelPath = QDir::cleanPath(QDir(m_basedir).filePath(settings.value("model/path").toString()));
     // 读取两幅配准图像的信息
     m_baseOneID = settings.value("align/base_one_id").toString();
     m_baseOneImagePath = QDir(m_basedir).filePath(m_baseOneID);
