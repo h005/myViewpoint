@@ -107,9 +107,10 @@ void MainEntryWindow::on_labelSecondImageBtn_clicked()
     }
 }
 
+QString target="./img0298.jpg";
+
 void MainEntryWindow::on_executePreviewTargetBtn_clicked()
 {
-    QString target = "./img0063.jpg";
     // 根据目前标定的结果，恢复新图片的外参矩阵
     glm::mat4 wantMVMatrix, wantProjMatrix;
     RecoveryMvMatrixYouWant(target, wantMVMatrix);
@@ -137,6 +138,19 @@ void MainEntryWindow::on_executePreviewTargetBtn_clicked()
     c->resize(imgSize);
 #endif
     c->show();
+}
+
+void MainEntryWindow::on_printMvMatrixBtn_clicked()
+{
+    // 根据目前标定的结果，恢复新图片的外参矩阵
+    glm::mat4 wantMVMatrix;
+    RecoveryMvMatrixYouWant(target, wantMVMatrix);
+    std::cout << "MV matrix [Row major]" << std::endl;
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++)
+            std::cout << wantMVMatrix[j][i] << " ";
+        std::cout << std::endl;
+    }
 }
 
 void MainEntryWindow::RecoveryMvMatrixYouWant(QString handler, glm::mat4 &wantMVMatrix)

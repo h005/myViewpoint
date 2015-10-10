@@ -38,6 +38,8 @@ private slots:
 
     void on_openOffscreenRenderBtn_clicked();
 
+    void on_printMvMatrixBtn_clicked();
+
 private:
     Ui::MainEntryWindow *ui;
     EntityManager *manager;
