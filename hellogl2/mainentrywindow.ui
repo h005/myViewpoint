@@ -97,12 +97,12 @@
      <rect>
       <x>30</x>
       <y>320</y>
-      <width>171</width>
+      <width>281</width>
       <height>23</height>
      </rect>
     </property>
     <property name="text">
-     <string>标定全部结果并输出矩阵</string>
+     <string>标定全部结果并输出矩阵（含模型缩放）</string>
     </property>
    </widget>
    <widget class="QPushButton" name="changePreviewTargetBtn">
