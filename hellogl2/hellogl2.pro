@@ -47,7 +47,7 @@ OTHER_FILES += shader/*.vert shader/*.frag
 
 QT           += widgets
 
-DEFINES += _CRT_SECURE_NO_WARNINGS
+DEFINES += _CRT_SECURE_NO_WARNINGS GLM_FORCE_RADIANS
 #DEFINES += __TEST_EXPFIT
 
 macx {

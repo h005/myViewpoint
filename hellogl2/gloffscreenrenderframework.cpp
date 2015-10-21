@@ -65,7 +65,7 @@ void GLOffscreenRenderFramework::initializeGL()
     assert(err == GLEW_OK);
     connect(context(), &QOpenGLContext::aboutToBeDestroyed, this, &GLOffscreenRenderFramework::cleanup);
     initializeOpenGLFunctions();
-    glClearColor(0, 0, 0, m_transparent ? 0 : 1);
+    glClearColor( 0.368, 0.368, 0.733, 1);
 }
 
 void GLOffscreenRenderFramework::createOrUpdateFrameBufferObject()
