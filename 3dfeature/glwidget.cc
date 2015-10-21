@@ -68,7 +68,7 @@ void GLWidget::initializeGL()
 
     connect(context(), &QOpenGLContext::aboutToBeDestroyed, this, &GLWidget::cleanup);
     initializeOpenGLFunctions();
-    glClearColor(0, 0, 0, m_transparent ? 0 : 1);
+    glClearColor( 0.368, 0.368, 0.733, 1);
 
     // Our camera never changes in this example.
     // Equal to:
@@ -76,9 +76,10 @@ void GLWidget::initializeGL()
     m_camera = glm::lookAt(glm::vec3(0.f, 0.f, 3.f), glm::vec3(0.f), glm::vec3(0.f, 1.f, 0.f));
 
     // link program for drawing sphere
-    m_programID = LoadShaders( "shader/sphereShader.vert", "shader/sphereShader.frag" );
+    m_programID = LoadShaders( "shader/simpleShader.vert", "shader/simpleShader.frag" );
+    GLuint vertexNormal_modelspaceID = glGetAttribLocation(m_programID, "vertexNormal_modelspace");
     GLuint vertexPosition_modelspaceID = glGetAttribLocation(m_programID, "vertexPosition_modelspace");
-    m_helper.init(vertexPosition_modelspaceID);
+    m_helper.init(vertexPosition_modelspaceID, vertexNormal_modelspaceID);
 }
 
 void GLWidget::paintGL()
@@ -87,17 +88,33 @@ void GLWidget::paintGL()
     glEnable(GL_DEPTH_TEST);
     // 默认开启背面剔除:GL_CULL_FACE
 
+    // 粗糙渲染，看得更清楚
+    glEnable(GL_FLAT);
+    glShadeModel(GL_FLAT);
+    glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+
     // 显示三角形网格，这样看得更清楚一些
     //glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
 
     // 计算modelView矩阵
-    glm::mat4 modelViewMatrix = getModelViewMatrix();
+    glm::mat4 M = getModelMatrix();
+    glm::mat4 V = m_camera;
+    glm::mat4 MV = V * M;
+    glm::mat4 normalMatrix = glm::transpose(glm::inverse(MV));
+    glm::mat4 MVP = m_proj * MV;
+    glm::vec3 lightPos = glm::vec3(4,4,4);
 
     glUseProgram(m_programID);
-    GLuint projMatrixID = glGetUniformLocation(m_programID, "projMatrix");
-    GLuint mvMatrixID = glGetUniformLocation(m_programID, "mvMatrix");
-    glUniformMatrix4fv(projMatrixID, 1, GL_FALSE, glm::value_ptr(m_proj));
-    glUniformMatrix4fv(mvMatrixID, 1, GL_FALSE, glm::value_ptr(modelViewMatrix));
+    GLuint mvpID = glGetUniformLocation(m_programID, "MVP");
+    GLuint mID = glGetUniformLocation(m_programID, "M");
+    GLuint vID = glGetUniformLocation(m_programID, "V");
+    GLuint nID = glGetUniformLocation(m_programID, "normalMatrix");
+    GLuint LightID = glGetUniformLocation(m_programID, "LightPosition_worldspace");
+    glUniformMatrix4fv(mvpID, 1, GL_FALSE, glm::value_ptr(MVP));
+    glUniformMatrix4fv(mID, 1, GL_FALSE, glm::value_ptr(M));
+    glUniformMatrix4fv(vID, 1, GL_FALSE, glm::value_ptr(V));
+    glUniformMatrix4fv(nID, 1, GL_FALSE, glm::value_ptr(normalMatrix));
+    glUniform3f(LightID, lightPos.x, lightPos.y, lightPos.z);
     m_helper.draw();
 }
 
@@ -110,10 +127,9 @@ void GLWidget::resizeGL(int w, int h)
  * @brief GLWidget::getModelViewMatrix 由于这个窗口支持鼠标拖拽和缩放，所以m_camera并不是最终的变换矩阵
  * @return 渲染时使用的ModelView矩阵
  */
-glm::mat4 GLWidget::getModelViewMatrix()
+glm::mat4 GLWidget::getModelMatrix()
 {
-    return (m_camera
-            * glm::scale(glm::mat4(1.f), glm::vec3(m_scale, m_scale, m_scale))
+    return (glm::scale(glm::mat4(1.f), glm::vec3(m_scale, m_scale, m_scale))
             * glm::rotate(glm::mat4(1.f), m_angle, m_rotateN)
             * m_baseRotate);
 }

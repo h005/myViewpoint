@@ -16,18 +16,24 @@ public:
      * @brief 将mesh的结构转换为OpenGL中的vao和vbo，并送入显存
      * @param vertexPositionID shader中顶点变量所在位置
      */
-    void init(GLuint vertexPositionID)
+    void init(GLuint vertexPositionID, GLuint vertexNormalID)
     {
         int index = 0;
         std::map<typename MeshT::VertexHandle, int> dict;
 
         std::vector<GLfloat> vertices;
+        std::vector<GLfloat> vertexNormals;
         typename MeshT::VertexIter v_it, v_end(m_mesh.vertices_end());
         for (v_it = m_mesh.vertices_begin(); v_it != v_end; v_it++) {
             MeshT::Point pos = m_mesh.point(*v_it);
             vertices.push_back(pos[0]);
             vertices.push_back(pos[1]);
             vertices.push_back(pos[2]);
+
+            MeshT::Point normal = m_mesh.normal(*v_it);
+            vertexNormals.push_back(normal[0]);
+            vertexNormals.push_back(normal[1]);
+            vertexNormals.push_back(normal[2]);
 
             dict[*v_it] = index;
             index++;
@@ -48,9 +54,16 @@ public:
         glGenBuffers(1, &m_vboVertex);
         glBindBuffer(GL_ARRAY_BUFFER, m_vboVertex);
         glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(GLfloat), &vertices[0], GL_STATIC_DRAW);
-
         glVertexAttribPointer(vertexPositionID, 3, GL_FLOAT, GL_FALSE, 0, NULL);
         glEnableVertexAttribArray (vertexPositionID);
+
+        if (vertexNormalID != -1) {
+            glGenBuffers(1, &m_vboVertexNormal);
+            glBindBuffer(GL_ARRAY_BUFFER, m_vboVertexNormal);
+            glBufferData(GL_ARRAY_BUFFER, vertexNormals.size() * sizeof(GLfloat), &vertexNormals[0], GL_STATIC_DRAW);
+            glVertexAttribPointer(vertexNormalID, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+            glEnableVertexAttribArray (vertexNormalID);
+        }
 
         glGenBuffers(1, &m_vboIndex);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_vboIndex);
@@ -81,6 +94,9 @@ public:
         if(m_vboVertex) {
             glDeleteBuffers(1, &m_vboVertex);
         }
+        if(m_vboVertexNormal) {
+            glDeleteBuffers(1, &m_vboVertexNormal);
+        }
         if(m_vboIndex) {
             glDeleteBuffers(1, &m_vboIndex);
         }
@@ -98,7 +114,7 @@ private:
     MeshT &m_mesh;
 
     bool m_isInited;
-    GLuint m_vao, m_vboVertex, m_vboIndex;
+    GLuint m_vao = 0, m_vboVertex = 0, m_vboVertexNormal = 0, m_vboIndex = 0;
     int numsToDraw;
 };
 

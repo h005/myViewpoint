@@ -15,10 +15,28 @@ void MainWindow::startMyProcess()
     // 从文件中读入mesh。ExternalImporter是我实现的模版类，支持的格式更多些
 
 #ifdef BUILDIN_READER
-    if ( ! OpenMesh::IO::read_mesh(mesh, "1.off") )
+    // 开启normal支持(相当于分配存储空间)
+    mesh.request_vertex_normals();
+    // 验证是否开启成功/存在normal的存储空间
+    if (!mesh.has_vertex_normals())
+    {
+        std::cerr << "ERROR: Standard vertex property 'Normals' not available!\n";
+        return;
+    }
+
+    // 需要设置参数，这样才会从文件中读取vertex normals
+    OpenMesh::IO::Options inopt;
+    inopt += OpenMesh::IO::Options::VertexNormal;
+    if ( ! OpenMesh::IO::read_mesh(mesh, "../models/1.off", inopt) )
     {
         std::cerr << "Error: Cannot read mesh from " << std::endl;
-        return 1;
+        return;
+    }
+
+    if ( !inopt.check( OpenMesh::IO::Options::VertexNormal ) ) {
+        // If the file did not provide vertex normals,
+        // we will calculate vertex normals later
+        mesh.release_vertex_normals();
     }
 #else
     if (!ExternalImporter<MyMesh>::read_mesh(mesh, "dragon.off") )
@@ -27,6 +45,21 @@ void MainWindow::startMyProcess()
         return;
     }
 #endif
+
+    // If the file did not provide vertex normals, then calculate them
+    if (!mesh.has_vertex_normals())
+    {
+        std::cout << "we need calculate vertex normal first" << std::endl;
+        // allocate memory for normals storage
+        // we need face normals to update the vertex normals
+        mesh.request_face_normals();
+        mesh.request_vertex_normals();
+
+        // let the mesh update the normals
+        mesh.update_normals();
+        // dispose the face normals, as we don't need them anymore
+        mesh.release_face_normals();
+    }
 
     // 创建两个对象，分别用于提取高斯曲率和平均曲率
     GaussCurvature<MyMesh> a(mesh);

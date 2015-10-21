@@ -82,7 +82,7 @@ protected:
     void wheelEvent (QWheelEvent * event) Q_DECL_OVERRIDE;
 
 protected:
-    glm::mat4 getModelViewMatrix();
+    glm::mat4 getModelMatrix();
     glm::mat4 m_proj;
     glm::mat4 m_camera;
     glm::mat4 m_baseRotate;

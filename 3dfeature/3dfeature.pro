@@ -28,7 +28,7 @@ HEADERS += Curvature.hh \
     mainwindow.hh
 OTHER_FILES += shader/*.vert shader/*.frag
 
-DEFINES += _USE_MATH_DEFINES
+DEFINES += _USE_MATH_DEFINES BUILDIN_READER
 
 win32 {
     DP_TOOLS_DIR = $$(DP_TOOLS_DIR)
