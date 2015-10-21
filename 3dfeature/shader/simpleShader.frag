@@ -2,6 +2,7 @@
 
 // Interpolated values from the vertex shaders
 varying vec2 UV;
+varying vec3 vertexNormal_cameraspace;
 
 // Values that stay constant for the whole mesh.
 uniform sampler2D myTextureSampler;

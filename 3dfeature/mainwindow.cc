@@ -21,7 +21,7 @@ void MainWindow::startMyProcess()
         return 1;
     }
 #else
-    if (!ExternalImporter<MyMesh>::read_mesh(mesh, "1.off") )
+    if (!ExternalImporter<MyMesh>::read_mesh(mesh, "dragon.off") )
     {
         std::cerr << "Error: Cannot read mesh from " << std::endl;
         return;

@@ -76,7 +76,7 @@ void GLWidget::initializeGL()
     m_camera = glm::lookAt(glm::vec3(0.f, 0.f, 3.f), glm::vec3(0.f), glm::vec3(0.f, 1.f, 0.f));
 
     // link program for drawing sphere
-    m_programID = LoadShaders( "sphereShader.vert", "sphereShader.frag" );
+    m_programID = LoadShaders( "shader/sphereShader.vert", "shader/sphereShader.frag" );
     GLuint vertexPosition_modelspaceID = glGetAttribLocation(m_programID, "vertexPosition_modelspace");
     m_helper.init(vertexPosition_modelspaceID);
 }
@@ -88,7 +88,7 @@ void GLWidget::paintGL()
     // 默认开启背面剔除:GL_CULL_FACE
 
     // 显示三角形网格，这样看得更清楚一些
-    glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
+    //glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
 
     // 计算modelView矩阵
     glm::mat4 modelViewMatrix = getModelViewMatrix();

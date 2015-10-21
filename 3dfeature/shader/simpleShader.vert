@@ -6,6 +6,7 @@ attribute vec3 vertexNormal_modelspace;
 
 // Output data ; will be interpolated for each fragment.
 varying vec2 UV;
+varying vec3 vertexNormal_cameraspace;
 
 uniform mat4 projMatrix;
 uniform mat4 mvMatrix;
@@ -15,5 +16,6 @@ void main()
 {
 	vec4 viewSpacePos = mvMatrix * vec4(vertexPosition_modelspace, 1);
 	gl_Position = projMatrix * viewSpacePos;
+        vertexNormal_cameraspace = normalMatrix * vec4(vertexNormal_modelspace, 0);
 	UV = vertexUV;
 }
