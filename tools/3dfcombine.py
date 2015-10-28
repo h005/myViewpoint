@@ -53,6 +53,8 @@ if __name__ == '__main__':
             fp.write('%d\n' % key)
             fp.write(result[key] + '\n')
 
+    print
     print 'output: %s' % options.output
+    print '%d instance(s)' % len(result)
         
 
