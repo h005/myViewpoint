@@ -29,7 +29,7 @@ if __name__ == '__main__':
     usage = 'Usage: %prog --dir=. -output=3df.out'  
     parser = optparse.OptionParser(usage = usage)
     parser.add_option('--dir', dest='dir', default = '.', help="3df file's dir")
-    parser.add_option('--output', dest='output', default = '3df.out', help="The output file path")
+    parser.add_option('--output', dest='output', default = 'integration.out', help="The output file path")
     (options, args) = parser.parse_args()
 
     print 'Searching %s For 3df files' % options.dir
@@ -44,13 +44,14 @@ if __name__ == '__main__':
                 b = fp.readline().strip()
                 if not a or not b:
                     break
-
+                a = int(a)
                 assert(a not in result or result[a] == b)
                 result[a] = b
 
     with open(options.output, 'w') as fp:
-        for key, val in result.items():
-            fp.write(key + '\n' + val + '\n')
+        for key in sorted(result.keys()):
+            fp.write('%d\n' % key)
+            fp.write(result[key] + '\n')
 
     print 'output: %s' % options.output
         
