@@ -292,7 +292,7 @@ void MainEntryWindow::on_saveLabeledResultBtn_2_clicked()
             this,
             QString("打开配置文件"),
             QString(),
-            tr("All files (*.*);;Model View Matrix File (*.matrix)" ),
+            tr("All files (*.*);;Model View Projection Matrix File (*.matrix)" ),
             &selfilter
     );
 
@@ -318,6 +318,16 @@ void MainEntryWindow::on_saveLabeledResultBtn_2_clicked()
             for (int i = 0; i < 4; i++) {
                 for (int j = 0; j < 4; j++)
                     matrixFile << wantMVMatrix[j][i] << " ";
+                matrixFile << std::endl;
+            }
+
+            Entity want;
+            Q_ASSERT(manager->getEntity(*it, want));
+            QSize imgSize = GetImageParamter(*it);
+            glm::mat4 wantProjMatrix = projectionMatrixWithFocalLength(want.f, imgSize.width(), imgSize.height(), 0.1f, 10.f);
+            for (int i = 0; i < 4; i++) {
+                for (int j = 0; j < 4; j++)
+                    matrixFile << wantProjMatrix[j][i] << " ";
                 matrixFile << std::endl;
             }
         }
