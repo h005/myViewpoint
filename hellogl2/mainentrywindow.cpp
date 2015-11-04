@@ -142,7 +142,20 @@ void MainEntryWindow::on_executePreviewTargetBtn_clicked()
 
 void MainEntryWindow::on_printMvMatrixBtn_clicked()
 {
-    // 根据目前标定的结果，恢复新图片的外参矩阵
+    // 根据目前标定的结果，恢复新图片的*外参*矩阵
+    glm::mat4 wantMVMatrix;
+    RecoveryMvMatrixYouWant(target, wantMVMatrix);
+    std::cout << "MV matrix [Row major]" << std::endl;
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++)
+            std::cout << wantMVMatrix[j][i] << " ";
+        std::cout << std::endl;
+    }
+}
+
+void MainEntryWindow::on_printMvPMatrixBtn_clicked()
+{
+    // 根据目前标定的结果，恢复新图片的*内外参*两个矩阵
     glm::mat4 wantMVMatrix;
     RecoveryMvMatrixYouWant(target, wantMVMatrix);
     std::cout << "MV matrix [Row major]" << std::endl;
@@ -270,8 +283,48 @@ void MainEntryWindow::on_saveLabeledResultBtn_clicked()
         qDebug() << "output finished";
         matrixFile.close();
     }
+}
 
+void MainEntryWindow::on_saveLabeledResultBtn_2_clicked()
+{
+    QString selfilter = tr("Model View Projection Matrix File (*.matrix)");
+    QString fileName = QFileDialog::getSaveFileName(
+            this,
+            QString("打开配置文件"),
+            QString(),
+            tr("All files (*.*);;Model View Matrix File (*.matrix)" ),
+            &selfilter
+    );
 
+    if (!fileName.isEmpty()) {
+        qDebug() << fileName;
+        std::ofstream matrixFile;
+        matrixFile.open(fileName.toUtf8().constData());
+
+        // 获取模型的"移中缩放"矩阵
+        GModel model;
+        model.load(manager->modelPath().toUtf8().constData());
+        glm::mat4 innerTransform = model.getInnerTransformation();
+
+        std::vector<QString> list;
+        manager->getImageList(list);
+        std::vector<QString>::iterator it;
+        for (it = list.begin(); it != list.end(); it++) {
+            glm::mat4 wantMVMatrix;
+            qDebug() << "********************* " << it - list.begin() << " ****************";
+            RecoveryMvMatrixYouWant(*it, wantMVMatrix);
+            wantMVMatrix *= innerTransform;
+            matrixFile << it->toUtf8().constData() << std::endl;
+            for (int i = 0; i < 4; i++) {
+                for (int j = 0; j < 4; j++)
+                    matrixFile << wantMVMatrix[j][i] << " ";
+                matrixFile << std::endl;
+            }
+        }
+
+        qDebug() << "output finished";
+        matrixFile.close();
+    }
 }
 
 void MainEntryWindow::on_saveLabeledImages_clicked()
@@ -335,3 +388,5 @@ void MainEntryWindow::on_openOffscreenRenderBtn_clicked()
     } else
         std::cout << "Please load config file first" << std::endl;
 }
+
+

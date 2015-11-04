@@ -40,6 +40,10 @@ private slots:
 
     void on_printMvMatrixBtn_clicked();
 
+    void on_printMvPMatrixBtn_clicked();
+
+    void on_saveLabeledResultBtn_2_clicked();
+
 private:
     Ui::MainEntryWindow *ui;
     EntityManager *manager;

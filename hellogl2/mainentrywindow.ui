@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>330</width>
-    <height>445</height>
+    <width>327</width>
+    <height>535</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -135,7 +135,7 @@
     <property name="geometry">
      <rect>
       <x>130</x>
-      <y>360</y>
+      <y>400</y>
       <width>181</width>
       <height>23</height>
      </rect>
@@ -148,7 +148,7 @@
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>360</y>
+      <y>400</y>
       <width>81</width>
       <height>23</height>
      </rect>
@@ -170,13 +170,39 @@
      <string>打印标定的MV矩阵</string>
     </property>
    </widget>
+   <widget class="QPushButton" name="printMvPMatrixBtn">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>280</y>
+      <width>141</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>打印标定的MV和P矩阵</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="saveLabeledResultBtn_2">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>360</y>
+      <width>281</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>标定全部结果并输出矩阵（含模型缩放&amp;&amp;投影）</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>330</width>
+     <width>327</width>
      <height>23</height>
     </rect>
    </property>
