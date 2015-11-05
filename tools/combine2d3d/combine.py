@@ -3,7 +3,7 @@ import sys
 import optparse
 
 if __name__ == '__main__':
-    usage = 'Usage: %prog --2df=kxm.2df --3df=kxm.3df --label=kxm.label --output=kxm [--libsvm]'
+    usage = 'Usage: %prog --2df=kxm.2df --3df=kxm.3df --label=kxm.label --output=kxm --libsvm'
     parser = optparse.OptionParser(usage=usage)
     parser.add_option('--2df', dest='f2d', help='extracted 2d features')
     parser.add_option('--3df', dest='f3d', help='extracted 3d features')
