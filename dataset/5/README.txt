@@ -2,12 +2,12 @@
 
 完全由周文喆标定
 
-注意：第一个版本，特征提取有误
+特征中融合了P矩阵
 
 C:\Users\mzd\Desktop\viewpoint\libsvm-3.20-auc-mod\tools>python easy.py ../kxm.d
 ata
 Scaling training data...
 Cross validation...
-Best c=512.0, g=3.0517578125e-05 CV rate=62.405
+Best c=0.125, g=0.0001220703125 CV rate=68.9051
 Training...
 Output model: kxm.data.model
