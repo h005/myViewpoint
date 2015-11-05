@@ -44,7 +44,7 @@ from sklearn.datasets import load_svmlight_file
 # Data IO and generation
 
 # scale kxm.data features to -1..1
-X, y = load_svmlight_file('../dataset/2/kxm.data.scale')
+X, y = load_svmlight_file('../dataset/6/kxm.data.scale')
 n_samples, n_features = X.shape
 
 ###############################################################################
@@ -54,7 +54,7 @@ n_samples, n_features = X.shape
 random_state = np.random.RandomState(0)
 #random_state = None
 cv = StratifiedKFold(y, n_folds=5)
-classifier = svm.SVC(C=2.0, gamma=0.5, probability=True, random_state=random_state)
+classifier = svm.SVC(C=8.0, gamma=0.0019533, probability=True, random_state=random_state)
 
 mean_tpr = 0.0
 mean_fpr = np.linspace(0, 1, 100)
