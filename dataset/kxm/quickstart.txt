@@ -1,1 +1,9 @@
 python combine.py kxm.2df kxm-1105.3df --label=hjw.label --output=../../libsvm-3.20-auc-mod/kxm --libsvm
+
+数据说明：
+kxm-1105.3df  首次融合P矩阵
+kxm-11052.3df 增加了AbovePreference (当前最好)
+kxm-11053.3df 增加了MeshSailency
+
+kxm-1106.3df  和1105的区别在于，1106是会将各个图像缩放到各自的图像大小
+kxm-11062.3df 1106基础上增加了AbovePreference
