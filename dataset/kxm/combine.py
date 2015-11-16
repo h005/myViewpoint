@@ -1,19 +1,13 @@
 #-*- coding:utf-8 -*-
 import sys
 import optparse
+import StringIO
 
-if __name__ == '__main__':
-    usage = 'Usage: %prog --label=kxm.label --output=kxm --libsvm kxm.2df kxm.3df [kxm2.3df]'
-    parser = optparse.OptionParser(usage=usage)
-    parser.add_option('--label', dest='label', help='labels for training')
-    parser.add_option('--output', dest='output', help='output data file name')
-    parser.add_option('--libsvm', dest='output_libsvm', action='store_true', help='output file with libsvm format')
-    options, feature_files = parser.parse_args()
-
+def generate_file(label_file, feature_files, output_libsvm=True):
     data = {}
 
     length = -1
-    with open(options.label, 'r') as label:
+    with open(label_file, 'r') as label:
         while True:
             key = label.readline().strip()
             value = label.readline().strip()
@@ -46,9 +40,9 @@ if __name__ == '__main__':
                 else:
                     assert(length == current_length)
 
-    if options.output_libsvm:
-        output_data = open('%s.data' % options.output, 'w')
-        output_list = open('%s.list' % options.output, 'w')
+    output_data = StringIO.StringIO()
+    output_list = StringIO.StringIO()
+    if output_libsvm:
         # length的长度含有开头的label
         for key in data:
             output_list.write(key + "\n")
@@ -60,17 +54,27 @@ if __name__ == '__main__':
             for idx, val in enumerate(elements[1:]):
                 output_data.write(' %d:%s' % (idx+1, val))
             output_data.write("\n")
-        output_data.close()
-        output_list.close()
     else:
-        output_data = open('%s.data' % options.output, 'w')
-        output_list = open('%s.list' % options.output, 'w')
         # length的长度含有开头的label
         output_data.write('%d %d\n' % (len(data), length-1))
         for key in data:
             output_list.write(key + "\n")
             output_data.write(data[key] + "\n")
-        output_data.close()
-        output_list.close()
+
+    return output_data.getvalue(), output_list.getvalue()
+
+
+if __name__ == '__main__':
+    usage = 'Usage: %prog --label=kxm.label --output=kxm --libsvm kxm.2df kxm.3df [kxm2.3df]'
+    parser = optparse.OptionParser(usage=usage)
+    parser.add_option('--label', dest='label', help='labels for training')
+    parser.add_option('--output', dest='output', help='output data file name')
+    parser.add_option('--libsvm', dest='output_libsvm', action='store_true', help='output file with libsvm format')
+    options, feature_files = parser.parse_args()
+    a, b = generate_file(options.label, feature_files, options.output_libsvm)
+    with open(options.output + '.data', 'w') as o:
+        o.write(a)
+    with open(options.output + '.list', 'w') as o:
+        o.write(b)
 
     print '[OK!]'
