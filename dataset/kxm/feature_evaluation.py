@@ -6,7 +6,7 @@ import pprint
 
 IN = 'kxm.data'
 if __name__ == '__main__':
-    # 搜集所有的df文件
+    '''从一个已有文件之后筛选出单列属性进行预测'''
 
     with open(IN, 'r') as indata:
         v = indata.readline().strip()
