@@ -1,5 +1,4 @@
-#ifndef PLYCLOUDLOADER_H
-#define PLYCLOUDLOADER_H
+#pragma once
 
 #include "baserenderobject.h"
 #include <string>
@@ -26,5 +25,3 @@ private:
     std::vector<GLfloat> m_normals;
     std::vector<GLuint> m_indices;
 };
-
-#endif // PLYCLOUDLOADER_H

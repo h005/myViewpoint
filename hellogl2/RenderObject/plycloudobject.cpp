@@ -1,4 +1,4 @@
-#include "plycloudloader.h"
+#include "plycloudobject.h"
 #include <iostream>
 #include <fstream>
 #include <assert.h>

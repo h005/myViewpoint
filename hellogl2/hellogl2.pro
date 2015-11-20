@@ -6,7 +6,6 @@ HEADERS       = glwidget.h \
     imageandpoint.h \
     shader.hpp \
     pointsmatchrelation.h \
-    sphere.h \
     alignresultwidget.h \
     entity.h \
     entitymanager.h \
@@ -19,9 +18,11 @@ HEADERS       = glwidget.h \
     gloffscreenrenderframework.h \
     OffscreenRender.h \
     TransformationUtils.h \
-    plycloudloader.h \
     pointcloudwidget.h \
-    baserenderobject.h
+    logo.h \
+    RenderObject/baserenderobject.h \
+    RenderObject/plycloudobject.h \
+    RenderObject/sphere.h
 SOURCES       = glwidget.cpp \
                 main.cpp \
                 window.cpp \
@@ -31,7 +32,6 @@ SOURCES       = glwidget.cpp \
     imageandpoint.cpp \
     shader.cpp \
     pointsmatchrelation.cpp \
-    sphere.cpp \
     alignresultwidget.cpp \
     entity.cpp \
     entitymanager.cpp \
@@ -45,9 +45,11 @@ SOURCES       = glwidget.cpp \
     gloffscreenrenderframework.cpp \
     OffscreenRender.cpp \
     TransformationUtils.cpp \
-    plycloudloader.cpp \
     pointcloudwidget.cpp \
-    baserenderobject.cpp
+    logo.cpp \
+    RenderObject/baserenderobject.cpp \
+    RenderObject/plycloudobject.cpp \
+    RenderObject/sphere.cpp
 
 OTHER_FILES += shader/*.vert shader/*.frag
 

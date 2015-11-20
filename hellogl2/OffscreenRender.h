@@ -3,7 +3,7 @@
 #include "gloffscreenrenderframework.h"
 #include <glm/glm.hpp>
 #include "GModel.h"
-#include "sphere.h"
+#include "RenderObject/sphere.h"
 
 QT_FORWARD_DECLARE_CLASS(QOpenGLShaderProgram)
 
