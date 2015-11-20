@@ -99,7 +99,6 @@ void GLWidget::cleanup()
     if (m_sphereProgramID) {
         glDeleteProgram(m_sphereProgramID);
     }
-    sphere.cleanup();
     doneCurrent();
 }
 
@@ -132,7 +131,9 @@ void GLWidget::initializeGL()
     // link program for drawing sphere
     m_sphereProgramID = LoadShaders("sphereShader.vert", "sphereShader.frag");
     GLuint vertexPosition_modelspaceID = glGetAttribLocation(m_sphereProgramID, "vertexPosition_modelspace");
-    sphere.init(vertexPosition_modelspaceID);
+
+    GLuint args[] = {vertexPosition_modelspaceID};
+    sphere.bindDataToGL(args);
 }
 
 void GLWidget::paintGL()

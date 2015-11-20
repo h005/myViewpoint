@@ -1,14 +1,14 @@
 #ifndef SPHERE_H
 #define SPHERE_H
 
-#include <GL/glew.h>
+#include "baserenderobject.h"
 
-class Sphere
+class Sphere: public BaseRenderObject
 {
 public:
     Sphere();
     ~Sphere();
-    void init(GLuint vertexPositionID);
+    void bindDataToGL(GLuint args[], void *others=0) override;
     void cleanup();
     void draw();
 

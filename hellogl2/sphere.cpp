@@ -8,11 +8,6 @@
 
 Sphere::Sphere()
 {
-    isInited = false;
-    m_vao = 0;
-    m_vboVertex = 0;
-    m_vboIndex = 0;
-
     lats = 20;
     longs = 20;
 }
@@ -22,8 +17,10 @@ Sphere::~Sphere()
 
 }
 
-void Sphere::init(GLuint vertexPositionID)
+void Sphere::bindDataToGL(GLuint args[], void *others)
 {
+    GLuint vertexPositionID = args[0];
+
     int i, j;
     std::vector<GLfloat> vertices;
     std::vector<GLuint> indices;
@@ -73,29 +70,7 @@ void Sphere::init(GLuint vertexPositionID)
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLuint), &indices[0], GL_STATIC_DRAW);
 
     numsToDraw = indices.size();
-
     isInited = true;
-}
-
-void Sphere::cleanup()
-{
-    if (!isInited) {
-        return;
-    }
-    if(m_vboVertex) {
-        glDeleteBuffers(1, &m_vboVertex);
-    }
-    if(m_vboIndex) {
-        glDeleteBuffers(1, &m_vboIndex);
-    }
-    if (m_vao) {
-        glDeleteVertexArrays(1, &m_vao);
-    }
-
-    isInited = false;
-    m_vao = 0;
-    m_vboVertex = 0;
-    m_vboIndex = 0;
 }
 
 void Sphere::draw()

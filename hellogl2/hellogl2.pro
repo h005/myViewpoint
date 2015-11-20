@@ -18,7 +18,10 @@ HEADERS       = glwidget.h \
     alignwindow.h \
     gloffscreenrenderframework.h \
     OffscreenRender.h \
-    TransformationUtils.h
+    TransformationUtils.h \
+    plycloudloader.h \
+    pointcloudwidget.h \
+    baserenderobject.h
 SOURCES       = glwidget.cpp \
                 main.cpp \
                 window.cpp \
@@ -41,7 +44,10 @@ SOURCES       = glwidget.cpp \
     alignwindow.cpp \
     gloffscreenrenderframework.cpp \
     OffscreenRender.cpp \
-    TransformationUtils.cpp
+    TransformationUtils.cpp \
+    plycloudloader.cpp \
+    pointcloudwidget.cpp \
+    baserenderobject.cpp
 
 OTHER_FILES += shader/*.vert shader/*.frag
 
