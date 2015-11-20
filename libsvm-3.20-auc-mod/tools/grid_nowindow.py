@@ -156,7 +156,6 @@ def redraw(db,best_param,gnuplot,options,tofile=False):
 		gnuplot.write("{0[0]} {0[1]} {0[2]}\n".format(line).encode())
 	gnuplot.write(b"e\n")
 	gnuplot.write(b"\n") # force gnuplot back to prompt when term set failure
-	gnuplot.flush()
 
 
 def calculate_jobs(options):

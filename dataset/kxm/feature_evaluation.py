@@ -13,7 +13,7 @@ if __name__ == '__main__':
         feature_count = len(v.split(' ')) - 1
 
     result = {}
-    for df in xrange(feature_count):
+    for df in xrange(256, feature_count):
         with open('kxm.data', 'r') as indata:
             with open(r'C:\Users\mzd\Desktop\viewpoint\libsvm-3.20-auc-mod\kxm.data', 'w') as f:
                 for line in indata:
