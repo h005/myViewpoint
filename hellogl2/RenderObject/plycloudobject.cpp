@@ -2,6 +2,7 @@
 #include <iostream>
 #include <fstream>
 #include <assert.h>
+#include <stdio.h>
 
 PLYCloudObject::PLYCloudObject(const std::string &path): BaseRenderObject()
 {
@@ -10,19 +11,18 @@ PLYCloudObject::PLYCloudObject(const std::string &path): BaseRenderObject()
 
 bool PLYCloudObject::load()
 {
-    std::ifstream plyFile;
-    plyFile.open(m_path);
+    FILE *fp = fopen(m_path.c_str(), "r");
+    if (fp == NULL)
+        std::cout << "Error reading " << m_path << std::endl;
 
     char buf[2048];
     for (int i = 0; i < 13; i++)
-        plyFile.getline(buf, sizeof(buf));
+        fgets(buf, sizeof(buf), fp);
 
 
+    CloudPointInfo p;
     int index = 0;
-    do {
-        CloudPointInfo p;
-        plyFile >> p.x >> p.y >> p.z >> p.nx >> p.ny >> p.nz >> p.r >> p.g >> p.b;
-
+    while (fscanf(fp, "%f %f %f %f %f %f %d %d %d", &p.x, &p.y,&p.z, &p.nx, &p.ny, &p.nz, &p.r, &p.g, &p.b) != EOF) {
         m_vertices.push_back(p.x);
         m_vertices.push_back(p.y);
         m_vertices.push_back(p.z);
@@ -33,8 +33,12 @@ bool PLYCloudObject::load()
 
         m_indices.push_back(index);
         index++;
-    } while (plyFile);
 
+        if (index % 10000 == 0)
+            std::cout << "processd: " << index << std::endl;
+    }
+
+    fclose(fp);
     std::cout << "load finished" << std::endl;
     return true;
 }

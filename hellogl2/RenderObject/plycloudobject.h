@@ -9,7 +9,7 @@ class PLYCloudObject: public BaseRenderObject
     struct CloudPointInfo {
         float x, y, z;
         float nx, ny, nz;
-        char r, g, b;
+        int r, g, b;
     };
 
 public:

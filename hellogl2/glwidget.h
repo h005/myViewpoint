@@ -42,11 +42,7 @@
 #define GLWIDGET_H
 
 #include <GL/glew.h>
-#include <QOpenGLWidget>
-#include <QOpenGLFunctions>
-#include <QOpenGLVertexArrayObject>
-#include <QOpenGLBuffer>
-#include <glm/glm.hpp>
+#include "dragablewidget.h"
 #include "GModel.h"
 #include "RenderObject/sphere.h"
 
@@ -54,7 +50,7 @@ QT_FORWARD_DECLARE_CLASS(QOpenGLShaderProgram)
 
 class PointsMatchRelation;
 class QString;
-class GLWidget : public QOpenGLWidget, protected QOpenGLFunctions
+class GLWidget : public DragableWidget
 {
     Q_OBJECT
 
@@ -78,25 +74,15 @@ protected:
     void initializeGL() Q_DECL_OVERRIDE;
     void paintGL() Q_DECL_OVERRIDE;
     void resizeGL(int width, int height) Q_DECL_OVERRIDE;
-    void mousePressEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
-    void mouseReleaseEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
-    void mouseMoveEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
-    void wheelEvent (QWheelEvent * event) Q_DECL_OVERRIDE;
 
 protected:
-    glm::mat4 getModelViewMatrix();
+
     GModel model;
-    glm::mat4 m_proj;
-    glm::mat4 m_camera;
-    glm::mat4 m_baseRotate;
-    glm::vec3 m_rotateN;
-    float m_angle;
-    GLfloat m_scale;
     GLuint m_sphereProgramID;
     Sphere sphere;
 
 private:
-    QPoint m_lastPos;
+
     bool m_transparent;
 };
 

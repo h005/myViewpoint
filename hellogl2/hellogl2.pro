@@ -22,7 +22,8 @@ HEADERS       = glwidget.h \
     logo.h \
     RenderObject/baserenderobject.h \
     RenderObject/plycloudobject.h \
-    RenderObject/sphere.h
+    RenderObject/sphere.h \
+    dragablewidget.h
 SOURCES       = glwidget.cpp \
                 main.cpp \
                 window.cpp \
@@ -49,7 +50,8 @@ SOURCES       = glwidget.cpp \
     logo.cpp \
     RenderObject/baserenderobject.cpp \
     RenderObject/plycloudobject.cpp \
-    RenderObject/sphere.cpp
+    RenderObject/sphere.cpp \
+    dragablewidget.cpp
 
 OTHER_FILES += shader/*.vert shader/*.frag
 
@@ -103,3 +105,7 @@ defineTest(copyToDestdir) {
     export(QMAKE_POST_LINK)
 }
 copyToDestdir($$_PRO_FILE_PWD_/shader)
+
+DISTFILES += \
+    shader/lightShader.frag \
+    shader/lightShader.vert

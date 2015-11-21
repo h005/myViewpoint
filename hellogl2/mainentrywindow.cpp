@@ -25,6 +25,7 @@
 #include "entity.h"
 #include "TransformationUtils.h"
 #include "OffscreenRender.h"
+#include "pointcloudwidget.h"
 
 //#define USE_DEFAULT_PROJECTION
 
@@ -111,6 +112,9 @@ QString target="./img0298.jpg";
 
 void MainEntryWindow::on_executePreviewTargetBtn_clicked()
 {
+    PointCloudWidget *w = new PointCloudWidget("D:\\kxm-01.15.ply");
+    w->show();
+    return;
     // 根据目前标定的结果，恢复新图片的外参矩阵
     glm::mat4 wantMVMatrix, wantProjMatrix;
     RecoveryMvMatrixYouWant(target, wantMVMatrix);
