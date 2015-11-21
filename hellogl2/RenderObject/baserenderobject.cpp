@@ -1,4 +1,4 @@
-#include "baserenderobject.h"
+﻿#include "baserenderobject.h"
 
 BaseRenderObject::BaseRenderObject()
 {
@@ -15,6 +15,9 @@ BaseRenderObject::~BaseRenderObject()
     }
     if(m_vboVertexNormal) {
         glDeleteBuffers(1, &m_vboVertexNormal);
+    }
+    if(m_vboVertexColor) {
+        glDeleteBuffers(1, &m_vboVertexColor);
     }
     if(m_vboIndex) {
         glDeleteBuffers(1, &m_vboIndex);

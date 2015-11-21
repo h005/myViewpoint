@@ -1,4 +1,4 @@
-#include "pointcloudwidget.h"
+﻿#include "pointcloudwidget.h"
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_inverse.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -44,11 +44,10 @@ void PointCloudWidget::initializeGL()
     m_camera = glm::lookAt(glm::vec3(0.f, 0.f, 3.f), glm::vec3(0.f), glm::vec3(0.f, 1.f, 0.f));
 
     // link program for drawing sphere
-    m_programID = LoadShaders( "lightShader.vert", "lightShader.frag" );
-    GLuint vertexNormal_modelspaceID = glGetAttribLocation(m_programID, "vertexNormal_modelspace");
+    m_programID = LoadShaders( "shader/ptCloudShader.vert", "shader/ptCloudShader.frag" );
     GLuint vertexPosition_modelspaceID = glGetAttribLocation(m_programID, "vertexPosition_modelspace");
-
-    GLuint args[] = {vertexPosition_modelspaceID, vertexNormal_modelspaceID};
+    GLuint vertexColorID = glGetAttribLocation(m_programID, "vertexColor");
+    GLuint args[] = {vertexPosition_modelspaceID, vertexColorID};
     m_renderObject.bindDataToGL(args);
 }
 
@@ -76,15 +75,7 @@ void PointCloudWidget::paintGL()
 
     glUseProgram(m_programID);
     GLuint mvpID = glGetUniformLocation(m_programID, "MVP");
-    GLuint mID = glGetUniformLocation(m_programID, "M");
-    GLuint vID = glGetUniformLocation(m_programID, "V");
-    GLuint nID = glGetUniformLocation(m_programID, "normalMatrix");
-    GLuint LightID = glGetUniformLocation(m_programID, "LightPosition_worldspace");
     glUniformMatrix4fv(mvpID, 1, GL_FALSE, glm::value_ptr(MVP));
-    glUniformMatrix4fv(mID, 1, GL_FALSE, glm::value_ptr(M));
-    glUniformMatrix4fv(vID, 1, GL_FALSE, glm::value_ptr(V));
-    glUniformMatrix4fv(nID, 1, GL_FALSE, glm::value_ptr(normalMatrix));
-    glUniform3f(LightID, lightPos.x, lightPos.y, lightPos.z);
     m_renderObject.draw();
 }
 

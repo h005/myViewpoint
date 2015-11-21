@@ -1,4 +1,4 @@
-#ifndef BASERENDEROBJECT_H
+﻿#ifndef BASERENDEROBJECT_H
 #define BASERENDEROBJECT_H
 
 #include <GL/glew.h>
@@ -43,7 +43,7 @@ public:
 
 protected:
     bool m_isInited = false;
-    GLuint m_vao = 0, m_vboVertex = 0, m_vboVertexNormal = 0, m_vboIndex = 0;
+    GLuint m_vao = 0, m_vboVertex = 0, m_vboVertexNormal = 0, m_vboVertexColor = 0, m_vboIndex = 0;
 };
 
 #endif // BASERENDEROBJECT_H

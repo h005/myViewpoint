@@ -1,4 +1,4 @@
-/****************************************************************************
+﻿/****************************************************************************
 **
 ** Copyright (C) 2014 Digia Plc and/or its subsidiary(-ies).
 ** Contact: http://www.qt-project.org/legal
@@ -120,7 +120,7 @@ void GLWidget::initializeGL()
     model.bindDataToGL();
 
     // link program for drawing sphere
-    m_sphereProgramID = LoadShaders("sphereShader.vert", "sphereShader.frag");
+    m_sphereProgramID = LoadShaders("shader/sphereShader.vert", "shader/sphereShader.frag");
     GLuint vertexPosition_modelspaceID = glGetAttribLocation(m_sphereProgramID, "vertexPosition_modelspace");
 
     GLuint args[] = {vertexPosition_modelspaceID};

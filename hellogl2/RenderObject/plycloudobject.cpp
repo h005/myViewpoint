@@ -37,6 +37,10 @@ bool PLYCloudObject::load()
         m_normals.push_back(p.ny);
         m_normals.push_back(p.nz);
 
+        m_colors.push_back(p.r / 255.0);
+        m_colors.push_back(p.g / 255.0);
+        m_colors.push_back(p.b / 255.0);
+
         m_indices.push_back(index);
         index++;
 
@@ -52,7 +56,7 @@ bool PLYCloudObject::load()
 void PLYCloudObject::bindDataToGL(GLuint args[], void *others)
 {
     GLuint vertexPositionID = args[0];
-    GLuint vertexNormalID = args[1];
+    GLuint vertexColorID = args[1];
 
     glGenVertexArrays(1, &m_vao);
     glBindVertexArray(m_vao);
@@ -63,11 +67,13 @@ void PLYCloudObject::bindDataToGL(GLuint args[], void *others)
     glVertexAttribPointer(vertexPositionID, 3, GL_FLOAT, GL_FALSE, 0, NULL);
     glEnableVertexAttribArray (vertexPositionID);
 
-    glGenBuffers(1, &m_vboVertexNormal);
-    glBindBuffer(GL_ARRAY_BUFFER, m_vboVertexNormal);
-    glBufferData(GL_ARRAY_BUFFER, m_normals.size() * sizeof(GLfloat), &m_normals[0], GL_STATIC_DRAW);
-    glVertexAttribPointer(vertexNormalID, 3, GL_FLOAT, GL_FALSE, 0, NULL);
-    glEnableVertexAttribArray (vertexNormalID);
+    // 暂时也用不到光照和法向
+
+    glGenBuffers(1, &m_vboVertexColor);
+    glBindBuffer(GL_ARRAY_BUFFER, m_vboVertexColor);
+    glBufferData(GL_ARRAY_BUFFER, m_colors.size() * sizeof(GLfloat), &m_colors[0], GL_STATIC_DRAW);
+    glVertexAttribPointer(vertexColorID, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+    glEnableVertexAttribArray (vertexColorID);
 
     glGenBuffers(1, &m_vboIndex);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_vboIndex);
