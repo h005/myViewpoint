@@ -83,7 +83,7 @@ void GLOffscreenRenderFramework::createOrUpdateFrameBufferObject()
     if (colorRenderBuffer == 0)
         glGenRenderbuffers(1, &colorRenderBuffer);
     glBindRenderbuffer(GL_RENDERBUFFER, colorRenderBuffer);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_RGBA, m_windowSize.width(), m_windowSize.height());
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_RGBA, m_windowSize.width(), m_windowSize.height()); // 类型跟shader中的输出对应
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, colorRenderBuffer);
 
     glBindFramebuffer(GL_FRAMEBUFFER,0);

@@ -468,6 +468,7 @@ void MainEntryWindow::on_savePtCloudLabeledResultBtn_clicked()
                 //渲染过程中无法更改窗口大小，只能先渲染出图片再对图片进行缩放
                 ptCloudOffscreenRender->renderToImageFile(want.mvMatrix, projMatrix, finalPath, imgSize);
             }
+            qDebug() << "render finished" << endl;
         }
     } else {
         std::cout << "Please Open A Render Window First" << std::endl;

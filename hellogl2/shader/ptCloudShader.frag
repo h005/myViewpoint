@@ -4,8 +4,8 @@
 in vec3 vColor;
 
 // Ouput data
-layout(location=0) out vec3 color;
+layout(location=0) out vec4 color;
 
 void main(){
-    color = vColor;
+    color = vec4(vColor, 1);
 }

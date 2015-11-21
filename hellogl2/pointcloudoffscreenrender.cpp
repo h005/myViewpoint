@@ -36,20 +36,20 @@ void PointCloudOffscreenRender::renderToImageFile(glm::mat4 mvMatrix, glm::mat4 
 
     // 从fbo中读取
     // 图片的具体类型要看shader对应位置上的输出
-    // 此处为vec3，所以大小也填3
-    GLubyte *img = new GLubyte[bwidth * bheight * 3];
+    // 此处为vec4，所以大小也填4
+    GLubyte *img = new GLubyte[bwidth * bheight * 4];
     glReadBuffer(GL_COLOR_ATTACHMENT0);
     glReadPixels(0,
             0,
             bwidth,
             bheight,
-            GL_BGR,
+            GL_BGRA,
             GL_UNSIGNED_BYTE,
             img);
 
     // 创建图片并写入路径
     // 由于OpenGL坐标原点位于左下角，保存前需要沿着x轴翻转图片
-    cv::Mat image = cv::Mat(bwidth, bheight, CV_8UC3, img);
+    cv::Mat image = cv::Mat(bwidth, bheight, CV_8UC4, img);
     cv::Mat flipped;
     cv::flip(image, flipped, 0);
 
