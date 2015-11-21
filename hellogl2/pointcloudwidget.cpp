@@ -1,4 +1,5 @@
 ﻿#include "pointcloudwidget.h"
+#include <iostream>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_inverse.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -65,13 +66,8 @@ void PointCloudWidget::paintGL()
     // 显示三角形网格，这样看得更清楚一些
     //glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
 
-    // 计算modelView矩阵
-    glm::mat4 M = getModelMatrix();
-    glm::mat4 V = m_camera;
-    glm::mat4 MV = V * M;
-    glm::mat4 normalMatrix = glm::transpose(glm::inverse(MV));
-    glm::mat4 MVP = m_proj * MV;
-    glm::vec3 lightPos = glm::vec3(4,4,4);
+    // 计算MVP矩阵
+    glm::mat4 MVP = m_proj * m_camera * getModelMatrix();\
 
     glUseProgram(m_programID);
     GLuint mvpID = glGetUniformLocation(m_programID, "MVP");

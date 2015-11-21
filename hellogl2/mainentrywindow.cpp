@@ -1,4 +1,4 @@
-#include "mainentrywindow.h"
+﻿#include "mainentrywindow.h"
 #include "ui_mainentrywindow.h"
 
 #include <iostream>
@@ -26,6 +26,8 @@
 #include "TransformationUtils.h"
 #include "OffscreenRender.h"
 #include "pointcloudwidget.h"
+#include "pointcloudcapturewidget.h"
+#include "pointcloudoffscreenrender.h"
 
 //#define USE_DEFAULT_PROJECTION
 
@@ -46,12 +48,12 @@ MainEntryWindow::~MainEntryWindow()
 
 QSize MainEntryWindow::sizeHint() const
 {
-    return QSize(400, 500);
+    return QSize(400, 700);
 }
 
 QSize MainEntryWindow::minimumSizeHint() const
 {
-    return QSize(400, 500);
+    return QSize(400, 700);
 }
 
 void MainEntryWindow::on_pushButton_clicked()
@@ -108,13 +110,13 @@ void MainEntryWindow::on_labelSecondImageBtn_clicked()
     }
 }
 
-QString target="./img0298.jpg";
+QString target="./img0000.jpg";
 
 void MainEntryWindow::on_executePreviewTargetBtn_clicked()
 {
-    PointCloudWidget *w = new PointCloudWidget("D:\\kxm-01.15.ply");
-    w->show();
-    return;
+
+
+
     // 根据目前标定的结果，恢复新图片的外参矩阵
     glm::mat4 wantMVMatrix, wantProjMatrix;
     RecoveryMvMatrixYouWant(target, wantMVMatrix);
@@ -130,6 +132,16 @@ void MainEntryWindow::on_executePreviewTargetBtn_clicked()
     qDebug() <<  imgSize.width() << imgSize.height();
     wantProjMatrix = projectionMatrixWithFocalLength(want.f, imgSize.width(), imgSize.height(), 0.1f, 10.f);
 #endif
+
+
+    //PointCloudCaptureWidget *w = new PointCloudCaptureWidget("D:\\kxm-01.15.ply", want.mvMatrix, wantProjMatrix);
+    PointCloudWidget *w = new PointCloudWidget("D:\\kxm-01.15.ply");
+    w->resize(imgSize);
+    w->show();
+
+    std::cout << glm::to_string(want.mvMatrix) << std::endl;
+    std::cout << glm::to_string(wantProjMatrix) << std::endl;
+    return;
 
     // [GUI]把目标图像的相机位置展现出来
     CameraShowWidget *b = new CameraShowWidget(manager->modelPath(), 1.f, wantMVMatrix, 0);
@@ -404,3 +416,77 @@ void MainEntryWindow::on_openOffscreenRenderBtn_clicked()
 }
 
 
+// 点云模型部分
+void MainEntryWindow::on_openPtCloudModelBtn_clicked()
+{
+    PointCloudWidget *w = new PointCloudWidget("D:\\kxm-01.15.ply");
+    w->show();
+}
+
+void MainEntryWindow::on_seeLabeledResultInPtCloudBtn_clicked()
+{
+    Entity want;
+    Q_ASSERT(manager->getEntity(target, want));
+
+    // 获取图片宽高
+    QSize imgSize = GetImageParamter(target);
+    glm::mat4 wantProjMatrix = projectionMatrixWithFocalLength(want.f, imgSize.width(), imgSize.height(), 0.1f, 10.f);
+
+    PointCloudCaptureWidget *w = new PointCloudCaptureWidget("D:\\kxm-01.15.ply", want.mvMatrix, wantProjMatrix);
+    w->resize(imgSize);
+    w->show();
+    return;
+}
+
+void MainEntryWindow::on_savePtCloudLabeledResultBtn_clicked()
+{
+    // 使用相机的内外参数渲染到图片
+    if (ptCloudOffscreenRender != NULL && ptCloudOffscreenRender->isVisible()) {
+        QString outputDir = QFileDialog::getExistingDirectory(
+                this,
+                QString("选定输出目录"),
+                QString()
+        );
+        qDebug() << "Selected Dir:" << outputDir;
+
+        if (!outputDir.isEmpty()) {
+            std::vector<QString> list;
+            manager->getImageList(list);
+            int index = 0;
+            for (auto it = list.begin(); it != list.end(); it++) {
+                qDebug() << "********************* " << it - list.begin() << " ****************";
+
+                Entity want;
+                Q_ASSERT(manager->getEntity(*it, want));
+                QSize imgSize = GetImageParamter(*it);
+                glm::mat4 projMatrix = projectionMatrixWithFocalLength(want.f, imgSize.width(), imgSize.height(), 0.1f, 10.f);
+
+                // 将图片生成到选定目录中，文件名与之前一致，但后缀改为png，方便对照
+                QFileInfo file(*it);
+                QString basename = file.baseName();
+                QString finalPath = QDir(outputDir).filePath(basename + ".png");
+
+                //渲染过程中无法更改窗口大小，只能先渲染出图片再对图片进行缩放
+                ptCloudOffscreenRender->renderToImageFile(want.mvMatrix, projMatrix, finalPath, imgSize);
+                if (++index == 3)
+                    break;
+            }
+        }
+    } else {
+        std::cout << "Please Open A Render Window First" << std::endl;
+    }
+}
+
+void MainEntryWindow::on_openPtCloudLabeledWindowBtn_clicked()
+{
+
+    if (manager != NULL) {
+        if (ptCloudOffscreenRender == NULL) {
+            ptCloudOffscreenRender = new PointCloudOffscreenRender("D:\\kxm-01.15.ply");
+            ptCloudOffscreenRender->resize(QSize(800, 800));
+        }
+        ptCloudOffscreenRender->show();
+        this->activateWindow();
+    } else
+        std::cout << "Please load config file first" << std::endl;
+}

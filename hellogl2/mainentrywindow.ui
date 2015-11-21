@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>327</width>
-    <height>535</height>
+    <width>426</width>
+    <height>668</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -196,13 +196,65 @@
      <string>标定全部结果并输出矩阵（含模型缩放&amp;&amp;投影）</string>
     </property>
    </widget>
+   <widget class="QPushButton" name="openPtCloudModelBtn">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>500</y>
+      <width>91</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>打开点云模型</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="seeLabeledResultInPtCloudBtn">
+    <property name="geometry">
+     <rect>
+      <x>150</x>
+      <y>500</y>
+      <width>161</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>查看使用点云渲染的结果</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="savePtCloudLabeledResultBtn">
+    <property name="geometry">
+     <rect>
+      <x>110</x>
+      <y>540</y>
+      <width>201</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>点云渲染所有图片</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="openPtCloudLabeledWindowBtn">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>540</y>
+      <width>71</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>打开渲染器</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>327</width>
+     <width>426</width>
      <height>23</height>
     </rect>
    </property>

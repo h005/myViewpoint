@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <GL/glew.h>
 #include <QOpenGLWidget>
@@ -15,7 +15,7 @@ class GLOffscreenRenderFramework : public QOpenGLWidget, protected QOpenGLFuncti
 
 public:
     GLOffscreenRenderFramework(QSize windowSize, QWidget *parent = 0);
-    ~GLOffscreenRenderFramework();
+    virtual ~GLOffscreenRenderFramework();
 
     QSize minimumSizeHint() const Q_DECL_OVERRIDE;
     QSize sizeHint() const Q_DECL_OVERRIDE;

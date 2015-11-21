@@ -1,4 +1,4 @@
-#ifndef DRAGABLEWIDGET_H
+﻿#ifndef DRAGABLEWIDGET_H
 #define DRAGABLEWIDGET_H
 
 
@@ -27,7 +27,6 @@ protected:
     void wheelEvent (QWheelEvent * event) Q_DECL_OVERRIDE;
 
     virtual glm::mat4 getModelMatrix();
-    glm::mat4 m_proj;
     glm::mat4 m_baseRotate;
     glm::vec3 m_rotateN;
     float m_angle;

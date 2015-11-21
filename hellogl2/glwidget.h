@@ -1,4 +1,4 @@
-/****************************************************************************
+﻿/****************************************************************************
 **
 ** Copyright (C) 2014 Digia Plc and/or its subsidiary(-ies).
 ** Contact: http://www.qt-project.org/legal
@@ -78,6 +78,7 @@ protected:
 
 protected:
     glm::mat4 m_camera;
+    glm::mat4 m_proj;
     GModel model;
     GLuint m_sphereProgramID;
     Sphere sphere;

@@ -1,4 +1,4 @@
-#ifndef MAINENTRYWINDOW_H
+﻿#ifndef MAINENTRYWINDOW_H
 #define MAINENTRYWINDOW_H
 
 #include <QMainWindow>
@@ -11,6 +11,7 @@ class MainEntryWindow;
 
 class EntityManager;
 class OffscreenRender;
+class PointCloudOffscreenRender;
 
 class MainEntryWindow : public QMainWindow
 {
@@ -44,10 +45,19 @@ private slots:
 
     void on_saveLabeledResultBtn_2_clicked();
 
+    void on_openPtCloudModelBtn_clicked();
+
+    void on_seeLabeledResultInPtCloudBtn_clicked();
+
+    void on_savePtCloudLabeledResultBtn_clicked();
+
+    void on_openPtCloudLabeledWindowBtn_clicked();
+
 private:
     Ui::MainEntryWindow *ui;
     EntityManager *manager;
     OffscreenRender *offscreenRender = NULL;
+    PointCloudOffscreenRender *ptCloudOffscreenRender = NULL;
     void RecoveryMvMatrixYouWant(QString handler, glm::mat4 &wantMVMatrix);
     QSize GetImageParamter(QString handler);
 };
