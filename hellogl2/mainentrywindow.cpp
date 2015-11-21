@@ -452,7 +452,6 @@ void MainEntryWindow::on_savePtCloudLabeledResultBtn_clicked()
         if (!outputDir.isEmpty()) {
             std::vector<QString> list;
             manager->getImageList(list);
-            int index = 0;
             for (auto it = list.begin(); it != list.end(); it++) {
                 qDebug() << "********************* " << it - list.begin() << " ****************";
 
@@ -468,8 +467,6 @@ void MainEntryWindow::on_savePtCloudLabeledResultBtn_clicked()
 
                 //渲染过程中无法更改窗口大小，只能先渲染出图片再对图片进行缩放
                 ptCloudOffscreenRender->renderToImageFile(want.mvMatrix, projMatrix, finalPath, imgSize);
-                if (++index == 3)
-                    break;
             }
         }
     } else {

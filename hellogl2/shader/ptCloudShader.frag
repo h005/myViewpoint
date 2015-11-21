@@ -4,7 +4,7 @@
 in vec3 vColor;
 
 // Ouput data
-out vec3 color;
+layout(location=0) out vec3 color;
 
 void main(){
     color = vColor;

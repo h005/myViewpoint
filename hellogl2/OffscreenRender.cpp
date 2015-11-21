@@ -1,4 +1,4 @@
-#include "OffscreenRender.h"
+﻿#include "OffscreenRender.h"
 #include <iostream>
 #include <QMouseEvent>
 #include <QOpenGLShaderProgram>
@@ -48,12 +48,12 @@ void OffscreenRender::renderToImageFile(glm::mat4 mvMatrix, glm::mat4 projMatrix
     GLubyte *img = new GLubyte[BUFFER_WIDTH * BUFFER_HEIGHT * 4];
     glReadBuffer(GL_BACK_LEFT);
     glReadPixels(0,
-            0,
-            BUFFER_WIDTH,
-            BUFFER_HEIGHT,
-            GL_BGRA,
-            GL_UNSIGNED_BYTE,
-            img);
+                0,
+                BUFFER_WIDTH,
+                BUFFER_HEIGHT,
+                GL_BGRA,
+                GL_UNSIGNED_BYTE,
+                img);
 
     // 创建图片并写入路径
     // 由于OpenGL坐标原点位于左下角，保存前需要沿着x轴翻转图片

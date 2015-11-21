@@ -21,10 +21,8 @@ void PointCloudOffscreenRender::renderToImageFile(glm::mat4 mvMatrix, glm::mat4 
     GLint viewport[4];
     glGetIntegerv(GL_VIEWPORT,viewport);
     int bwidth = viewport[2], bheight = viewport[3];
-    std::cout << bwidth << " " << bheight << std::endl;
 
     // 渲染代码，和widget中相同
-
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_FLAT);
@@ -37,21 +35,21 @@ void PointCloudOffscreenRender::renderToImageFile(glm::mat4 mvMatrix, glm::mat4 
     m_renderObject.draw();
 
     // 从fbo中读取
-    GLubyte *img = new GLubyte[bwidth * bheight * 4];
-    glReadBuffer(GL_BACK_LEFT);
+    // 图片的具体类型要看shader对应位置上的输出
+    // 此处为vec3，所以大小也填3
+    GLubyte *img = new GLubyte[bwidth * bheight * 3];
+    glReadBuffer(GL_COLOR_ATTACHMENT0);
     glReadPixels(0,
             0,
             bwidth,
             bheight,
-            GL_BGRA,
+            GL_BGR,
             GL_UNSIGNED_BYTE,
             img);
 
-
-
     // 创建图片并写入路径
     // 由于OpenGL坐标原点位于左下角，保存前需要沿着x轴翻转图片
-    cv::Mat image = cv::Mat(bwidth, bheight,CV_8UC4,img);
+    cv::Mat image = cv::Mat(bwidth, bheight, CV_8UC3, img);
     cv::Mat flipped;
     cv::flip(image, flipped, 0);
 
@@ -62,7 +60,6 @@ void PointCloudOffscreenRender::renderToImageFile(glm::mat4 mvMatrix, glm::mat4 
     delete img;
     glBindFramebuffer(GL_FRAMEBUFFER,0);
     doneCurrent();
-
 }
 
 void PointCloudOffscreenRender::initializeGL()
