@@ -11,6 +11,7 @@ PointCloudWidget::PointCloudWidget(const std::string &plyPath, QWidget *parent)
       m_renderObject(plyPath)
 {
     m_renderObject.load();
+    m_scaleAndShift = m_renderObject.recommendScaleAndShift();
 }
 
 PointCloudWidget::~PointCloudWidget()
@@ -90,5 +91,10 @@ void PointCloudWidget::paintGL()
 void PointCloudWidget::resizeGL(int width, int height)
 {
     m_proj = glm::perspective(glm::pi<float>() / 3, GLfloat(width) / height, 0.01f, 100.0f);
+}
+
+glm::mat4 PointCloudWidget::getModelMatrix()
+{
+    return DragableWidget::getModelMatrix() * m_scaleAndShift;
 }
 

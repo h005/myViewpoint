@@ -74,9 +74,10 @@ protected:
     void initializeGL() Q_DECL_OVERRIDE;
     void paintGL() Q_DECL_OVERRIDE;
     void resizeGL(int width, int height) Q_DECL_OVERRIDE;
+    glm::mat4 getModelViewMatrix();
 
 protected:
-
+    glm::mat4 m_camera;
     GModel model;
     GLuint m_sphereProgramID;
     Sphere sphere;

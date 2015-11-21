@@ -1,8 +1,14 @@
-#include "plycloudobject.h"
+﻿#include "plycloudobject.h"
 #include <iostream>
 #include <fstream>
 #include <assert.h>
 #include <stdio.h>
+#include <algorithm>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_inverse.hpp>
+#include <glm/gtc/type_ptr.hpp>
+#include <glm/gtx/string_cast.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 PLYCloudObject::PLYCloudObject(const std::string &path): BaseRenderObject()
 {
@@ -79,7 +85,45 @@ void PLYCloudObject::draw()
     glDrawElements(GL_POINTS, m_indices.size(), GL_UNSIGNED_INT, 0);
 }
 
+glm::mat4 PLYCloudObject::recommendScaleAndShift()
+{
+    glm::vec3 scene_min = glm::vec3(1e10, 1e10, 1e10);
+    glm::vec3 scene_max = glm::vec3(-1e10, -1e10, -1e10);
+    for (int i = 0; i < m_vertices.size(); i += 3) {
+        if (m_vertices[i] < scene_min.x)
+            scene_min.x = m_vertices[i];
+        if (m_vertices[i] > scene_max.x)
+            scene_max.x = m_vertices[i];
+
+        if (m_vertices[i+1] < scene_min.y)
+            scene_min.y = m_vertices[i+1];
+        if (m_vertices[i+1] > scene_max.y)
+            scene_max.y = m_vertices[i+1];
+
+        if (m_vertices[i+2] < scene_min.z)
+            scene_min.z = m_vertices[i+2];
+        if (m_vertices[i+2] > scene_max.z)
+            scene_max.z = m_vertices[i+2];
+    }
+    float tmp = -1e10;
+    tmp = std::max<float>(scene_max.x - scene_min.x, tmp);
+    tmp = std::max<float>(scene_max.y - scene_min.y, tmp);
+    tmp = std::max<float>(scene_max.z - scene_min.z, tmp);
+    float scale = 2.f / tmp;
+
+    glm::vec3 scene_center;
+    scene_center.x = (scene_min.x + scene_max.x) / 2.f;
+    scene_center.y = (scene_min.y + scene_max.y) / 2.f;
+    scene_center.z = (scene_min.z + scene_max.z) / 2.f;
+
+    // 缩放矩阵 * 移中矩阵，表示先移中后缩放
+    glm::mat4 scaleAndShift = glm::scale(glm::mat4(1.f), glm::vec3(scale, scale, scale));
+    scaleAndShift = glm::translate(scaleAndShift, glm::vec3(-scene_center.x, -scene_center.y, -scene_center.z));
+    return scaleAndShift;
+}
+
 PLYCloudObject::~PLYCloudObject()
 {
+    // m_vao, m_vbo的清理在基类中会自动进行
 }
 

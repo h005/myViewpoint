@@ -21,8 +21,11 @@ protected:
     void initializeGL() Q_DECL_OVERRIDE;
     void paintGL() Q_DECL_OVERRIDE;
     void resizeGL(int width, int height) Q_DECL_OVERRIDE;
+    glm::mat4 getModelMatrix() override;
 
 private:
+    glm::mat4 m_camera;
+    glm::mat4 m_scaleAndShift;
     PLYCloudObject m_renderObject;
     GLuint m_programID;
 };

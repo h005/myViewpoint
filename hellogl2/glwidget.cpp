@@ -134,7 +134,7 @@ void GLWidget::paintGL()
     // 默认开启背面剔除:GL_CULL_FACE
 
     // 计算modelView矩阵
-    glm::mat4 modelViewMatrix = getModelViewMatrix();
+    glm::mat4 modelViewMatrix = m_camera * getModelMatrix();
 
     // 绘制模型
     model.drawNormalizedModel(modelViewMatrix, m_proj);
@@ -162,6 +162,11 @@ void GLWidget::paintGL()
 void GLWidget::resizeGL(int w, int h)
 {
     m_proj = glm::perspective(glm::pi<float>() / 3, GLfloat(w) / h, 0.01f, 100.0f);
+}
+
+glm::mat4 GLWidget::getModelViewMatrix()
+{
+    return m_camera * DragableWidget::getModelMatrix();
 }
 
 

@@ -26,10 +26,8 @@ protected:
     void mouseMoveEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
     void wheelEvent (QWheelEvent * event) Q_DECL_OVERRIDE;
 
-    glm::mat4 getModelViewMatrix();
-    glm::mat4 getModelMatrix();
+    virtual glm::mat4 getModelMatrix();
     glm::mat4 m_proj;
-    glm::mat4 m_camera;
     glm::mat4 m_baseRotate;
     glm::vec3 m_rotateN;
     float m_angle;

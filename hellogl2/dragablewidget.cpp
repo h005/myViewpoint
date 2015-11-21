@@ -64,14 +64,6 @@ void DragableWidget::wheelEvent(QWheelEvent *event)
     update();
 }
 
-glm::mat4 DragableWidget::getModelViewMatrix()
-{
-    return (m_camera
-            * glm::scale(glm::mat4(1.f), glm::vec3(m_scale, m_scale, m_scale))
-            * glm::rotate(glm::mat4(1.f), m_angle, m_rotateN)
-            * m_baseRotate);
-}
-
 glm::mat4 DragableWidget::getModelMatrix()
 {
     return (glm::scale(glm::mat4(1.f), glm::vec3(m_scale, m_scale, m_scale))
