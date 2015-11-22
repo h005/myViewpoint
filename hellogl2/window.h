@@ -1,4 +1,4 @@
-/****************************************************************************
+﻿/****************************************************************************
 **
 ** Copyright (C) 2014 Digia Plc and/or its subsidiary(-ies).
 ** Contact: http://www.qt-project.org/legal
@@ -54,6 +54,7 @@ class AlignWindow;
 class ImageAndPoint;
 class PointsMatchRelation;
 class EntityManager;
+class PointCloudWidget;
 
 class Window : public QWidget
 {
@@ -75,7 +76,7 @@ private slots:
     void clearPressed();
 
 private:
-    ImageAndPoint *left;
+    PointCloudWidget *left;
     GLWidget *right = NULL;
     QPushButton *alignBtn;
     QPushButton *confirmBtn;

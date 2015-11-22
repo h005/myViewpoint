@@ -1,4 +1,4 @@
-/****************************************************************************
+﻿/****************************************************************************
 **
 ** Copyright (C) 2014 Digia Plc and/or its subsidiary(-ies).
 ** Contact: http://www.qt-project.org/legal
@@ -65,6 +65,7 @@
 #include "entitymanager.h"
 #include "entity.h"
 #include "TransformationUtils.h"
+#include "pointcloudwidget.h"
 
 Window::Window(AlignWindow *mw, const QString &imagePath, const QString &modelPath, PointsMatchRelation &relation)
     : mainWindow(mw),
@@ -79,7 +80,7 @@ Window::Window(AlignWindow *mw, const QString &imagePath, const QString &modelPa
     right = new GLWidget(modelPath, this);
     right->m_relation = &relation;
 
-    left = new ImageAndPoint(imagePath, relation, this);
+    left = new PointCloudWidget("D:\\kxm-01.15.ply", this);
     alignBtn = new QPushButton(tr("Align && See"), this);
     confirmBtn = new QPushButton(tr("Confirm && Uplevel"), this);
     clearBtn = new QPushButton(tr("Clear"), this);
@@ -167,7 +168,7 @@ void Window::keyPressEvent(QKeyEvent *e)
         p = left->mapFromGlobal(QCursor::pos());
         if ((p.x() >= 0 && p.x() < lsize.width())
                       && (p.y() >= 0 && p.y() < lsize.height())) {
-            std::cout << left->removePoint() << std::endl;
+            std::cout << left->removeLastPoint() << std::endl;
         }
     } else
         QWidget::keyPressEvent(e);
@@ -204,6 +205,6 @@ void Window::clearPressed()
 {
     relation.getPoints2d().clear();
     relation.getPoints3d().clear();
-    left->redisplay();
+    left->update();
     right->update();
 }
