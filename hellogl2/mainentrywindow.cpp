@@ -278,7 +278,6 @@ void MainEntryWindow::on_saveLabeledResultBtn_clicked()
         // 获取模型的"移中缩放"矩阵
         GModel model;
         model.load(manager->modelPath().toUtf8().constData());
-        glm::mat4 innerTransform = model.getInnerTransformation();
 
         std::vector<QString> list;
         manager->getImageList(list);
@@ -287,7 +286,6 @@ void MainEntryWindow::on_saveLabeledResultBtn_clicked()
             glm::mat4 wantMVMatrix;
             qDebug() << "********************* " << it - list.begin() << " ****************";
             RecoveryMvMatrixYouWant(*it, wantMVMatrix);
-            wantMVMatrix *= innerTransform;
             matrixFile << it->toUtf8().constData() << std::endl;
             for (int i = 0; i < 4; i++) {
                 for (int j = 0; j < 4; j++)
@@ -320,7 +318,6 @@ void MainEntryWindow::on_saveLabeledResultBtn_2_clicked()
         // 获取模型的"移中缩放"矩阵
         GModel model;
         model.load(manager->modelPath().toUtf8().constData());
-        glm::mat4 innerTransform = model.getInnerTransformation();
 
         std::vector<QString> list;
         manager->getImageList(list);
@@ -329,7 +326,6 @@ void MainEntryWindow::on_saveLabeledResultBtn_2_clicked()
             glm::mat4 wantMVMatrix;
             qDebug() << "********************* " << it - list.begin() << " ****************";
             RecoveryMvMatrixYouWant(*it, wantMVMatrix);
-            wantMVMatrix *= innerTransform;
             matrixFile << it->toUtf8().constData() << std::endl;
             for (int i = 0; i < 4; i++) {
                 for (int j = 0; j < 4; j++)

@@ -56,7 +56,7 @@ public:
     void bindDataToGL();
     void cleanUp();
     void drawNormalizedModel(const glm::mat4 &inheritModelView, const glm::mat4 &projection);
-    glm::mat4 getInnerTransformation();
+    glm::mat4 recommandScaleAndShift();
 	~GModel();
 
 private:

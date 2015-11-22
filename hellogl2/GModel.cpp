@@ -290,10 +290,8 @@ void GModel::drawNormalizedModel(const glm::mat4 &inheritModelView, const glm::m
     glEnable(GL_TEXTURE_2D);
     glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
 
-    // 下面这个过程对模型缩放和居中，便于在OpenGL中显示
-    // 可以认作硬件实现的点变换
-    // 对模型进行移中和缩放
-    glm::mat4 transformation = inheritModelView * getInnerTransformation();
+    // 传入的变换已经含有移中和缩放了
+    glm::mat4 transformation = inheritModelView;
 
     // 绑定使用的shader并设置其中的投影矩阵
     glUseProgram(m_programID);
@@ -350,7 +348,7 @@ void GModel::drawNormalizedModel(const glm::mat4 &inheritModelView, const glm::m
 
 }
 
-glm::mat4 GModel::getInnerTransformation()
+glm::mat4 GModel::recommandScaleAndShift()
 {
     float scale = drawScale();
     glm::mat4 transformation = glm::scale(glm::mat4(1.f), glm::vec3(scale, scale, scale));

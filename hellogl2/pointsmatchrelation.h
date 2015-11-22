@@ -1,4 +1,4 @@
-#ifndef POINTSMATCHRELATION_H
+﻿#ifndef POINTSMATCHRELATION_H
 #define POINTSMATCHRELATION_H
 
 #include <glm/glm.hpp>
@@ -24,11 +24,8 @@ public:
 private:
     QString filepath;
     QString modelPath;
-    glm::mat4 RepresentationToModel;
     std::vector<glm::vec2> points2d;
     std::vector<glm::vec3> points3d;
-
-    glm::mat4 getModelTranslateAndScaleTransform();
 };
 
 #endif // POINTSMATCHRELATION_H

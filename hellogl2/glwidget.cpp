@@ -49,6 +49,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/string_cast.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <qdebug.h>
 
 #include "pointsmatchrelation.h"
 #include "shader.hpp"
@@ -59,6 +60,8 @@ GLWidget::GLWidget(const QString &modelPath, QWidget *parent)
       m_sphereProgramID(0)
 {
     model.load(modelPath.toLocal8Bit().data());
+    m_scaleAndShift = model.recommandScaleAndShift();
+    std::cout << glm::to_string(m_scaleAndShift) << std::endl;
 }
 
 GLWidget::~GLWidget()
@@ -156,12 +159,11 @@ void GLWidget::paintGL()
         for (it = points.begin(); it != points.end(); it++) {
             // multiple point's position
             glm::mat4 pointMV = glm::translate(modelViewMatrix, *it);
-            pointMV = glm::scale(pointMV, glm::vec3(0.005, 0.005, 0.005));
+            pointMV = glm::scale(pointMV, glm::vec3(0.5, 0.5, 0.5));
             glUniformMatrix4fv(mvMatrixID, 1, GL_FALSE, glm::value_ptr(pointMV));
             sphere.draw();
         }
     }
-
 }
 
 void GLWidget::resizeGL(int w, int h)
@@ -171,7 +173,12 @@ void GLWidget::resizeGL(int w, int h)
 
 glm::mat4 GLWidget::getModelViewMatrix()
 {
-    return m_camera * DragableWidget::getModelMatrix();
+    return m_camera * getModelMatrix();
+}
+
+glm::mat4 GLWidget::getModelMatrix()
+{
+    return DragableWidget::getModelMatrix() * m_scaleAndShift;
 }
 
 
