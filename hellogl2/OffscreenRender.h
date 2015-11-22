@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "gloffscreenrenderframework.h"
 #include <glm/glm.hpp>
@@ -14,6 +14,7 @@ class OffscreenRender : public GLOffscreenRenderFramework
 
 public:
     OffscreenRender(const QString &modelPath, QWidget *parent = 0);
+    ~OffscreenRender();
     void renderToImageFile(glm::mat4 mvMatrix, glm::mat4 projMatrix, QString filePath, QSize dsize);
 
 protected:

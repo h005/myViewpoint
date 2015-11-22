@@ -1,4 +1,4 @@
-#ifndef SPHERE_H
+﻿#ifndef SPHERE_H
 #define SPHERE_H
 
 #include "baserenderobject.h"
@@ -9,7 +9,6 @@ public:
     Sphere();
     ~Sphere();
     void bindDataToGL(GLuint args[], void *others=0) override;
-    void cleanup();
     void draw();
 
 private:

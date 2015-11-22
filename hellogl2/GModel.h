@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <map>
 #include <GL/glew.h>
 #include <glm/glm.hpp>
@@ -45,7 +45,7 @@ private:
 	TextureIdMapType textureIdMap;
 	GLuint *textureIds;
     std::vector<MeshEntry *> meshEntries;
-    GLuint m_programID;
+    GLuint m_programID = 0;
 
 public:
 	aiVector3D scene_min, scene_max, scene_center;
@@ -54,6 +54,7 @@ public:
 	bool load(const char *modelPath);
 	bool hasModel();
     void bindDataToGL();
+    void cleanUp();
     void drawNormalizedModel(const glm::mat4 &inheritModelView, const glm::mat4 &projection);
     glm::mat4 getInnerTransformation();
 	~GModel();
@@ -62,6 +63,5 @@ private:
     float drawScale();
 	void apply_material(const aiMaterial *mtl);
     void recursive_create(const aiScene *sc, const aiNode* nd, const glm::mat4 &inheritedTransformation);
-	void cleanUp();
 };
 

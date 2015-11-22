@@ -22,6 +22,14 @@ OffscreenRender::OffscreenRender(const QString &modelPath, QWidget *parent)
     model.load(modelPath.toLocal8Bit().data());
 }
 
+OffscreenRender::~OffscreenRender()
+{
+    // 仅需负责子类生成对象的清理
+    makeCurrent();
+    model.cleanUp();
+    doneCurrent();
+}
+
 void OffscreenRender::initializeGL()
 {
     GLOffscreenRenderFramework::initializeGL();

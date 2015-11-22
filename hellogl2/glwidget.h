@@ -65,8 +65,8 @@ public:
 
     PointsMatchRelation *m_relation;
 
-public slots:
-    virtual void cleanup();
+private:
+    void cleanup();
 
 signals:
 
@@ -80,7 +80,7 @@ protected:
     glm::mat4 m_camera;
     glm::mat4 m_proj;
     GModel model;
-    GLuint m_sphereProgramID;
+    GLuint m_sphereProgramID = 0;
     Sphere sphere;
 
 private:

@@ -360,6 +360,7 @@ glm::mat4 GModel::getInnerTransformation()
 }
 
 void GModel::cleanUp() {
+    std::cout << "GModel cleanup" << std::endl;
 	if (pImporter) {
 		delete pImporter;
 		pImporter = NULL;
@@ -372,6 +373,7 @@ void GModel::cleanUp() {
 	}
     if (m_programID) {
         glDeleteProgram(m_programID);
+        m_programID = 0;
     }
 
 	scene = NULL;
@@ -399,7 +401,6 @@ float GModel::drawScale() {
 
 GModel::~GModel()
 {
-	cleanUp();
 }
 
 GModel::MeshEntry::MeshEntry(const aiMesh *mesh, const glm::mat4 &transformation, GLuint programID)

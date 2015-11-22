@@ -10,6 +10,7 @@ class PointCloudOffscreenRender: public GLOffscreenRenderFramework
 
 public:
     PointCloudOffscreenRender(const std::string &modelPath, QWidget *parent = 0);
+    ~PointCloudOffscreenRender();
     void renderToImageFile(glm::mat4 mvMatrix, glm::mat4 projMatrix, QString filePath, QSize dsize);
 
 protected:

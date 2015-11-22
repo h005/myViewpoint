@@ -19,7 +19,6 @@ public:
     void bindDataToGL(GLuint args[], void *others=0) override;
     void draw() override;
     glm::mat4 recommendScaleAndShift();
-    ~PLYCloudObject();
 
 private:
     std::string m_path;

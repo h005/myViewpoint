@@ -1,4 +1,5 @@
 ﻿#include "baserenderobject.h"
+#include <iostream>
 
 BaseRenderObject::BaseRenderObject()
 {
@@ -6,6 +7,12 @@ BaseRenderObject::BaseRenderObject()
 
 BaseRenderObject::~BaseRenderObject()
 {
+    std::cout << "BaseRenderObject closed" << std::endl;
+}
+
+void BaseRenderObject::cleanup()
+{
+    std::cout << "BaseRenderObject cleanup" << std::endl;
     // 清理显存中的数据
     if (!m_isInited) {
         return;

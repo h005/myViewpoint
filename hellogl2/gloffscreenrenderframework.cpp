@@ -12,6 +12,7 @@ GLOffscreenRenderFramework::GLOffscreenRenderFramework(QSize windowSize, QWidget
     : QOpenGLWidget(parent),
       m_windowSize(windowSize)
 {
+    setAttribute(Qt::WA_DeleteOnClose);
     m_transparent = QCoreApplication::arguments().contains(QStringLiteral("--transparent"));
     if (m_transparent)
         setAttribute(Qt::WA_TranslucentBackground);
@@ -19,7 +20,23 @@ GLOffscreenRenderFramework::GLOffscreenRenderFramework(QSize windowSize, QWidget
 
 GLOffscreenRenderFramework::~GLOffscreenRenderFramework()
 {
-    cleanup();
+    makeCurrent();
+
+    // 删除fbo相关结构
+    if (depthRenderBuffer != 0) {
+        glDeleteRenderbuffers(1, &depthRenderBuffer);
+        depthRenderBuffer = 0;
+    }
+    if (colorRenderBuffer != 0) {
+        glDeleteRenderbuffers(1, &colorRenderBuffer);
+        colorRenderBuffer = 0;
+    }
+    if (fboId != 0) {
+        glDeleteFramebuffers(1, &fboId);
+        fboId = 0;
+    }
+
+    doneCurrent();
 }
 
 QSize GLOffscreenRenderFramework::minimumSizeHint() const
@@ -41,21 +58,6 @@ void GLOffscreenRenderFramework::resizeGL(int width, int height)
     createOrUpdateFrameBufferObject();
 }
 
-void GLOffscreenRenderFramework::cleanup()
-{
-    makeCurrent();
-
-    // 删除fbo相关结构
-    if (depthRenderBuffer != 0)
-        glDeleteRenderbuffers(1, &depthRenderBuffer);
-    if (colorRenderBuffer != 0)
-        glDeleteRenderbuffers(1, &colorRenderBuffer);
-    if (fboId != 0)
-        glDeleteFramebuffers(1, &fboId);
-
-    doneCurrent();
-}
-
 void GLOffscreenRenderFramework::initializeGL()
 {
     // http://stackoverflow.com/a/8303331
@@ -63,7 +65,6 @@ void GLOffscreenRenderFramework::initializeGL()
 
     GLenum err = glewInit();
     assert(err == GLEW_OK);
-    connect(context(), &QOpenGLContext::aboutToBeDestroyed, this, &GLOffscreenRenderFramework::cleanup);
     initializeOpenGLFunctions();
     glClearColor( 0.368, 0.368, 0.733, 1);
 }

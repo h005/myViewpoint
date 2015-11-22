@@ -11,11 +11,13 @@ class BaseRenderObject
 {
 public:
     BaseRenderObject();
+    ~BaseRenderObject();
+
     ///
-    /// \brief ~BaseRenderObject
-    /// 可以执行一些自定义的清理操作
-    ///
-    virtual ~BaseRenderObject();
+    /// \brief cleanup
+    /// 可以执行一些自定义的清理操作，需要在OpenGL环境中调用
+    /// 一般情况下不用覆盖此实现
+    virtual void cleanup();
 
     ///
     /// \brief load

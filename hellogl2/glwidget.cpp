@@ -86,10 +86,16 @@ static void qNormalizeAngle(int &angle)
 
 void GLWidget::cleanup()
 {
+    // 仅清理该子类生成的对象
     makeCurrent();
+
     if (m_sphereProgramID) {
         glDeleteProgram(m_sphereProgramID);
+        m_sphereProgramID = 0;
     }
+    sphere.cleanup();
+    model.cleanUp();
+
     doneCurrent();
 }
 
@@ -107,7 +113,6 @@ void GLWidget::initializeGL()
     // aboutToBeDestroyed() signal, instead of the destructor. The emission of
     // the signal will be followed by an invocation of initializeGL() where we
     // can recreate all resources.
-    connect(context(), &QOpenGLContext::aboutToBeDestroyed, this, &GLWidget::cleanup);
     initializeOpenGLFunctions();
     glClearColor(0, 0, 0, m_transparent ? 0 : 1);
 

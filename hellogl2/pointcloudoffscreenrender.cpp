@@ -13,6 +13,18 @@ PointCloudOffscreenRender::PointCloudOffscreenRender(const std::string &modelPat
     m_renderObject.load();
 }
 
+PointCloudOffscreenRender::~PointCloudOffscreenRender()
+{
+    // 仅负责子类生成对象的清理
+    makeCurrent();
+    m_renderObject.cleanup();
+    if (m_programID) {
+        glDeleteProgram(m_programID);
+        m_programID = 0;
+    }
+    doneCurrent();
+}
+
 void PointCloudOffscreenRender::renderToImageFile(glm::mat4 mvMatrix, glm::mat4 projMatrix, QString filePath, QSize dsize)
 {
     makeCurrent();

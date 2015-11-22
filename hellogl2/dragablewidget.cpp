@@ -1,4 +1,4 @@
-#include "dragablewidget.h"
+﻿#include "dragablewidget.h"
 #include <iostream>
 #include <QMouseEvent>
 #include <QOpenGLShaderProgram>
@@ -22,6 +22,7 @@ DragableWidget::DragableWidget(QWidget *parent)
 
 DragableWidget::~DragableWidget()
 {
+    qDebug() << "DragableWidget closed" << endl;
 }
 
 void DragableWidget::mousePressEvent(QMouseEvent *event)

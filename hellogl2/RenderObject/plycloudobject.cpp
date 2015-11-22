@@ -127,9 +127,3 @@ glm::mat4 PLYCloudObject::recommendScaleAndShift()
     scaleAndShift = glm::translate(scaleAndShift, glm::vec3(-scene_center.x, -scene_center.y, -scene_center.z));
     return scaleAndShift;
 }
-
-PLYCloudObject::~PLYCloudObject()
-{
-    // m_vao, m_vbo的清理在基类中会自动进行
-}
-

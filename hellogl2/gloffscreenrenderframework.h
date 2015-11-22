@@ -21,11 +21,6 @@ public:
     QSize sizeHint() const Q_DECL_OVERRIDE;
     void resizeGL(int width, int height) Q_DECL_OVERRIDE;
 
-public slots:
-    virtual void cleanup();
-
-signals:
-
 protected:
     void initializeGL() Q_DECL_OVERRIDE;
     GLuint fboId = 0, depthRenderBuffer = 0, colorRenderBuffer = 0;

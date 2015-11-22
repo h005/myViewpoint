@@ -5,6 +5,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/string_cast.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <qdebug.h>
 #include "shader.hpp"
 
 PointCloudWidget::PointCloudWidget(const std::string &plyPath, QWidget *parent)
@@ -17,14 +18,20 @@ PointCloudWidget::PointCloudWidget(const std::string &plyPath, QWidget *parent)
 
 PointCloudWidget::~PointCloudWidget()
 {
-
-}
-
-void PointCloudWidget::cleanup()
-{
+    // 仅清理改子类生成的对象
     makeCurrent();
-    if (m_programID)
+
+    m_sphereObject.cleanup();
+    m_renderObject.cleanup();
+    if (m_programID) {
         glDeleteProgram(m_programID);
+        m_programID = 0;
+    }
+    if (m_sphereProgramID) {
+        glDeleteProgram(m_sphereProgramID);
+        m_sphereProgramID = 0;
+    }
+
     doneCurrent();
 }
 
@@ -35,7 +42,6 @@ void PointCloudWidget::initializeGL()
     GLenum err = glewInit();
     assert(err == GLEW_OK);
 
-    connect(context(), &QOpenGLContext::aboutToBeDestroyed, this, &PointCloudWidget::cleanup);
     initializeOpenGLFunctions();
     glClearColor( 0.368, 0.368, 0.733, 1);
 
@@ -67,7 +73,7 @@ void PointCloudWidget::paintGL()
     //glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
 
     // 计算MVP矩阵
-    glm::mat4 MVP = m_proj * m_camera * getModelMatrix();\
+    glm::mat4 MVP = m_proj * m_camera * getModelMatrix();
 
     glUseProgram(m_programID);
     GLuint mvpID = glGetUniformLocation(m_programID, "MVP");
@@ -83,5 +89,58 @@ void PointCloudWidget::resizeGL(int width, int height)
 glm::mat4 PointCloudWidget::getModelMatrix()
 {
     return DragableWidget::getModelMatrix() * m_scaleAndShift;
+}
+
+int PointCloudWidget::addPoint(const QPoint &p) {
+    return 0;
+//    static int dx[] = {0, 0, 1, 0, -1};
+//    static int dy[] = {0, 1, 0, -1, 0};
+
+//    makeCurrent();
+
+//    std::vector<glm::vec3> &points = m_points;
+//    GLfloat x = p.x();
+//    GLfloat y = p.y();
+
+//    GLint viewport[4];
+//    GLdouble object_x,object_y,object_z;
+//    GLfloat realy, winZ = 0;
+
+//    glGetIntegerv(GL_VIEWPORT, viewport);
+//    realy=(GLfloat)viewport[3] - (GLfloat)y;
+//    glReadBuffer(GL_BACK);
+//    for (int i = 0; i < sizeof(dx) / sizeof(int); i++) {
+//        int xx = x + dx[i];
+//        int yy = int(realy) + dy[i];
+//        glReadPixels(xx,yy,1,1,GL_DEPTH_COMPONENT,GL_FLOAT,&winZ);
+//        if (winZ < 1 - 1e-5) {
+//            glm::mat4 modelViewMatrix = m_camera * getModelMatrix();
+//            glm::dmat4 mvDouble, projDouble;
+//            for (int i = 0; i < 4; i++) {
+//                for (int j = 0; j < 4; j++) {
+//                    mvDouble[i][j] = modelViewMatrix[i][j];
+//                    projDouble[i][j] = m_proj[i][j];
+//                }
+//            }
+//            gluUnProject((GLdouble)xx,(GLdouble)yy,winZ, glm::value_ptr(mvDouble), glm::value_ptr(projDouble),viewport,&object_x,&object_y,&object_z);
+//            points.push_back(glm::vec3(object_x, object_y, object_z));
+//        }
+
+//    }
+
+//    doneCurrent();
+//    update();
+//    return points.size();
+}
+
+bool PointCloudWidget::removeLastPoint() {
+    return true;
+//    std::vector<glm::vec3> &points = m_points;
+//    if (points.size() > 0) {
+//        points.pop_back();
+//        update();
+//        return true;
+//    } else
+//        return false;
 }
 
