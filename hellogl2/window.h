@@ -51,7 +51,6 @@ QT_END_NAMESPACE
 
 class GLWidget;
 class AlignWindow;
-class ImageAndPoint;
 class PointsMatchRelation;
 class EntityManager;
 class PointCloudWidget;

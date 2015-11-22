@@ -3,7 +3,6 @@ HEADERS       = glwidget.h \
     DLT.h \
     GModel.h \
     trackball.h \
-    imageandpoint.h \
     shader.hpp \
     pointsmatchrelation.h \
     alignresultwidget.h \
@@ -32,7 +31,6 @@ SOURCES       = glwidget.cpp \
     DLT.cpp \
     GModel.cpp \
     trackball.cpp \
-    imageandpoint.cpp \
     shader.cpp \
     pointsmatchrelation.cpp \
     alignresultwidget.cpp \

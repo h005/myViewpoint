@@ -1,4 +1,4 @@
-/****************************************************************************
+﻿/****************************************************************************
 **
 ** Copyright (C) 2014 Digia Plc and/or its subsidiary(-ies).
 ** Contact: http://www.qt-project.org/legal
@@ -58,7 +58,7 @@ AlignWindow::AlignWindow(QString imageHandler, QString modelPath, QString relati
     if (!relation->loadFromFile()) {
         std::cout << "read failed" << std::endl;
     }
-    qDebug() << relation->getPoints2d().size();
+    qDebug() << relation->getModelPoints().size();
     setCentralWidget(new Window(this, imageHandler, modelPath, *relation));
 }
 

@@ -148,7 +148,7 @@ void GLWidget::paintGL()
     model.drawNormalizedModel(modelViewMatrix, m_proj);
 
     // 绘制模型上被选择的点
-    std::vector<glm::vec3> &points = m_relation->getPoints3d();
+    std::vector<glm::vec3> &points = m_relation->getModelPoints();
     if (points.size() > 0) {
         glUseProgram(m_sphereProgramID);
         GLuint projMatrixID = glGetUniformLocation(m_sphereProgramID, "projMatrix");
@@ -185,7 +185,7 @@ glm::mat4 GLWidget::getModelMatrix()
 int GLWidget::addPoint(const QPoint &p) {
     makeCurrent();
 
-    std::vector<glm::vec3> &points = m_relation->getPoints3d();
+    std::vector<glm::vec3> &points = m_relation->getModelPoints();
     GLfloat x = p.x();
     GLfloat y = p.y();
 
@@ -216,7 +216,7 @@ int GLWidget::addPoint(const QPoint &p) {
 }
 
 bool GLWidget::removeLastPoint() {
-    std::vector<glm::vec3> &points = m_relation->getPoints3d();
+    std::vector<glm::vec3> &points = m_relation->getModelPoints();
     if (points.size() > 0) {
         points.pop_back();
         update();

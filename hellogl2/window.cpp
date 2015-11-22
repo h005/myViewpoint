@@ -57,7 +57,6 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/string_cast.hpp>
 
-#include "imageandpoint.h"
 #include "pointsmatchrelation.h"
 #include "alignresultwidget.h"
 #include "camerashowwidget.h"
@@ -79,8 +78,9 @@ Window::Window(AlignWindow *mw, const QString &imagePath, const QString &modelPa
 
     right = new GLWidget(modelPath, this);
     right->m_relation = &relation;
-
     left = new PointCloudWidget("D:\\kxm-01.15.ply", this);
+    left->m_relation = &relation;
+
     alignBtn = new QPushButton(tr("Align && See"), this);
     confirmBtn = new QPushButton(tr("Confirm && Uplevel"), this);
     clearBtn = new QPushButton(tr("Clear"), this);
@@ -182,14 +182,7 @@ void Window::closeEvent(QCloseEvent *event)
 
 void Window::align()
 {
-    glm::mat4 mvMatrix, projMatrix;
-    std::vector<glm::vec2> &points2d = relation.getPoints2d();
-    std::vector<glm::vec3> &points3d = relation.getPoints3d();
-    DLTwithPoints(points2d.size(), (float(*)[2])&points2d[0], (float(*)[3])&points3d[0], m_iwidth, m_iheight, mvMatrix, projMatrix);
 
-    // [GUI]把DLT标定结果显示出来
-    AlignResultWidget *a = new AlignResultWidget(m_modelpath, m_iwidth * 1.f / m_iheight, mvMatrix, projMatrix, 0);
-    a->show();
 }
 
 void Window::confirm()
@@ -203,8 +196,6 @@ void Window::confirm()
 
 void Window::clearPressed()
 {
-    relation.getPoints2d().clear();
-    relation.getPoints3d().clear();
     left->update();
     right->update();
 }

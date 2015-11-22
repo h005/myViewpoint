@@ -11,8 +11,8 @@ PointsMatchRelation::PointsMatchRelation(QString filepath, QString modelPath)
     : filepath(filepath),
       modelPath(modelPath)
 {
-    points2d.clear();
-    points3d.clear();
+    ptCloudPoints.clear();
+    modelPoints.clear();
 }
 
 PointsMatchRelation::~PointsMatchRelation()
@@ -22,8 +22,8 @@ PointsMatchRelation::~PointsMatchRelation()
 
 bool PointsMatchRelation::loadFromFile()
 {
-    points2d.clear();
-    points3d.clear();
+    ptCloudPoints.clear();
+    modelPoints.clear();
 
     QFile file(filepath);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
@@ -33,13 +33,13 @@ bool PointsMatchRelation::loadFromFile()
     while (!in.atEnd()) {
         QString line = in.readLine();
         QStringList tokens = line.split(' ', QString::SkipEmptyParts);
-        if (tokens.size() != 5)
+        if (tokens.size() != 6)
             return false;
 
-        glm::vec4 p3d = glm::vec4(tokens[2].toFloat(), tokens[3].toFloat(), tokens[4].toFloat(), 1.f);
-        glm::vec2 p2d = glm::vec2(tokens[0].toFloat(), tokens[1].toFloat());
-        points3d.push_back(glm::vec3(p3d));
-        points2d.push_back(p2d);
+        glm::vec3 modelPoint = glm::vec3(tokens[3].toFloat(), tokens[4].toFloat(), tokens[5].toFloat());
+        glm::vec3 ptCloudPoint = glm::vec3(tokens[0].toFloat(), tokens[1].toFloat(), tokens[2].toFloat());
+        modelPoints.push_back(modelPoint);
+        ptCloudPoints.push_back(ptCloudPoint);
     }
     file.close();
     return true;
@@ -47,20 +47,17 @@ bool PointsMatchRelation::loadFromFile()
 
 bool PointsMatchRelation::saveToFile()
 {
-    if (points2d.size() == points3d.size()) {
+    std::cout << filepath.toStdString() << std::endl;
+    if (ptCloudPoints.size() == modelPoints.size()) {
         QFile file(filepath);
         if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
             return false;
 
         QTextStream out(&file);
-        for (uint32_t i = 0; i < points2d.size(); i++) {
-            glm::vec2 p2d = points2d[i];
-
-            // 由于模型显示前要进行移中和缩放，所以得到的3d点和模型的尺度有关
-            // 将3d点当前的坐标变换到模型坐标系下，获得尺度无关的坐标
-            glm::vec3 tmp = points3d[i];
-            glm::vec4 p3d = glm::vec4(tmp, 1.f);
-            out << p2d.x << " " << p2d.y << " " << p3d.x << " " << p3d.y << " " << p3d.z << "\n";
+        for (uint32_t i = 0; i < ptCloudPoints.size(); i++) {
+            glm::vec3 ptCloudPoint = ptCloudPoints[i];
+            glm::vec3 modelPoint = modelPoints[i];
+            out << ptCloudPoint.x << " " << ptCloudPoint.y << " " << ptCloudPoint.z << " " << modelPoint.x << " " << modelPoint.y << " " << modelPoint.z << "\n";
         }
         file.close();
 
@@ -76,26 +73,26 @@ bool PointsMatchRelation::saveToFile()
  */
 bool PointsMatchRelation::isPointsEqual()
 {
-    return points2d.size() == points3d.size();
+    return ptCloudPoints.size() == modelPoints.size();
 }
 
-std::vector<glm::vec2>& PointsMatchRelation::getPoints2d()
+std::vector<glm::vec3>& PointsMatchRelation::getPtCloudPoints()
 {
-    return points2d;
+    return ptCloudPoints;
 }
 
-void PointsMatchRelation::setPoints2d(const std::vector<glm::vec2> &value)
+void PointsMatchRelation::setPtCloudPoints(const std::vector<glm::vec3> &value)
 {
-    points2d = value;
+    ptCloudPoints = value;
 }
-std::vector<glm::vec3>& PointsMatchRelation::getPoints3d()
+std::vector<glm::vec3>& PointsMatchRelation::getModelPoints()
 {
-    return points3d;
+    return modelPoints;
 }
 
-void PointsMatchRelation::setPoints3d(const std::vector<glm::vec3> &value)
+void PointsMatchRelation::setModelPoints(const std::vector<glm::vec3> &value)
 {
-    points3d = value;
+    modelPoints = value;
 }
 
 

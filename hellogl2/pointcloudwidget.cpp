@@ -7,6 +7,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <qdebug.h>
 #include "shader.hpp"
+#include "pointsmatchrelation.h"
 
 PointCloudWidget::PointCloudWidget(const std::string &plyPath, QWidget *parent)
     : DragableWidget(parent),
@@ -89,21 +90,23 @@ void PointCloudWidget::paintGL()
     glUniformMatrix4fv(mvpID, 1, GL_FALSE, glm::value_ptr(MVP));
     m_renderObject.draw();
 
-    // 显示选定的点
-    std::vector<glm::vec3> &points = m_points;
-    if (points.size() > 0) {
-        glUseProgram(m_sphereProgramID);
-        GLuint projMatrixID = glGetUniformLocation(m_sphereProgramID, "projMatrix");
-        GLuint mvMatrixID = glGetUniformLocation(m_sphereProgramID, "mvMatrix");
-        glUniformMatrix4fv(projMatrixID, 1, GL_FALSE, glm::value_ptr(m_proj));
+    if (m_relation != NULL) {
+        // 显示选定的点
+        std::vector<glm::vec3> &points = m_relation->getPtCloudPoints();
+        if (points.size() > 0) {
+            glUseProgram(m_sphereProgramID);
+            GLuint projMatrixID = glGetUniformLocation(m_sphereProgramID, "projMatrix");
+            GLuint mvMatrixID = glGetUniformLocation(m_sphereProgramID, "mvMatrix");
+            glUniformMatrix4fv(projMatrixID, 1, GL_FALSE, glm::value_ptr(m_proj));
 
-        std::vector<glm::vec3>::iterator it;
-        for (it = points.begin(); it != points.end(); it++) {
-            // multiple point's position
-            glm::mat4 pointMV = glm::translate(MV, *it);
-            pointMV = glm::scale(pointMV, glm::vec3(0.005, 0.005, 0.005));
-            glUniformMatrix4fv(mvMatrixID, 1, GL_FALSE, glm::value_ptr(pointMV));
-            m_sphereObject.draw();
+            std::vector<glm::vec3>::iterator it;
+            for (it = points.begin(); it != points.end(); it++) {
+                // multiple point's position
+                glm::mat4 pointMV = glm::translate(MV, *it);
+                pointMV = glm::scale(pointMV, glm::vec3(0.005, 0.005, 0.005));
+                glUniformMatrix4fv(mvMatrixID, 1, GL_FALSE, glm::value_ptr(pointMV));
+                m_sphereObject.draw();
+            }
         }
     }
 }
@@ -124,7 +127,7 @@ int PointCloudWidget::addPoint(const QPoint &p) {
 
     makeCurrent();
 
-    std::vector<glm::vec3> &points = m_points;
+    std::vector<glm::vec3> &points = m_relation->getPtCloudPoints();
     GLfloat x = p.x();
     GLfloat y = p.y();
 
@@ -162,7 +165,7 @@ int PointCloudWidget::addPoint(const QPoint &p) {
 }
 
 bool PointCloudWidget::removeLastPoint() {
-    std::vector<glm::vec3> &points = m_points;
+    std::vector<glm::vec3> &points = m_relation->getPtCloudPoints();
     if (points.size() > 0) {
         points.pop_back();
         update();

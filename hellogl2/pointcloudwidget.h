@@ -10,14 +10,15 @@
 
 QT_FORWARD_DECLARE_CLASS(QOpenGLShaderProgram)
 
+class PointsMatchRelation;
 class PointCloudWidget: public DragableWidget
 {
 public:
     PointCloudWidget(const std::string &plyPath, QWidget *parent = NULL);
     ~PointCloudWidget();
-    std::vector<glm::vec3> m_points;
     int addPoint(const QPoint &p);
     bool removeLastPoint();
+    PointsMatchRelation *m_relation = NULL;
 
 protected:
     void initializeGL() Q_DECL_OVERRIDE;

@@ -15,17 +15,17 @@ public:
     bool saveToFile();
     bool isPointsEqual();
 
-    std::vector<glm::vec2>& getPoints2d();
-    void setPoints2d(const std::vector<glm::vec2> &value);
+    std::vector<glm::vec3>& getPtCloudPoints();
+    void setPtCloudPoints(const std::vector<glm::vec3> &value);
 
-    std::vector<glm::vec3>& getPoints3d();
-    void setPoints3d(const std::vector<glm::vec3> &value);
+    std::vector<glm::vec3>& getModelPoints();
+    void setModelPoints(const std::vector<glm::vec3> &value);
 
 private:
     QString filepath;
     QString modelPath;
-    std::vector<glm::vec2> points2d;
-    std::vector<glm::vec3> points3d;
+    std::vector<glm::vec3> ptCloudPoints;
+    std::vector<glm::vec3> modelPoints;
 };
 
 #endif // POINTSMATCHRELATION_H
