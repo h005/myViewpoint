@@ -24,7 +24,8 @@ HEADERS       = glwidget.h \
     RenderObject/sphere.h \
     dragablewidget.h \
     pointcloudcapturewidget.h \
-    pointcloudoffscreenrender.h
+    pointcloudoffscreenrender.h \
+    bothwidget.h
 SOURCES       = glwidget.cpp \
                 main.cpp \
                 window.cpp \
@@ -53,7 +54,8 @@ SOURCES       = glwidget.cpp \
     RenderObject/sphere.cpp \
     dragablewidget.cpp \
     pointcloudcapturewidget.cpp \
-    pointcloudoffscreenrender.cpp
+    pointcloudoffscreenrender.cpp \
+    bothwidget.cpp
 
 OTHER_FILES += shader/*.vert shader/*.frag
 

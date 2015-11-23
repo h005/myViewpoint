@@ -61,10 +61,12 @@
 #include "alignresultwidget.h"
 #include "camerashowwidget.h"
 #include "DLT.h"
+#include "lmdlt.h"
 #include "entitymanager.h"
 #include "entity.h"
 #include "TransformationUtils.h"
 #include "pointcloudwidget.h"
+#include "bothwidget.h"
 
 Window::Window(AlignWindow *mw, const QString &imagePath, const QString &modelPath, PointsMatchRelation &relation)
     : mainWindow(mw),
@@ -182,7 +184,18 @@ void Window::closeEvent(QCloseEvent *event)
 
 void Window::align()
 {
+    Q_ASSERT(relation.isPointsEqual());
+    glm::mat3 R;
+    glm::vec3 t;
+    float c;
+    LMDLT::ModelRegistration(relation.getModelPoints().size(), &relation.getPtCloudPoints()[0], &relation.getModelPoints()[0], R, t, c);
 
+    glm::mat4 model2ptCloud = glm::mat4(c*R);
+    model2ptCloud[3] = glm::vec4(t, 1.f);
+    std::cout << glm::to_string(model2ptCloud) << std::endl;
+
+    BothWidget *w = new BothWidget("D:\\kxm-01.15.ply", m_modelpath.toStdString(), model2ptCloud);
+    w->show();
 }
 
 void Window::confirm()
@@ -196,6 +209,8 @@ void Window::confirm()
 
 void Window::clearPressed()
 {
+    relation.getModelPoints().clear();
+    relation.getPtCloudPoints().clear();
     left->update();
     right->update();
 }

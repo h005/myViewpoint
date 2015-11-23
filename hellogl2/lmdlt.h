@@ -1,4 +1,4 @@
-#ifndef LMDLT_H
+﻿#ifndef LMDLT_H
 #define LMDLT_H
 
 #include <glm/glm.hpp>
@@ -15,6 +15,13 @@ public:
         const cv::Mat &initialCameraMatrix,
         const cv::Mat &initialExtrinsicMatrix,
         cv::Mat &modelView, cv::Mat &K);
+
+    static void ModelRegistration(int matchnum,
+                                  glm::vec3 ptCloudPoints[],
+                                  glm::vec3 modelPoints[],
+                                  glm::mat3 &R,
+                                  glm::vec3 &t,
+                                  float &c);
 };
 
 #endif // LMDLT_H

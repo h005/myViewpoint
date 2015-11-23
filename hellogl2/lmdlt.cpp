@@ -1,4 +1,4 @@
-#include "lmdlt.h"
+﻿#include "lmdlt.h"
 #include <stdio.h>
 #include <iostream>
 #include <math.h>
@@ -153,5 +153,72 @@ void LMDLT::DLTwithPoints(int matchnum, float points2d[][2], float points3d[][3]
     free(ptx);
     free(inputPoints3d);
     free(para);
+}
+
+static void modelPointsToPtCloudPoints(double parameter[], double newP[], int LM_m, int LM_n, void *adata)
+{
+    float c = parameter[0];
+    glm::mat3 R = RodtoR(glm::vec3(parameter[1], parameter[2], parameter[3]));
+    glm::vec3 t = glm::vec3(parameter[4], parameter[5], parameter[6]);
+    double *p = (double *)adata;
+    int matchnum = LM_n / 3;
+    for (int i = 0; i < matchnum; i++) {
+        glm::vec3 point(p[3*i + 0], p[3*i + 1], p[3*i + 2]);
+        glm::vec3 dest = c * R * point + t;
+        newP[i*3 + 0] = dest[0];
+        newP[i*3 + 1] = dest[1];
+        newP[i*3 + 2] = dest[2];
+    }
+}
+
+void LMDLT::ModelRegistration(int matchnum, glm::vec3 ptCloudPoints[], glm::vec3 modelPoints[], glm::mat3 &R, glm::vec3 &t, float &c)
+{
+    void (*minfn)(double *p, double *hx, int m, int n, void *adata);
+    double opts[LM_OPTS_SZ], info[LM_INFO_SZ];
+    opts[0] = LM_INIT_MU;
+    opts[1] = 1E-12;
+    opts[2] = 1E-12;
+    opts[3] = 1E-15;
+    opts[4] = LM_DIFF_DELTA;
+
+    // c, R, t中一共有多少参数
+    int LM_m = 1 + 3 + 3;
+    int LM_n = 3*matchnum;
+    std::vector<double> para(LM_m);
+    std::vector<double> ptx(matchnum * 3);
+    std::vector<double> inputPoints3d(matchnum * 3);
+
+    for (int i = 0; i < matchnum; i++) {
+        // 方程左边数据 * para = 方程右边
+        inputPoints3d[i*3 + 0] = modelPoints[i].x;
+        inputPoints3d[i*3 + 1] = modelPoints[i].y;
+        inputPoints3d[i*3 + 2] = modelPoints[i].z;
+        // 方程的右边
+        ptx[i*3+0] = ptCloudPoints[i].x;
+        ptx[i*3+1] = ptCloudPoints[i].y;
+        ptx[i*3+2] = ptCloudPoints[i].z;
+    }
+
+    // !!! 注意初始值要设置得有意义，起码计算结果中不能出现IND
+    float init_c = 1;
+    glm::vec3 init_w(1.f, 0.f, 0.f);
+    glm::vec3 init_t(0.f);
+    para[0] = init_c;
+    para[1] = init_w[0];
+    para[2] = init_w[1];
+    para[3] = init_w[2];
+    para[4] = init_t[0];
+    para[5] = init_t[1];
+    para[6] = init_t[2];
+
+    minfn = calcProjectedPoint;
+    int iter = dlevmar_dif(modelPointsToPtCloudPoints, &para[0], &ptx[0], LM_m, LM_n, 1000,
+                           opts, info, NULL, NULL, &inputPoints3d[0]);
+    printf("Levenberg-Marquardt returned in %g iter, reason %g, sumsq %g [%g]\n", info[5], info[6], info[1], info[0]);
+    std::cout << "Itered: " << iter << std::endl;
+
+    c = para[0];
+    R = RodtoR(glm::vec3(para[1], para[2], para[3]));
+    t = glm::vec3(para[4], para[5], para[6]);
 }
 
