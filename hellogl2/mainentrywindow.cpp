@@ -98,10 +98,6 @@ void MainEntryWindow::on_labelFirstImageBtn_clicked()
     }
 }
 
-void MainEntryWindow::on_labelSecondImageBtn_clicked()
-{
-}
-
 QString target="./img0000.jpg";
 
 void MainEntryWindow::on_executePreviewTargetBtn_clicked()
@@ -110,10 +106,95 @@ void MainEntryWindow::on_executePreviewTargetBtn_clicked()
 
 void MainEntryWindow::on_printMvMatrixBtn_clicked()
 {
+    // 输出MV
+    QString selfilter = tr("Model View Matrix File (*.matrix)");
+    QString fileName = QFileDialog::getSaveFileName(
+            this,
+            QString("打开配置文件"),
+            QString(),
+            tr("All files (*.*);;Model View Matrix File (*.matrix)" ),
+            &selfilter
+    );
+
+    // 获得模型到点云的变换
+    glm::mat4 model2ptCloud = getModel2PtCloudTrans();
+    if (!fileName.isEmpty()) {
+        qDebug() << fileName;
+        std::ofstream matrixFile;
+        matrixFile.open(fileName.toUtf8().constData());
+
+        std::vector<QString> list;
+        manager->getImageList(list);
+        std::vector<QString>::iterator it;
+        for (it = list.begin(); it != list.end(); it++) {
+
+            qDebug() << "********************* " << it - list.begin() << " ****************";
+
+            Entity want;
+            Q_ASSERT(manager->getEntity(*it, want));
+            glm::mat4 wantMVMatrix = want.mvMatrix * model2ptCloud;
+
+            matrixFile << it->toUtf8().constData() << std::endl;
+            for (int i = 0; i < 4; i++) {
+                for (int j = 0; j < 4; j++)
+                    matrixFile << wantMVMatrix[j][i] << " ";
+                matrixFile << std::endl;
+            }
+        }
+
+        qDebug() << "output finished";
+        matrixFile.close();
+    }
 }
 
 void MainEntryWindow::on_printMvPMatrixBtn_clicked()
 {
+    // 输出MV和P
+    QString selfilter = tr("Model View Matrix File (*.matrix)");
+    QString fileName = QFileDialog::getSaveFileName(
+            this,
+            QString("打开配置文件"),
+            QString(),
+            tr("All files (*.*);;Model View Matrix File (*.matrix)" ),
+            &selfilter
+    );
+
+    // 获得模型到点云的变换
+    glm::mat4 model2ptCloud = getModel2PtCloudTrans();
+    if (!fileName.isEmpty()) {
+        qDebug() << fileName;
+        std::ofstream matrixFile;
+        matrixFile.open(fileName.toUtf8().constData());
+
+        std::vector<QString> list;
+        manager->getImageList(list);
+        std::vector<QString>::iterator it;
+        for (it = list.begin(); it != list.end(); it++) {
+
+            qDebug() << "********************* " << it - list.begin() << " ****************";
+
+            Entity want;
+            Q_ASSERT(manager->getEntity(*it, want));
+            glm::mat4 wantMVMatrix = want.mvMatrix * model2ptCloud;
+
+            matrixFile << it->toUtf8().constData() << std::endl;
+            for (int i = 0; i < 4; i++) {
+                for (int j = 0; j < 4; j++)
+                    matrixFile << wantMVMatrix[j][i] << " ";
+                matrixFile << std::endl;
+            }
+
+            QSize imgSize = GetImageParamter(*it);
+            glm::mat4 wantProjMatrix = projectionMatrixWithFocalLength(want.f, imgSize.width(), imgSize.height(), 0.1f, 10.f);
+            for (int i = 0; i < 4; i++) {
+                for (int j = 0; j < 4; j++)
+                    matrixFile << wantProjMatrix[j][i] << " ";
+                matrixFile << std::endl;
+            }
+        }
+        qDebug() << "output finished";
+        matrixFile.close();
+    }
 }
 
 QSize MainEntryWindow::GetImageParamter(QString handler)
@@ -125,14 +206,6 @@ QSize MainEntryWindow::GetImageParamter(QString handler)
     cv::Mat img = cv::imread(finalPath.toUtf8().constData());
 
     return QSize(img.size().width, img.size().height);
-}
-
-void MainEntryWindow::on_saveLabeledResultBtn_clicked()
-{
-}
-
-void MainEntryWindow::on_saveLabeledResultBtn_2_clicked()
-{
 }
 
 void MainEntryWindow::on_saveLabeledImages_clicked()

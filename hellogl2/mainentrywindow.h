@@ -29,11 +29,7 @@ private slots:
 
     void on_pushButton_clicked();
 
-    void on_labelSecondImageBtn_clicked();
-
     void on_executePreviewTargetBtn_clicked();
-
-    void on_saveLabeledResultBtn_clicked();
 
     void on_saveLabeledImages_clicked();
 
@@ -42,8 +38,6 @@ private slots:
     void on_printMvMatrixBtn_clicked();
 
     void on_printMvPMatrixBtn_clicked();
-
-    void on_saveLabeledResultBtn_2_clicked();
 
     void on_openPtCloudModelBtn_clicked();
 
