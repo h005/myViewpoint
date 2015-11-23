@@ -237,9 +237,10 @@ void MainEntryWindow::on_saveLabeledImages_clicked()
                     QFileInfo file(*it);
                     QString basename = file.baseName();
                     QString finalPath = QDir(outputDir).filePath(basename + ".m.png");
+                    QString depthImgPath = QDir(outputDir).filePath(basename + ".d.bmp");
 
                     //更改窗口尺寸不可以即时生效，所以我们先渲染出图片再对图片进行缩放
-                    offscreenRender->renderToImageFile(wantMVMatrix, wantProjMatrix, finalPath, imgSize);
+                    offscreenRender->renderToImageFile(wantMVMatrix, wantProjMatrix, finalPath, depthImgPath, imgSize);
                 }
                 qDebug() << "finished" << endl;
             }

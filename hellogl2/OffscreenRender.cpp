@@ -37,7 +37,7 @@ void OffscreenRender::initializeGL()
 }
 
 
-void OffscreenRender::renderToImageFile(glm::mat4 mvMatrix, glm::mat4 projMatrix, QString filePath, QSize dsize)
+void OffscreenRender::renderToImageFile(glm::mat4 mvMatrix, glm::mat4 projMatrix, QString filePath, QString depthFilePath, QSize dsize)
 {
     makeCurrent();
     glBindFramebuffer(GL_FRAMEBUFFER, fboId);
@@ -52,28 +52,55 @@ void OffscreenRender::renderToImageFile(glm::mat4 mvMatrix, glm::mat4 projMatrix
     model.drawNormalizedModel(mvMatrix, projMatrix);
 
     // 从fbo中读取
-    GLubyte *img = new GLubyte[BUFFER_WIDTH * BUFFER_HEIGHT * 4];
-    glReadBuffer(GL_BACK_LEFT);
-    glReadPixels(0,
-                0,
-                BUFFER_WIDTH,
-                BUFFER_HEIGHT,
-                GL_BGRA,
-                GL_UNSIGNED_BYTE,
-                img);
 
-    // 创建图片并写入路径
-    // 由于OpenGL坐标原点位于左下角，保存前需要沿着x轴翻转图片
-    qDebug()<<"save to" << filePath;
-    cv::Mat image = cv::Mat(BUFFER_WIDTH, BUFFER_HEIGHT,CV_8UC4,img);
-    cv::Mat flipped;
-    cv::flip(image, flipped, 0);
+    if (!filePath.isNull())
+    {
+        std::vector<GLubyte> img(BUFFER_WIDTH * BUFFER_HEIGHT * 4);
+        glReadBuffer(GL_BACK_LEFT);
+        glReadPixels(0,
+                    0,
+                    BUFFER_WIDTH,
+                    BUFFER_HEIGHT,
+                    GL_BGRA,
+                    GL_UNSIGNED_BYTE,
+                    &img[0]);
 
-    cv::Mat final;
-    cv::resize(flipped, final, cv::Size(dsize.width(), dsize.height()));
-    cv::imwrite(filePath.toUtf8().constData(), final);
+        // 创建图片并写入路径
+        // 由于OpenGL坐标原点位于左下角，保存前需要沿着x轴翻转图片
+        qDebug()<<"save to" << filePath;
+        cv::Mat image = cv::Mat(BUFFER_WIDTH, BUFFER_HEIGHT,CV_8UC4, &img[0]);
+        cv::Mat flipped;
+        cv::flip(image, flipped, 0);
 
-    delete img;
+        cv::Mat final;
+        cv::resize(flipped, final, cv::Size(dsize.width(), dsize.height()));
+        cv::imwrite(filePath.toUtf8().constData(), final);
+    }
+
+    if (!depthFilePath.isNull())
+    {
+        std::vector<GLfloat> img(BUFFER_WIDTH * BUFFER_HEIGHT);
+
+        // 读到的深度位于[0, 1]之间
+        glReadBuffer(GL_BACK);
+        glReadPixels(0,0,BUFFER_WIDTH,BUFFER_HEIGHT,GL_DEPTH_COMPONENT,GL_FLOAT, &img[0]);
+
+        // 创建图片并写入路径
+        // 由于OpenGL坐标原点位于左下角，保存前需要沿着x轴翻转图片
+        qDebug()<<"save to" << depthFilePath;
+        cv::Mat image = cv::Mat(BUFFER_WIDTH, BUFFER_HEIGHT,CV_32FC1,&img[0]);
+
+        cv::Mat ucharMat;
+        image.convertTo(ucharMat, CV_8UC1, 255.0);
+
+        cv::Mat flipped;
+        cv::flip(ucharMat, flipped, 0);
+
+        cv::Mat final;
+        cv::resize(flipped, final, cv::Size(dsize.width(), dsize.height()));
+        cv::imwrite(depthFilePath.toUtf8().constData(), final);
+    }
+
     glBindFramebuffer(GL_FRAMEBUFFER,0);
     doneCurrent();
 }
