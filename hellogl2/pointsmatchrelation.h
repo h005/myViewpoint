@@ -8,7 +8,7 @@
 class PointsMatchRelation
 {
 public:
-    PointsMatchRelation(QString filepath, QString modelPath);
+    PointsMatchRelation(QString filepath);
     ~PointsMatchRelation();
 
     bool loadFromFile();
@@ -23,7 +23,6 @@ public:
 
 private:
     QString filepath;
-    QString modelPath;
     std::vector<glm::vec3> ptCloudPoints;
     std::vector<glm::vec3> modelPoints;
 };

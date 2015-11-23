@@ -22,7 +22,6 @@ DragableWidget::DragableWidget(QWidget *parent)
 
 DragableWidget::~DragableWidget()
 {
-    qDebug() << "DragableWidget closed" << endl;
 }
 
 void DragableWidget::mousePressEvent(QMouseEvent *event)

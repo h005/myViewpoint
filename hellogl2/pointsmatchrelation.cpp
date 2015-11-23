@@ -7,9 +7,8 @@
 #include <glm/gtx/string_cast.hpp>
 #include "GModel.h"
 
-PointsMatchRelation::PointsMatchRelation(QString filepath, QString modelPath)
-    : filepath(filepath),
-      modelPath(modelPath)
+PointsMatchRelation::PointsMatchRelation(QString filepath)
+    : filepath(filepath)
 {
     ptCloudPoints.clear();
     modelPoints.clear();

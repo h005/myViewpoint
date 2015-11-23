@@ -54,7 +54,7 @@
 AlignWindow::AlignWindow(QString modelPath, QString ptCloudPath, QString relationPath)
 {
     setAttribute(Qt::WA_DeleteOnClose);
-    relation = new PointsMatchRelation(relationPath, modelPath);
+    relation = new PointsMatchRelation(relationPath);
     if (!relation->loadFromFile()) {
         std::cout << "read failed" << std::endl;
     }

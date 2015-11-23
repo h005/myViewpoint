@@ -58,7 +58,7 @@ private:
     EntityManager *manager;
     OffscreenRender *offscreenRender = NULL;
     PointCloudOffscreenRender *ptCloudOffscreenRender = NULL;
-    void RecoveryMvMatrixYouWant(QString handler, glm::mat4 &wantMVMatrix);
+    glm::mat4 getModel2PtCloudTrans();
     QSize GetImageParamter(QString handler);
 };
 

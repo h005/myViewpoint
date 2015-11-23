@@ -31,52 +31,13 @@
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>140</y>
+      <y>230</y>
       <width>121</width>
       <height>23</height>
      </rect>
     </property>
     <property name="text">
-     <string>标定第一张图片</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="labelSecondImageBtn">
-    <property name="geometry">
-     <rect>
-      <x>30</x>
-      <y>180</y>
-      <width>121</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>标定第二张图片</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="previewFirstImageBtn">
-    <property name="geometry">
-     <rect>
-      <x>190</x>
-      <y>140</y>
-      <width>121</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>查看第一张图片效果</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="previewSecondImageBtn">
-    <property name="geometry">
-     <rect>
-      <x>190</x>
-      <y>180</y>
-      <width>121</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>查看第二张图片效果</string>
+     <string>模型对准</string>
     </property>
    </widget>
    <widget class="QLabel" name="configFileLabel">
@@ -96,7 +57,7 @@
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>320</y>
+      <y>270</y>
       <width>281</width>
       <height>23</height>
      </rect>
@@ -109,7 +70,7 @@
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>250</y>
+      <y>460</y>
       <width>121</width>
       <height>23</height>
      </rect>
@@ -122,7 +83,7 @@
     <property name="geometry">
      <rect>
       <x>190</x>
-      <y>250</y>
+      <y>460</y>
       <width>121</width>
       <height>23</height>
      </rect>
@@ -135,7 +96,7 @@
     <property name="geometry">
      <rect>
       <x>130</x>
-      <y>400</y>
+      <y>350</y>
       <width>181</width>
       <height>23</height>
      </rect>
@@ -148,7 +109,7 @@
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>400</y>
+      <y>350</y>
       <width>81</width>
       <height>23</height>
      </rect>
@@ -161,7 +122,7 @@
     <property name="geometry">
      <rect>
       <x>190</x>
-      <y>280</y>
+      <y>490</y>
       <width>121</width>
       <height>23</height>
      </rect>
@@ -174,7 +135,7 @@
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>280</y>
+      <y>490</y>
       <width>141</width>
       <height>23</height>
      </rect>
@@ -187,7 +148,7 @@
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>360</y>
+      <y>310</y>
       <width>281</width>
       <height>23</height>
      </rect>
@@ -200,7 +161,7 @@
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>500</y>
+      <y>130</y>
       <width>91</width>
       <height>23</height>
      </rect>
@@ -213,7 +174,7 @@
     <property name="geometry">
      <rect>
       <x>150</x>
-      <y>500</y>
+      <y>130</y>
       <width>161</width>
       <height>23</height>
      </rect>
@@ -226,7 +187,7 @@
     <property name="geometry">
      <rect>
       <x>110</x>
-      <y>540</y>
+      <y>170</y>
       <width>201</width>
       <height>23</height>
      </rect>
@@ -239,7 +200,7 @@
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>540</y>
+      <y>170</y>
       <width>71</width>
       <height>23</height>
      </rect>

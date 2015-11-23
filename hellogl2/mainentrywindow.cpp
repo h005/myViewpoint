@@ -28,6 +28,7 @@
 #include "pointcloudwidget.h"
 #include "pointcloudcapturewidget.h"
 #include "pointcloudoffscreenrender.h"
+#include "lmdlt.h"
 
 //#define USE_DEFAULT_PROJECTION
 
@@ -115,10 +116,6 @@ void MainEntryWindow::on_printMvPMatrixBtn_clicked()
 {
 }
 
-void MainEntryWindow::RecoveryMvMatrixYouWant(QString handler, glm::mat4 &wantMVMatrix)
-{
-}
-
 QSize MainEntryWindow::GetImageParamter(QString handler)
 {
     // 先拼接，在去除路径中多余的信息
@@ -140,10 +137,55 @@ void MainEntryWindow::on_saveLabeledResultBtn_2_clicked()
 
 void MainEntryWindow::on_saveLabeledImages_clicked()
 {
+    if (offscreenRender != NULL && offscreenRender->isVisible()) {
+            QString outputDir = QFileDialog::getExistingDirectory(
+                    this,
+                    QString("选定输出目录"),
+                    QString()
+            );
+            qDebug() << "Selected Dir:" << outputDir;
+
+            // 获得模型到点云的变换
+            glm::mat4 model2ptCloud = getModel2PtCloudTrans();
+            if (!outputDir.isEmpty()) {
+                std::vector<QString> list;
+                manager->getImageList(list);
+                std::vector<QString>::iterator it;
+                for (it = list.begin(); it != list.end(); it++) {
+                    qDebug() << "********************* " << it - list.begin() << " ****************";
+
+                    Entity want;
+                    Q_ASSERT(manager->getEntity(*it, want));
+                    QSize imgSize = GetImageParamter(*it);
+                    glm::mat4 wantMVMatrix = want.mvMatrix * model2ptCloud;
+                    glm::mat4 wantProjMatrix = projectionMatrixWithFocalLength(want.f, imgSize.width(), imgSize.height(), 0.1f, 10.f);
+
+                    // 将图片生成到选定目录中，文件名与之前一致，但后缀改为.m.png，方便对照
+                    QFileInfo file(*it);
+                    QString basename = file.baseName();
+                    QString finalPath = QDir(outputDir).filePath(basename + ".m.png");
+
+                    //更改窗口尺寸不可以即时生效，所以我们先渲染出图片再对图片进行缩放
+                    offscreenRender->renderToImageFile(wantMVMatrix, wantProjMatrix, finalPath, imgSize);
+                }
+                qDebug() << "finished" << endl;
+            }
+        } else {
+            std::cout << "Please Open A Render Window First" << std::endl;
+        }
 }
 
 void MainEntryWindow::on_openOffscreenRenderBtn_clicked()
 {
+    if (manager != NULL) {
+        if (offscreenRender == NULL) {
+            offscreenRender = new OffscreenRender(manager->modelPath(), NULL);
+            offscreenRender->resize(offscreenRender->sizeHint());
+        }
+        offscreenRender->show();
+        this->activateWindow();
+    } else
+        std::cout << "Please load config file first" << std::endl;
 }
 
 
@@ -218,4 +260,26 @@ void MainEntryWindow::on_openPtCloudLabeledWindowBtn_clicked()
         this->activateWindow();
     } else
         std::cout << "Please load config file first" << std::endl;
+}
+
+glm::mat4 MainEntryWindow::getModel2PtCloudTrans()
+{
+    // 从文件中读取
+    PointsMatchRelation relation(manager->registrationFile());
+    if (!relation.loadFromFile()) {
+        std::cout << "read failed" << std::endl;
+    }
+
+    // 获得模型到点云的变换
+    Q_ASSERT(relation.isPointsEqual());
+    glm::mat3 R;
+    glm::vec3 t;
+    float c;
+    LMDLT::ModelRegistration(relation.getModelPoints().size(), &relation.getPtCloudPoints()[0], &relation.getModelPoints()[0], R, t, c);
+
+    // 整理为mat4
+    glm::mat4 model2ptCloud = glm::mat4(c*R);
+    model2ptCloud[3] = glm::vec4(t, 1.f);
+
+    return model2ptCloud;
 }

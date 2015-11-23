@@ -358,7 +358,6 @@ glm::mat4 GModel::recommandScaleAndShift()
 }
 
 void GModel::cleanUp() {
-    std::cout << "GModel cleanup" << std::endl;
 	if (pImporter) {
 		delete pImporter;
 		pImporter = NULL;

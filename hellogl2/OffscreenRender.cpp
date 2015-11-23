@@ -44,7 +44,6 @@ void OffscreenRender::renderToImageFile(glm::mat4 mvMatrix, glm::mat4 projMatrix
 
     GLint viewport[4];
     glGetIntegerv(GL_VIEWPORT,viewport);
-    qDebug() << viewport[0] << viewport[1] << viewport[2] << viewport[3];
 
     // 默认开启背面剔除:GL_CULL_FACE
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -73,7 +72,6 @@ void OffscreenRender::renderToImageFile(glm::mat4 mvMatrix, glm::mat4 projMatrix
     cv::Mat final;
     cv::resize(flipped, final, cv::Size(dsize.width(), dsize.height()));
     cv::imwrite(filePath.toUtf8().constData(), final);
-    qDebug() << "...ok";
 
     delete img;
     glBindFramebuffer(GL_FRAMEBUFFER,0);
