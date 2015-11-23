@@ -61,7 +61,6 @@ GLWidget::GLWidget(const QString &modelPath, QWidget *parent)
 {
     model.load(modelPath.toLocal8Bit().data());
     m_scaleAndShift = model.recommandScaleAndShift();
-    std::cout << glm::to_string(m_scaleAndShift) << std::endl;
 }
 
 GLWidget::~GLWidget()

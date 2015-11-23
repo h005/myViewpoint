@@ -1,4 +1,4 @@
-#ifndef ENTITYMANAGER_H
+﻿#ifndef ENTITYMANAGER_H
 #define ENTITYMANAGER_H
 
 #include <map>
@@ -18,23 +18,11 @@ public:
     QString modelPath() const;
     void setModelPath(const QString &modelPath);
 
-    QString baseOneImagePath() const;
-    void setBaseOneImagePath(const QString &baseOneImagePath);
+    QString ptCloudPath() const;
+    void setPtCloudPath(const QString &path);
 
-    QString baseTwoImagePath() const;
-    void setBaseTwoImagePath(const QString &baseTwoImagePath);
-
-    QString baseOneImageRelation() const;
-    void setBaseOneImageRelation(const QString &baseOneImageRelation);
-
-    QString baseTwoImageRelation() const;
-    void setBaseTwoImageRelation(const QString &baseTwoImageRelation);
-
-    QString baseOneID() const;
-    void setBaseOneID(const QString &baseOneID);
-
-    QString baseTwoID() const;
-    void setBaseTwoID(const QString &baseTwoID);
+    QString registrationFile() const;
+    void setRegistrationFile(const QString &registrationFile);
 
 private:
     static glm::mat4 giveMVMatrix(float input[5][3]);
@@ -42,12 +30,8 @@ private:
     std::map<QString, Entity> container;
     QString m_basedir;
     QString m_modelPath;
-    QString m_baseOneImagePath;
-    QString m_baseTwoImagePath;
-    QString m_baseOneImageRelation;
-    QString m_baseTwoImageRelation;
-    QString m_baseOneID;
-    QString m_baseTwoID;
+    QString m_ptCloudPath;
+    QString m_registrationFile;
 };
 
 #endif // ENTITYMANAGER_H

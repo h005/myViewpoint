@@ -68,19 +68,16 @@
 #include "pointcloudwidget.h"
 #include "bothwidget.h"
 
-Window::Window(AlignWindow *mw, const QString &imagePath, const QString &modelPath, PointsMatchRelation &relation)
+Window::Window(AlignWindow *mw, const QString &modelPath, const QString &ptCloudPath, PointsMatchRelation &relation)
     : mainWindow(mw),
       relation(relation),
       m_modelpath(modelPath),
-      m_imagepath(imagePath)
+      m_ptCloudPath(ptCloudPath)
 {
-    QImage img(imagePath);
-    m_iwidth = img.width();
-    m_iheight = img.height();
 
     right = new GLWidget(modelPath, this);
     right->m_relation = &relation;
-    left = new PointCloudWidget("D:\\kxm-01.15.ply", this);
+    left = new PointCloudWidget(ptCloudPath.toStdString(), this);
     left->m_relation = &relation;
 
     alignBtn = new QPushButton(tr("Align && See"), this);
@@ -192,9 +189,8 @@ void Window::align()
 
     glm::mat4 model2ptCloud = glm::mat4(c*R);
     model2ptCloud[3] = glm::vec4(t, 1.f);
-    std::cout << glm::to_string(model2ptCloud) << std::endl;
 
-    BothWidget *w = new BothWidget("D:\\kxm-01.15.ply", m_modelpath.toStdString(), model2ptCloud);
+    BothWidget *w = new BothWidget(m_ptCloudPath.toStdString(), m_modelpath.toStdString(), model2ptCloud);
     w->show();
 }
 

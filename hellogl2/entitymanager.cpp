@@ -1,4 +1,4 @@
-#include "entitymanager.h"
+﻿#include "entitymanager.h"
 
 #include <iostream>
 #include <QtGlobal>
@@ -26,16 +26,11 @@ bool EntityManager::load()
     QSettings settings(QDir(m_basedir).filePath("config.ini"), QSettings::IniFormat);
     // 读取模型的信息
     m_modelPath = QDir::cleanPath(QDir(m_basedir).filePath(settings.value("model/path").toString()));
-    // 读取两幅配准图像的信息
-    m_baseOneID = settings.value("align/base_one_id").toString();
-    m_baseOneImagePath = QDir(m_basedir).filePath(m_baseOneID);
-    m_baseOneImageRelation = QDir(m_basedir).filePath(settings.value("align/base_one_point").toString());
-    m_baseTwoID = settings.value("align/base_two_id").toString();
-    m_baseTwoImagePath = QDir(m_basedir).filePath(m_baseTwoID);
-    m_baseTwoImageRelation = QDir(m_basedir).filePath(settings.value("align/base_two_point").toString());
+    m_ptCloudPath = QDir::cleanPath(QDir(m_basedir).filePath(settings.value("model/ptCloudPath").toString()));
+    // 读取配准文件
+    m_registrationFile = QDir::cleanPath(QDir(m_basedir).filePath(settings.value("align/points").toString()));
 
     container.clear();
-
     QFile listFile(QDir(m_basedir).filePath("list.txt"));
     if (!listFile.open(QIODevice::ReadOnly | QIODevice::Text))
         return false;
@@ -119,64 +114,14 @@ glm::mat4 EntityManager::giveMVMatrix(float input[][3])
 
     return matrix;
 }
-QString EntityManager::baseTwoID() const
+QString EntityManager::registrationFile() const
 {
-    return m_baseTwoID;
+    return m_registrationFile;
 }
 
-void EntityManager::setBaseTwoID(const QString &baseTwoID)
+void EntityManager::setRegistrationFile(const QString &registrationFile)
 {
-    m_baseTwoID = baseTwoID;
-}
-
-QString EntityManager::baseOneID() const
-{
-    return m_baseOneID;
-}
-
-void EntityManager::setBaseOneID(const QString &baseOneID)
-{
-    m_baseOneID = baseOneID;
-}
-
-QString EntityManager::baseTwoImageRelation() const
-{
-    return m_baseTwoImageRelation;
-}
-
-void EntityManager::setBaseTwoImageRelation(const QString &baseTwoImageRelation)
-{
-    m_baseTwoImageRelation = baseTwoImageRelation;
-}
-
-QString EntityManager::baseOneImageRelation() const
-{
-    return m_baseOneImageRelation;
-}
-
-void EntityManager::setBaseOneImageRelation(const QString &baseOneImageRelation)
-{
-    m_baseOneImageRelation = baseOneImageRelation;
-}
-
-QString EntityManager::baseTwoImagePath() const
-{
-    return m_baseTwoImagePath;
-}
-
-void EntityManager::setBaseTwoImagePath(const QString &baseTwoImagePath)
-{
-    m_baseTwoImagePath = baseTwoImagePath;
-}
-
-QString EntityManager::baseOneImagePath() const
-{
-    return m_baseOneImagePath;
-}
-
-void EntityManager::setBaseOneImagePath(const QString &baseOneImagePath)
-{
-    m_baseOneImagePath = baseOneImagePath;
+    m_registrationFile = registrationFile;
 }
 
 QString EntityManager::modelPath() const
@@ -187,6 +132,16 @@ QString EntityManager::modelPath() const
 void EntityManager::setModelPath(const QString &modelPath)
 {
     m_modelPath = modelPath;
+}
+
+QString EntityManager::ptCloudPath() const
+{
+    return m_ptCloudPath;
+}
+
+void EntityManager::setPtCloudPath(const QString &path)
+{
+    m_ptCloudPath = path;
 }
 
 

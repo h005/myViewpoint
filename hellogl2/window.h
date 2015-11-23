@@ -60,7 +60,7 @@ class Window : public QWidget
     Q_OBJECT
 
 public:
-    Window(AlignWindow *mw, const QString &imagePath, const QString &modelPath, PointsMatchRelation &releation);
+    Window(AlignWindow *mw, const QString &modelPath, const QString &ptCloudPath, PointsMatchRelation &releation);
     ~Window();
 
     QSize sizeHint() const Q_DECL_OVERRIDE;
@@ -84,9 +84,7 @@ private:
     PointsMatchRelation &relation;
 
     QString m_modelpath;
-    QString m_imagepath;
-    int m_iwidth, m_iheight;
-
+    QString m_ptCloudPath;
 };
 
 #endif

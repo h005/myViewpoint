@@ -51,7 +51,7 @@
 #include "TransformationUtils.h"
 
 
-AlignWindow::AlignWindow(QString imageHandler, QString modelPath, QString relationPath)
+AlignWindow::AlignWindow(QString modelPath, QString ptCloudPath, QString relationPath)
 {
     setAttribute(Qt::WA_DeleteOnClose);
     relation = new PointsMatchRelation(relationPath, modelPath);
@@ -59,7 +59,7 @@ AlignWindow::AlignWindow(QString imageHandler, QString modelPath, QString relati
         std::cout << "read failed" << std::endl;
     }
     qDebug() << relation->getModelPoints().size();
-    setCentralWidget(new Window(this, imageHandler, modelPath, *relation));
+    setCentralWidget(new Window(this, modelPath, ptCloudPath, *relation));
 }
 
 AlignWindow::~AlignWindow()

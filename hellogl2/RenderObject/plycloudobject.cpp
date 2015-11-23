@@ -25,7 +25,6 @@ bool PLYCloudObject::load()
     for (int i = 0; i < 13; i++)
         fgets(buf, sizeof(buf), fp);
 
-
     CloudPointInfo p;
     int index = 0;
     while (fscanf(fp, "%f %f %f %f %f %f %d %d %d", &p.x, &p.y,&p.z, &p.nx, &p.ny, &p.nz, &p.r, &p.g, &p.b) != EOF) {
@@ -44,8 +43,8 @@ bool PLYCloudObject::load()
         m_indices.push_back(index);
         index++;
 
-        if (index % 10000 == 0)
-            std::cout << "processd: " << index << std::endl;
+        if (index % 50000 == 0)
+            std::cout << "processed: " << index << std::endl;
     }
 
     fclose(fp);

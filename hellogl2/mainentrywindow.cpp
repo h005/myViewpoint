@@ -89,7 +89,7 @@ void MainEntryWindow::on_labelFirstImageBtn_clicked()
     if (manager != NULL) {
         ui->labelFirstImageBtn->setEnabled(false);
 
-        AlignWindow *window = new AlignWindow(manager->baseOneImagePath(), manager->modelPath(), manager->baseOneImageRelation());
+        AlignWindow *window = new AlignWindow(manager->modelPath(), manager->ptCloudPath(),manager->registrationFile());
         window->resize(window->sizeHint());
         window->show();
 
@@ -99,15 +99,6 @@ void MainEntryWindow::on_labelFirstImageBtn_clicked()
 
 void MainEntryWindow::on_labelSecondImageBtn_clicked()
 {
-    if (manager != NULL) {
-        ui->labelSecondImageBtn->setEnabled(false);
-
-        AlignWindow *window = new AlignWindow(manager->baseTwoImagePath(), manager->modelPath(), manager->baseTwoImageRelation());
-        window->resize(window->sizeHint());
-        window->show();
-
-        ui->labelSecondImageBtn->setEnabled(true);
-    }
 }
 
 QString target="./img0000.jpg";
@@ -159,7 +150,7 @@ void MainEntryWindow::on_openOffscreenRenderBtn_clicked()
 // 点云模型部分
 void MainEntryWindow::on_openPtCloudModelBtn_clicked()
 {
-    PointCloudWidget *w = new PointCloudWidget("D:\\kxm-01.15.ply");
+    PointCloudWidget *w = new PointCloudWidget(manager->ptCloudPath().toStdString());
     w->show();
 }
 
@@ -172,7 +163,7 @@ void MainEntryWindow::on_seeLabeledResultInPtCloudBtn_clicked()
     QSize imgSize = GetImageParamter(target);
     glm::mat4 wantProjMatrix = projectionMatrixWithFocalLength(want.f, imgSize.width(), imgSize.height(), 0.1f, 10.f);
 
-    PointCloudCaptureWidget *w = new PointCloudCaptureWidget("D:\\kxm-01.15.ply", want.mvMatrix, wantProjMatrix);
+    PointCloudCaptureWidget *w = new PointCloudCaptureWidget(manager->ptCloudPath().toStdString(), want.mvMatrix, wantProjMatrix);
     w->resize(imgSize);
     w->show();
     return;
@@ -220,7 +211,7 @@ void MainEntryWindow::on_openPtCloudLabeledWindowBtn_clicked()
 
     if (manager != NULL) {
         if (ptCloudOffscreenRender == NULL) {
-            ptCloudOffscreenRender = new PointCloudOffscreenRender("D:\\kxm-01.15.ply");
+            ptCloudOffscreenRender = new PointCloudOffscreenRender(manager->ptCloudPath().toStdString());
             ptCloudOffscreenRender->resize(QSize(800, 800));
         }
         ptCloudOffscreenRender->show();

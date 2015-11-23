@@ -1,4 +1,4 @@
-/****************************************************************************
+﻿/****************************************************************************
 **
 ** Copyright (C) 2014 Digia Plc and/or its subsidiary(-ies).
 ** Contact: http://www.qt-project.org/legal
@@ -50,7 +50,7 @@ class AlignWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    AlignWindow(QString imageHandler, QString modelPath, QString relationPath);
+    AlignWindow(QString modelPath, QString ptCloudPath, QString relationPath);
     ~AlignWindow();
 
 private:
