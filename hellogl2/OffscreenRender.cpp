@@ -85,13 +85,18 @@ void OffscreenRender::renderToImageFile(glm::mat4 mvMatrix, glm::mat4 projMatrix
         glReadBuffer(GL_BACK);
         glReadPixels(0,0,BUFFER_WIDTH,BUFFER_HEIGHT,GL_DEPTH_COMPONENT,GL_FLOAT, &img[0]);
 
+        GLfloat min_val = 2;
+        for (auto it = img.begin(); it != img.end(); it++)
+            min_val = std::min<GLfloat>(*it, min_val);
+
         // 创建图片并写入路径
         // 由于OpenGL坐标原点位于左下角，保存前需要沿着x轴翻转图片
         qDebug()<<"save to" << depthFilePath;
         cv::Mat image = cv::Mat(BUFFER_WIDTH, BUFFER_HEIGHT,CV_32FC1,&img[0]);
 
+        // 深度是非线性变换，大部分值会集中在1附近，为了前景看得更明显需要作区间转换
         cv::Mat ucharMat;
-        image.convertTo(ucharMat, CV_8UC1, 255.0);
+        image.convertTo(ucharMat, CV_8UC1, 255.0 / (1 - min_val), -255.0 * min_val / (1 - min_val));
 
         cv::Mat flipped;
         cv::flip(ucharMat, flipped, 0);
