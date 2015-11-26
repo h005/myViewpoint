@@ -30,6 +30,9 @@
 #include "pointcloudoffscreenrender.h"
 #include "lmdlt.h"
 
+#define P_NEAR 0.0001f
+#define P_FAR 30.f
+
 //#define USE_DEFAULT_PROJECTION
 
 MainEntryWindow::MainEntryWindow(QWidget *parent) :
@@ -98,7 +101,7 @@ void MainEntryWindow::on_labelFirstImageBtn_clicked()
     }
 }
 
-QString target="./img0000.jpg";
+QString target="./img0023.jpg";
 
 void MainEntryWindow::on_executePreviewTargetBtn_clicked()
 {
@@ -185,7 +188,7 @@ void MainEntryWindow::on_printMvPMatrixBtn_clicked()
             }
 
             QSize imgSize = GetImageParamter(*it);
-            glm::mat4 wantProjMatrix = projectionMatrixWithFocalLength(want.f, imgSize.width(), imgSize.height(), 0.1f, 10.f);
+            glm::mat4 wantProjMatrix = projectionMatrixWithFocalLength(want.f, imgSize.width(), imgSize.height(), P_NEAR, P_FAR);
             for (int i = 0; i < 4; i++) {
                 for (int j = 0; j < 4; j++)
                     matrixFile << wantProjMatrix[j][i] << " ";
@@ -231,7 +234,7 @@ void MainEntryWindow::on_saveLabeledImages_clicked()
                     Q_ASSERT(manager->getEntity(*it, want));
                     QSize imgSize = GetImageParamter(*it);
                     glm::mat4 wantMVMatrix = want.mvMatrix * model2ptCloud;
-                    glm::mat4 wantProjMatrix = projectionMatrixWithFocalLength(want.f, imgSize.width(), imgSize.height(), 0.1f, 10.f);
+                    glm::mat4 wantProjMatrix = projectionMatrixWithFocalLength(want.f, imgSize.width(), imgSize.height(), P_NEAR, P_FAR);
 
                     // 将图片生成到选定目录中，文件名与之前一致，但后缀改为.m.png，方便对照
                     QFileInfo file(*it);
@@ -277,7 +280,7 @@ void MainEntryWindow::on_seeLabeledResultInPtCloudBtn_clicked()
 
     // 获取图片宽高
     QSize imgSize = GetImageParamter(target);
-    glm::mat4 wantProjMatrix = projectionMatrixWithFocalLength(want.f, imgSize.width(), imgSize.height(), 0.1f, 10.f);
+    glm::mat4 wantProjMatrix = projectionMatrixWithFocalLength(want.f, imgSize.width(), imgSize.height(), P_NEAR, P_FAR);
 
     PointCloudCaptureWidget *w = new PointCloudCaptureWidget(manager->ptCloudPath().toStdString(), want.mvMatrix, wantProjMatrix);
     w->resize(imgSize);
@@ -305,7 +308,7 @@ void MainEntryWindow::on_savePtCloudLabeledResultBtn_clicked()
                 Entity want;
                 Q_ASSERT(manager->getEntity(*it, want));
                 QSize imgSize = GetImageParamter(*it);
-                glm::mat4 projMatrix = projectionMatrixWithFocalLength(want.f, imgSize.width(), imgSize.height(), 0.1f, 10.f);
+                glm::mat4 projMatrix = projectionMatrixWithFocalLength(want.f, imgSize.width(), imgSize.height(), P_NEAR, P_FAR);
 
                 // 将图片生成到选定目录中，文件名与之前一致，但后缀改为png，方便对照
                 QFileInfo file(*it);
