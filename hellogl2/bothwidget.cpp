@@ -1,4 +1,5 @@
 ﻿#include "bothwidget.h"
+#include <iostream>
 
 BothWidget::BothWidget(const std::string ptCloudPath, const std::string modelPath, glm::mat4 modelMV, QWidget *parent)
     : PointCloudWidget(ptCloudPath, parent),
@@ -9,6 +10,7 @@ BothWidget::BothWidget(const std::string ptCloudPath, const std::string modelPat
 
 BothWidget::~BothWidget()
 {
+    std::cout << "cleanup" << std::endl;
     makeCurrent();
     m_gModel.cleanUp();
     doneCurrent();

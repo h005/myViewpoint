@@ -3,6 +3,7 @@
 #include "baserenderobject.h"
 #include <string>
 #include <vector>
+#include <utility>
 #include <glm/glm.hpp>
 
 class PLYCloudObject: public BaseRenderObject
@@ -18,7 +19,7 @@ public:
     bool load() override;
     void bindDataToGL(GLuint args[], void *others=0) override;
     void draw() override;
-    glm::mat4 recommendScaleAndShift();
+    std::pair<GLfloat, glm::mat4> recommendScaleAndShift();
 
 private:
     std::string m_path;

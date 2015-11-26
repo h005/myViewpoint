@@ -14,7 +14,11 @@ PointCloudWidget::PointCloudWidget(const std::string &plyPath, QWidget *parent)
       m_renderObject(plyPath)
 {
     m_renderObject.load();
-    m_scaleAndShift = m_renderObject.recommendScaleAndShift();
+
+    // 为了模型上点的大小自适应，分离出移中和缩放矩阵
+    auto scaleAndShift = m_renderObject.recommendScaleAndShift();
+    m_scaleBeforeRender = scaleAndShift.first;
+    m_shiftBeforeRender = scaleAndShift.second;
 }
 
 PointCloudWidget::~PointCloudWidget()
@@ -103,7 +107,7 @@ void PointCloudWidget::paintGL()
             for (it = points.begin(); it != points.end(); it++) {
                 // multiple point's position
                 glm::mat4 pointMV = glm::translate(MV, *it);
-                pointMV = glm::scale(pointMV, glm::vec3(0.005, 0.005, 0.005));
+                pointMV = glm::scale(pointMV, glm::vec3(0.005 / m_scaleBeforeRender));
                 glUniformMatrix4fv(mvMatrixID, 1, GL_FALSE, glm::value_ptr(pointMV));
                 m_sphereObject.draw();
             }
@@ -118,7 +122,7 @@ void PointCloudWidget::resizeGL(int width, int height)
 
 glm::mat4 PointCloudWidget::getModelMatrix()
 {
-    return DragableWidget::getModelMatrix() * m_scaleAndShift;
+    return DragableWidget::getModelMatrix() * glm::scale(glm::mat4(1.f), glm::vec3(m_scaleBeforeRender)) * m_shiftBeforeRender;
 }
 
 int PointCloudWidget::addPoint(const QPoint &p) {

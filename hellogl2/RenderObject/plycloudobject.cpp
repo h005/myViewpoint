@@ -90,7 +90,7 @@ void PLYCloudObject::draw()
     glDrawElements(GL_POINTS, m_indices.size(), GL_UNSIGNED_INT, 0);
 }
 
-glm::mat4 PLYCloudObject::recommendScaleAndShift()
+std::pair<GLfloat, glm::mat4> PLYCloudObject::recommendScaleAndShift()
 {
     glm::vec3 scene_min = glm::vec3(1e10, 1e10, 1e10);
     glm::vec3 scene_max = glm::vec3(-1e10, -1e10, -1e10);
@@ -114,15 +114,13 @@ glm::mat4 PLYCloudObject::recommendScaleAndShift()
     tmp = std::max<float>(scene_max.x - scene_min.x, tmp);
     tmp = std::max<float>(scene_max.y - scene_min.y, tmp);
     tmp = std::max<float>(scene_max.z - scene_min.z, tmp);
-    float scale = 2.f / tmp;
+    GLfloat scale = 2.f / tmp;
 
     glm::vec3 scene_center;
     scene_center.x = (scene_min.x + scene_max.x) / 2.f;
     scene_center.y = (scene_min.y + scene_max.y) / 2.f;
     scene_center.z = (scene_min.z + scene_max.z) / 2.f;
 
-    // 缩放矩阵 * 移中矩阵，表示先移中后缩放
-    glm::mat4 scaleAndShift = glm::scale(glm::mat4(1.f), glm::vec3(scale, scale, scale));
-    scaleAndShift = glm::translate(scaleAndShift, glm::vec3(-scene_center.x, -scene_center.y, -scene_center.z));
-    return scaleAndShift;
+    glm::mat4 shiftTransform = glm::translate(glm::mat4(1.f), glm::vec3(-scene_center.x, -scene_center.y, -scene_center.z));
+    return std::make_pair(scale, shiftTransform);
 }
