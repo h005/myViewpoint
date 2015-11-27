@@ -30,7 +30,7 @@
 #include "pointcloudoffscreenrender.h"
 #include "lmdlt.h"
 
-#define P_NEAR 0.0001f
+#define P_NEAR 0.00001f
 #define P_FAR 30.f
 
 //#define USE_DEFAULT_PROJECTION
@@ -101,7 +101,7 @@ void MainEntryWindow::on_labelFirstImageBtn_clicked()
     }
 }
 
-QString target="./img0023.jpg";
+QString target="./img1104.jpg";
 
 void MainEntryWindow::on_executePreviewTargetBtn_clicked()
 {
