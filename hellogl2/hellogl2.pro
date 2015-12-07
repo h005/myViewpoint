@@ -9,7 +9,6 @@ HEADERS       = glwidget.h \
     entity.h \
     entitymanager.h \
     camerashowwidget.h \
-    axis.h \
     cvdlt.h \
     lmdlt.h \
     mainentrywindow.h \
@@ -25,7 +24,8 @@ HEADERS       = glwidget.h \
     dragablewidget.h \
     pointcloudcapturewidget.h \
     pointcloudoffscreenrender.h \
-    bothwidget.h
+    bothwidget.h \
+    RenderObject/axis.h
 SOURCES       = glwidget.cpp \
                 main.cpp \
                 window.cpp \
@@ -38,7 +38,6 @@ SOURCES       = glwidget.cpp \
     entity.cpp \
     entitymanager.cpp \
     camerashowwidget.cpp \
-    axis.cpp \
     expfit.cpp \
     cvdlt.cpp \
     lmdlt.cpp \
@@ -55,7 +54,8 @@ SOURCES       = glwidget.cpp \
     dragablewidget.cpp \
     pointcloudcapturewidget.cpp \
     pointcloudoffscreenrender.cpp \
-    bothwidget.cpp
+    bothwidget.cpp \
+    RenderObject/axis.cpp
 
 OTHER_FILES += shader/*.vert shader/*.frag
 

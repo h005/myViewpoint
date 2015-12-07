@@ -101,10 +101,41 @@ void MainEntryWindow::on_labelFirstImageBtn_clicked()
     }
 }
 
-QString target="./img1104.jpg";
+QString target="./img0006.jpg";
 
 void MainEntryWindow::on_executePreviewTargetBtn_clicked()
 {
+    // 获得模型到点云的变换
+    glm::mat4 model2ptCloud = getModel2PtCloudTrans();
+
+    Entity want;
+    Q_ASSERT(manager->getEntity(target, want));
+    QSize imgSize = GetImageParamter(target);
+    glm::mat4 wantMVMatrix = want.mvMatrix * model2ptCloud;
+
+    std::vector<glm::mat4> mvMatrixs;
+    mvMatrixs.push_back(wantMVMatrix);
+    CameraShowWidget *w = new CameraShowWidget(manager->modelPath(), imgSize.width() / 1.0 / imgSize.height(), mvMatrixs);
+    w->show();
+}
+
+
+void MainEntryWindow::on_showAllViewpoints_clicked()
+{
+    glm::mat4 model2ptCloud = getModel2PtCloudTrans();
+
+    std::vector<QString> list;
+    manager->getImageList(list);
+    std::vector<glm::mat4> mvMatrixs;
+    for (auto it = list.begin(); it != list.end(); it++) {
+        Entity want;
+        Q_ASSERT(manager->getEntity(*it, want));
+        glm::mat4 wantMVMatrix = want.mvMatrix * model2ptCloud;
+        mvMatrixs.push_back(wantMVMatrix);
+    }
+
+    CameraShowWidget *w = new CameraShowWidget(manager->modelPath(), 1.f, mvMatrixs);
+    w->show();
 }
 
 void MainEntryWindow::on_printMvMatrixBtn_clicked()

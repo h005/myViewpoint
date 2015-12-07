@@ -1,15 +1,15 @@
-#ifndef CAMERASHOWWIDGET_H
+﻿#ifndef CAMERASHOWWIDGET_H
 #define CAMERASHOWWIDGET_H
 
-
+#include <vector>
 #include <glm/glm.hpp>
 #include "glwidget.h"
-#include "axis.h"
+#include "RenderObject/axis.h"
 
 class CameraShowWidget: public GLWidget
 {
 public:
-    CameraShowWidget(const QString &modelPath, const float imgRatio, const glm::mat4 &mvMatrix, QWidget *parent = 0);
+    CameraShowWidget(const QString &modelPath, const float imgRatio, const std::vector<glm::mat4> &mvMatrixs, QWidget *parent = 0);
     ~CameraShowWidget();
 
     QSize minimumSizeHint() const Q_DECL_OVERRIDE;
@@ -22,7 +22,7 @@ protected:
 private:
     glm::vec3 m_eye, m_center, m_up;
     float m_imgRatio;
-    glm::mat4 m_estimatedMVMatrix;
+    std::vector<glm::mat4> m_estimatedMVMatrixs;
     Axis m_axis;
 
 };

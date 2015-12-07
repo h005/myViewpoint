@@ -1,4 +1,4 @@
-#include "axis.h"
+﻿#include "axis.h"
 
 #include <vector>
 #include <iostream>
@@ -8,7 +8,6 @@
 
 Axis::Axis()
 {
-    isInited = false;
 }
 
 Axis::~Axis()
@@ -16,22 +15,14 @@ Axis::~Axis()
 
 }
 
-void Axis::init(GLuint vertexPositionID)
+void Axis::bindDataToGL(GLuint args[], void *others)
 {
-    isInited = true;
-}
-
-void Axis::cleanup()
-{
-    if (!isInited) {
-        return;
-    }
-    isInited = false;
+    m_isInited = true;
 }
 
 void Axis::draw()
 {
-    if (!isInited) {
+    if (!m_isInited) {
         std::cout << "please call init() before draw()" << std::endl;
     }
 

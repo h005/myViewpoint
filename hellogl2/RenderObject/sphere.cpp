@@ -1,4 +1,4 @@
-#include "sphere.h"
+﻿#include "sphere.h"
 
 #include <vector>
 #include <iostream>
@@ -70,12 +70,12 @@ void Sphere::bindDataToGL(GLuint args[], void *others)
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLuint), &indices[0], GL_STATIC_DRAW);
 
     numsToDraw = indices.size();
-    isInited = true;
+    m_isInited = true;
 }
 
 void Sphere::draw()
 {
-    if (!isInited) {
+    if (!m_isInited) {
         std::cout << "please call init() before draw()" << std::endl;
     }
 

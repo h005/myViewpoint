@@ -9,11 +9,10 @@ public:
     Sphere();
     ~Sphere();
     void bindDataToGL(GLuint args[], void *others=0) override;
-    void draw();
+    void draw() override;
 
 private:
     int lats, longs;
-    bool isInited;
     GLuint m_vao, m_vboVertex, m_vboIndex;
     int numsToDraw;
 };

@@ -47,6 +47,8 @@ private slots:
 
     void on_openPtCloudLabeledWindowBtn_clicked();
 
+    void on_showAllViewpoints_clicked();
+
 private:
     Ui::MainEntryWindow *ui;
     EntityManager *manager;
