@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include <map>
+#include <utility>
 #include <GL/glew.h>
 #include <glm/glm.hpp>
 
@@ -56,7 +57,7 @@ public:
     void bindDataToGL();
     void cleanUp();
     void draw(const glm::mat4 &inheritModelView, const glm::mat4 &projection);
-    glm::mat4 recommandScaleAndShift();
+    std::pair<GLfloat, glm::mat4> recommandScaleAndShift();
 	~GModel();
 
 private:

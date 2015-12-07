@@ -1,5 +1,6 @@
 ﻿#include "camerashowwidget.h"
 
+#include <iostream>
 #include <glm/gtc/matrix_inverse.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/matrix_inverse.hpp>
@@ -55,7 +56,7 @@ void CameraShowWidget::paintGL()
     // 默认开启背面剔除:GL_CULL_FACE
 
     // 计算modelView矩阵
-    glm::mat4 modelViewMatrix = glm::scale(getModelViewMatrix(), glm::vec3(0.3, 0.3, 0.3));
+    glm::mat4 modelViewMatrix = getModelViewMatrix();
 
     // 绘制模型
     model.draw(modelViewMatrix, m_proj);
@@ -66,7 +67,7 @@ void CameraShowWidget::paintGL()
     GLuint mvMatrixID = glGetUniformLocation(m_sphereProgramID, "mvMatrix");
     for (auto it = m_estimatedMVMatrixs.begin(); it != m_estimatedMVMatrixs.end(); it++) {
         glm::mat4 axisMV = modelViewMatrix * (*it);
-        axisMV = glm::scale(axisMV, glm::vec3(0.3, 0.3, 0.3));
+        axisMV = glm::scale(axisMV, glm::vec3(0.5 * m_scaleBeforeRender));
         glUniformMatrix4fv(projMatrixID, 1, GL_FALSE, glm::value_ptr(m_proj));
         glUniformMatrix4fv(mvMatrixID, 1, GL_FALSE, glm::value_ptr(axisMV));
         m_axis.draw();
@@ -74,8 +75,15 @@ void CameraShowWidget::paintGL()
 
     for (auto it = m_estimatedMVMatrixs.begin(); it != m_estimatedMVMatrixs.end(); it++) {
         glm::mat4 axisMV = modelViewMatrix * (*it);
-        axisMV = glm::scale(axisMV, glm::vec3(0.3, 0.3, 0.3));
+        axisMV = glm::scale(axisMV, glm::vec3(0.5 * m_scaleBeforeRender));
         m_cameraModel.draw(axisMV, m_proj);
     }
 
+}
+
+glm::mat4 CameraShowWidget::getModelViewMatrix()
+{
+    // 缩放矩阵不能放在m_camera之前，否则是在相机坐标系下等比例缩放
+    // 会得到一致的渲染结果（除了离相机更近以外）
+    return glm::scale(m_camera, glm::vec3(0.3)) * getModelMatrix();
 }

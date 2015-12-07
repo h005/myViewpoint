@@ -19,6 +19,7 @@ public:
 protected:
     void initializeGL() Q_DECL_OVERRIDE;
     void paintGL() Q_DECL_OVERRIDE;
+    glm::mat4 getModelViewMatrix();
 
 private:
     glm::vec3 m_eye, m_center, m_up;

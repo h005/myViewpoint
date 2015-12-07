@@ -60,7 +60,9 @@ GLWidget::GLWidget(const QString &modelPath, QWidget *parent)
       m_sphereProgramID(0)
 {
     model.load(modelPath.toLocal8Bit().data());
-    m_scaleAndShift = model.recommandScaleAndShift();
+    auto scaleAndShift = model.recommandScaleAndShift();
+    m_scaleBeforeRender = scaleAndShift.first;
+    m_shiftBeforeRender = scaleAndShift.second;
 }
 
 GLWidget::~GLWidget()
@@ -158,7 +160,7 @@ void GLWidget::paintGL()
         for (it = points.begin(); it != points.end(); it++) {
             // multiple point's position
             glm::mat4 pointMV = glm::translate(modelViewMatrix, *it);
-            pointMV = glm::scale(pointMV, glm::vec3(0.5, 0.5, 0.5));
+            pointMV = glm::scale(pointMV, glm::vec3(0.015 / m_scaleBeforeRender));
             glUniformMatrix4fv(mvMatrixID, 1, GL_FALSE, glm::value_ptr(pointMV));
             sphere.draw();
         }
@@ -177,7 +179,7 @@ glm::mat4 GLWidget::getModelViewMatrix()
 
 glm::mat4 GLWidget::getModelMatrix()
 {
-    return DragableWidget::getModelMatrix() * m_scaleAndShift;
+    return DragableWidget::getModelMatrix() * glm::scale(glm::mat4(1.f), glm::vec3(m_scaleBeforeRender)) * m_shiftBeforeRender;
 }
 
 

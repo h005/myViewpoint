@@ -283,7 +283,7 @@ void GModel::bindDataToGL() {
 }
 
 
-void GModel::drawNormalizedModel(const glm::mat4 &inheritModelView, const glm::mat4 &projection) {
+void GModel::draw(const glm::mat4 &inheritModelView, const glm::mat4 &projection) {
     assert(scene != NULL);
     glPushAttrib(GL_ENABLE_BIT);
 
@@ -348,13 +348,11 @@ void GModel::drawNormalizedModel(const glm::mat4 &inheritModelView, const glm::m
 
 }
 
-glm::mat4 GModel::recommandScaleAndShift()
+std::pair<GLfloat, glm::mat4> GModel::recommandScaleAndShift()
 {
-    float scale = drawScale();
-    glm::mat4 transformation = glm::scale(glm::mat4(1.f), glm::vec3(scale, scale, scale));
-    // 缩放矩阵 * 移中矩阵，表示先移中后缩放
-    transformation = glm::translate(transformation, glm::vec3(-scene_center.x, -scene_center.y, -scene_center.z));
-    return transformation;
+    GLfloat scale = drawScale();
+    glm::mat4 shiftTransform = glm::translate(glm::mat4(1.f), glm::vec3(-scene_center.x, -scene_center.y, -scene_center.z));
+    return std::make_pair(scale, shiftTransform);
 }
 
 void GModel::cleanUp() {

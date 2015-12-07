@@ -80,7 +80,8 @@ protected:
 protected:
     glm::mat4 m_camera;
     glm::mat4 m_proj;
-    glm::mat4 m_scaleAndShift;
+    GLfloat m_scaleBeforeRender;
+    glm::mat4 m_shiftBeforeRender;
     GModel model;
     GLuint m_sphereProgramID = 0;
     Sphere sphere;
