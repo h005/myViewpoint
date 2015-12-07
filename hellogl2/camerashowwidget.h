@@ -5,6 +5,7 @@
 #include <glm/glm.hpp>
 #include "glwidget.h"
 #include "RenderObject/axis.h"
+#include "GModel.h"
 
 class CameraShowWidget: public GLWidget
 {
@@ -24,6 +25,7 @@ private:
     float m_imgRatio;
     std::vector<glm::mat4> m_estimatedMVMatrixs;
     Axis m_axis;
+    GModel m_cameraModel;
 
 };
 

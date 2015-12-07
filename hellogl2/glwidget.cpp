@@ -144,7 +144,7 @@ void GLWidget::paintGL()
     glm::mat4 modelViewMatrix = m_camera * getModelMatrix();
 
     // 绘制模型
-    model.drawNormalizedModel(modelViewMatrix, m_proj);
+    model.draw(modelViewMatrix, m_proj);
 
     // 绘制模型上被选择的点
     std::vector<glm::vec3> &points = m_relation->getModelPoints();

@@ -14,12 +14,18 @@ CameraShowWidget::CameraShowWidget(const QString &modelPath, const float imgRati
     for (auto it = mvMatrixs.begin(); it != mvMatrixs.end(); it++)
         m_estimatedMVMatrixs.push_back(glm::inverse(*it));
 
+    m_cameraModel.load("camera/camera_adjust.obj");
     //recoveryLookAtWithModelView(mvMatrix, m_eye, m_center, m_up);
 }
 
 CameraShowWidget::~CameraShowWidget()
 {
+    makeCurrent();
+
     // axis无需清理
+    model.cleanUp();
+
+    doneCurrent();
 }
 
 QSize CameraShowWidget::minimumSizeHint() const
@@ -36,6 +42,8 @@ void CameraShowWidget::initializeGL()
 {
     GLWidget::initializeGL();
 
+    m_cameraModel.bindDataToGL();
+
     GLuint args[] = {0};
     m_axis.bindDataToGL(args);
 }
@@ -50,7 +58,7 @@ void CameraShowWidget::paintGL()
     glm::mat4 modelViewMatrix = glm::scale(getModelViewMatrix(), glm::vec3(0.3, 0.3, 0.3));
 
     // 绘制模型
-    model.drawNormalizedModel(modelViewMatrix, m_proj);
+    model.draw(modelViewMatrix, m_proj);
 
     // 绘制坐标系
     glUseProgram(m_sphereProgramID);
@@ -62,6 +70,12 @@ void CameraShowWidget::paintGL()
         glUniformMatrix4fv(projMatrixID, 1, GL_FALSE, glm::value_ptr(m_proj));
         glUniformMatrix4fv(mvMatrixID, 1, GL_FALSE, glm::value_ptr(axisMV));
         m_axis.draw();
+    }
+
+    for (auto it = m_estimatedMVMatrixs.begin(); it != m_estimatedMVMatrixs.end(); it++) {
+        glm::mat4 axisMV = modelViewMatrix * (*it);
+        axisMV = glm::scale(axisMV, glm::vec3(0.3, 0.3, 0.3));
+        m_cameraModel.draw(axisMV, m_proj);
     }
 
 }

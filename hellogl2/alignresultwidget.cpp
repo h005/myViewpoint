@@ -43,6 +43,6 @@ void AlignResultWidget::paintGL()
     glm::mat4 modelViewMatrix = m_customMV * glm::rotate(glm::mat4(1.f), m_angle, m_rotateN) * m_baseRotate;
 
     // 绘制模型
-    model.drawNormalizedModel(modelViewMatrix, m_customProj);
+    model.draw(modelViewMatrix, m_customProj);
 }
 

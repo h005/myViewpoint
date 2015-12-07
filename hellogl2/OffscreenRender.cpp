@@ -49,7 +49,7 @@ void OffscreenRender::renderToImageFile(glm::mat4 mvMatrix, glm::mat4 projMatrix
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
     // 绘制模型
-    model.drawNormalizedModel(mvMatrix, projMatrix);
+    model.draw(mvMatrix, projMatrix);
 
     // 从fbo中读取
 

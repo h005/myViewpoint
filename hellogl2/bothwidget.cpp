@@ -27,6 +27,6 @@ void BothWidget::paintGL()
     PointCloudWidget::paintGL();
 
     glm::mat4 gModelVP = m_camera * getModelMatrix() * m_modelMV;
-    m_gModel.drawNormalizedModel(gModelVP, m_proj);
+    m_gModel.draw(gModelVP, m_proj);
 }
 

@@ -55,7 +55,7 @@ public:
 	bool hasModel();
     void bindDataToGL();
     void cleanUp();
-    void drawNormalizedModel(const glm::mat4 &inheritModelView, const glm::mat4 &projection);
+    void draw(const glm::mat4 &inheritModelView, const glm::mat4 &projection);
     glm::mat4 recommandScaleAndShift();
 	~GModel();
 
