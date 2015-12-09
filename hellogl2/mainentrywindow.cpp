@@ -29,6 +29,8 @@
 #include "pointcloudcapturewidget.h"
 #include "pointcloudoffscreenrender.h"
 #include "lmdlt.h"
+#include "lmpca.h"
+#include "externalimporter.h"
 
 #define P_NEAR 0.00001f
 #define P_FAR 30.f
@@ -390,4 +392,17 @@ glm::mat4 MainEntryWindow::getModel2PtCloudTrans()
     model2ptCloud[3] = glm::vec4(t, 1.f);
 
     return model2ptCloud;
+}
+
+void MainEntryWindow::on_pushButton_2_clicked()
+{
+    std::vector<glm::vec3> vertices;
+    ExternalImporter<float>::read_vertices(vertices, manager->modelPath().toStdString().c_str());
+    std::cout << glm::to_string(LMPCA::PCAWithModelPoints(vertices.size(), &vertices[0])) << std::endl;
+//    std::vector<glm::vec3> p;
+//    for (int i = -100; i <= 100; i++)
+//        for (int j = -50; j <= 50; j++)
+//            p.push_back(glm::vec3((float)i, 0, (float)j));
+
+//    std::cout << glm::to_string(LMPCA::PCAWithModelPoints(p.size(), &p[0])) << std::endl;
 }

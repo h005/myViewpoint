@@ -25,7 +25,9 @@ HEADERS       = glwidget.h \
     pointcloudcapturewidget.h \
     pointcloudoffscreenrender.h \
     bothwidget.h \
-    RenderObject/axis.h
+    RenderObject/axis.h \
+    lmpca.h \
+    externalimporter.h
 SOURCES       = glwidget.cpp \
                 main.cpp \
                 window.cpp \
@@ -55,7 +57,8 @@ SOURCES       = glwidget.cpp \
     pointcloudcapturewidget.cpp \
     pointcloudoffscreenrender.cpp \
     bothwidget.cpp \
-    RenderObject/axis.cpp
+    RenderObject/axis.cpp \
+    lmpca.cpp
 
 OTHER_FILES += shader/*.vert shader/*.frag
 

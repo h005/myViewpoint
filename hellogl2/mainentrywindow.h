@@ -49,6 +49,8 @@ private slots:
 
     void on_showAllViewpoints_clicked();
 
+    void on_pushButton_2_clicked();
+
 private:
     Ui::MainEntryWindow *ui;
     EntityManager *manager;
