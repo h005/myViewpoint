@@ -26,8 +26,8 @@ HEADERS       = glwidget.h \
     pointcloudoffscreenrender.h \
     bothwidget.h \
     RenderObject/axis.h \
-    lmpca.h \
-    externalimporter.h
+    externalimporter.h \
+    LMModelMainComponent.h
 SOURCES       = glwidget.cpp \
                 main.cpp \
                 window.cpp \
@@ -58,7 +58,7 @@ SOURCES       = glwidget.cpp \
     pointcloudoffscreenrender.cpp \
     bothwidget.cpp \
     RenderObject/axis.cpp \
-    lmpca.cpp
+    LMModelMainComponent.cpp
 
 OTHER_FILES += shader/*.vert shader/*.frag
 

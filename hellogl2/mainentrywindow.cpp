@@ -29,7 +29,7 @@
 #include "pointcloudcapturewidget.h"
 #include "pointcloudoffscreenrender.h"
 #include "lmdlt.h"
-#include "lmpca.h"
+#include "LMModelMainComponent.h"
 #include "externalimporter.h"
 
 #define P_NEAR 0.00001f
@@ -398,7 +398,16 @@ void MainEntryWindow::on_pushButton_2_clicked()
 {
     std::vector<glm::vec3> vertices;
     ExternalImporter<float>::read_vertices(vertices, manager->modelPath().toStdString().c_str());
-    std::cout << glm::to_string(LMPCA::PCAWithModelPoints(vertices.size(), &vertices[0])) << std::endl;
+    std::vector<glm::vec3> dirs = LMModelMainComponent::getModelMainComponent(vertices.size(), &vertices[0]);
+    auto firstN = dirs[0];
+    auto secondN = dirs[1];
+    auto thirdN = dirs[2];
+
+    std::cout << glm::to_string(firstN) << std::endl;
+    std::cout << glm::to_string(secondN) << std::endl;
+    std::cout << glm::to_string(thirdN) << std::endl;
+
+    std::cout << glm::dot(firstN, secondN) << std::endl;
 //    std::vector<glm::vec3> p;
 //    for (int i = -100; i <= 100; i++)
 //        for (int j = -50; j <= 50; j++)
