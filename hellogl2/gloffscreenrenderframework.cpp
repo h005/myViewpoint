@@ -31,6 +31,10 @@ GLOffscreenRenderFramework::~GLOffscreenRenderFramework()
         glDeleteRenderbuffers(1, &colorRenderBuffer);
         colorRenderBuffer = 0;
     }
+    if (secondRenderBuffer != 0) {
+        glDeleteRenderbuffers(1, &secondRenderBuffer);
+        secondRenderBuffer = 0;
+    }
     if (fboId != 0) {
         glDeleteFramebuffers(1, &fboId);
         fboId = 0;
@@ -86,6 +90,17 @@ void GLOffscreenRenderFramework::createOrUpdateFrameBufferObject()
     glBindRenderbuffer(GL_RENDERBUFFER, colorRenderBuffer);
     glRenderbufferStorage(GL_RENDERBUFFER, GL_RGBA, m_windowSize.width(), m_windowSize.height()); // 类型跟shader中的输出对应
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, colorRenderBuffer);
+
+    // 备用输出通道，在frag出现第二个输出的时候用到
+    if (secondRenderBuffer == 0)
+        glGenRenderbuffers(1, &secondRenderBuffer);
+    glBindRenderbuffer(GL_RENDERBUFFER, secondRenderBuffer);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_RGBA, m_windowSize.width(), m_windowSize.height()); // 类型跟shader中的输出对应
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_RENDERBUFFER, secondRenderBuffer);
+
+    // 默认渲染输出只支持一个变量，使用第二个变量前要显式开启第二个通道
+    GLenum fboBuffers[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1};
+    glDrawBuffers(2, fboBuffers);
 
     glBindFramebuffer(GL_FRAMEBUFFER,0);
     qDebug()<<"FramebufferName fbo...init"<<endl;

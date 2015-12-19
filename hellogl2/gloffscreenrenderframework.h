@@ -23,7 +23,7 @@ public:
 
 protected:
     void initializeGL() Q_DECL_OVERRIDE;
-    GLuint fboId = 0, depthRenderBuffer = 0, colorRenderBuffer = 0;
+    GLuint fboId = 0, depthRenderBuffer = 0, colorRenderBuffer = 0, secondRenderBuffer = 0;
     QSize m_windowSize;
     bool m_transparent;
     void createOrUpdateFrameBufferObject();
