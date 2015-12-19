@@ -67,17 +67,17 @@ void CameraShowWidget::paintGL()
     GLuint mvMatrixID = glGetUniformLocation(m_sphereProgramID, "mvMatrix");
     for (auto it = m_estimatedMVMatrixs.begin(); it != m_estimatedMVMatrixs.end(); it++) {
         glm::mat4 axisMV = modelViewMatrix * (*it);
-        axisMV = glm::scale(axisMV, glm::vec3(0.00005 / m_scaleBeforeRender));
+        axisMV = glm::scale(axisMV, glm::vec3(500.f));
         glUniformMatrix4fv(projMatrixID, 1, GL_FALSE, glm::value_ptr(m_proj));
         glUniformMatrix4fv(mvMatrixID, 1, GL_FALSE, glm::value_ptr(axisMV));
         m_axis.draw();
     }
 
-    for (auto it = m_estimatedMVMatrixs.begin(); it != m_estimatedMVMatrixs.end(); it++) {
-        glm::mat4 axisMV = modelViewMatrix * (*it);
-        axisMV = glm::scale(axisMV, glm::vec3(0.00005 / m_scaleBeforeRender));
-        m_cameraModel.draw(axisMV, m_proj);
-    }
+//    for (auto it = m_estimatedMVMatrixs.begin(); it != m_estimatedMVMatrixs.end(); it++) {
+//        glm::mat4 axisMV = modelViewMatrix * (*it);
+//        axisMV = glm::scale(axisMV, glm::vec3(0.00005 / m_scaleBeforeRender));
+//        m_cameraModel.draw(axisMV, m_proj);
+//    }
 
 }
 

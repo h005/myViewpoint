@@ -408,6 +408,17 @@ void MainEntryWindow::on_pushButton_2_clicked()
     std::cout << glm::to_string(thirdN) << std::endl;
 
     std::cout << glm::dot(firstN, secondN) << std::endl;
+
+    glm::mat3 R = glm::mat3(firstN, secondN, thirdN);
+    std::cout << glm::to_string(R) << std::endl;
+
+    glm::mat4 mv = glm::mat4(R);
+    mv[3][3] = 1.f;
+
+    std::vector<glm::mat4> mvMatrixs;
+    mvMatrixs.push_back(mv);
+    CameraShowWidget *w = new CameraShowWidget(manager->modelPath(), 1.0, mvMatrixs);
+    w->show();
 //    std::vector<glm::vec3> p;
 //    for (int i = -100; i <= 100; i++)
 //        for (int j = -50; j <= 50; j++)
