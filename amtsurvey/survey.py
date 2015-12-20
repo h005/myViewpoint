@@ -1,24 +1,29 @@
 #-*-coding:utf-8-*-
+import sys
+
+SLICE_N = 15
 
 class Question:
-    def __init__(self, item):
+    def __init__(self, item, idx):
         self.item = item
         self.url = 'http://dn-goodview.qbox.me/' + item
+        self.idx = idx
 
     def resp(self):
         template = \
 u'''
   <Question> 
     <QuestionIdentifier>%s</QuestionIdentifier>  
+    <IsRequired>true</IsRequired>
     <QuestionContent> 
-      <Text>%s</Text>  
+      <Text>Progress %d/%d: %s</Text>  
       <Binary> 
         <MimeType> 
           <Type>image</Type>  
           <SubType>jpg</SubType> 
         </MimeType>  
         <DataURL>%s</DataURL>  
-        <AltText>aaa</AltText> 
+        <AltText>Focus on the viewpoint of this photo</AltText> 
       </Binary> 
     </QuestionContent>  
     <AnswerSpecification> 
@@ -26,11 +31,11 @@ u'''
         <StyleSuggestion>radiobutton</StyleSuggestion>  
         <Selections> 
           <Selection> 
-            <SelectionIdentifier>good</SelectionIdentifier>  
+            <SelectionIdentifier>good[%s]</SelectionIdentifier>  
             <Text>I think the viewpoint is good</Text> 
           </Selection>  
           <Selection> 
-            <SelectionIdentifier>bad</SelectionIdentifier>  
+            <SelectionIdentifier>bad[%s]</SelectionIdentifier>  
             <Text>I think the viewpoint is bad</Text> 
           </Selection>
         </Selections> 
@@ -38,13 +43,13 @@ u'''
     </AnswerSpecification> 
   </Question>
 '''
-        return template % (self.item, self.item, self.url)
+        return template % (self.item, self.idx+1, SLICE_N, self.item, self.url, self.item, self.item)
 
 
 class Survey:
     def __init__(self, identity, items):
         self.identity = identity
-        self.questions = [Question(item) for item in items]
+        self.questions = [Question(item, idx) for idx, item in enumerate(items)]
 
     def question_resp(self):
         template = \
@@ -53,13 +58,14 @@ u'''<?xml version="1.0" encoding="utf-8"?>
   <Overview>
     <Title>Evaluate these photos' viewpoints</Title>
     <Text>Feel free to give us your opinions about these photos, focus on its' viewpoints</Text>
+    <Text>Each HIT has %d pictures :)</Text>
   </Overview>
   
   %s
 </QuestionForm>
 '''
         strs = [q.resp() for q in self.questions]
-        return template % '\n'.join(strs)
+        return template % (SLICE_N, '\n'.join(strs))
 
     def property_resp(self):
         template = \
@@ -84,10 +90,24 @@ hitlifetime:259200
 autoapprovaldelay:1296000'''
         return template % self.identity
 
-if __name__ == '__main__':
-    a = Survey('goodview10', ['kxm/img0000.jpg', 'kxm/img0001.jpg'])
-    with open('moviesurvey.properties', 'w') as f:
-        f.write(a.property_resp().encode('utf-8'))
 
-    with open('moviesurvey.question', 'w') as f:
-        f.write(a.question_resp().encode('utf-8'))
+if __name__ == '__main__':
+    idx = 0
+    items = []
+    #with open('list.txt', 'r') as inf:
+    for line in sys.stdin:
+        line = line.decode('utf-8').strip()
+        item = line.split()[0]
+        items.append(item)
+    for idx in xrange(0, len(items), SLICE_N):
+        end_idx = idx + SLICE_N
+        if end_idx >= len(items):
+            break
+        identity = 'goodview_%d-%d' % (idx, end_idx - 1)
+        a = Survey(identity, items[idx:end_idx])
+        with open(identity + '.properties', 'w') as f:
+            f.write(a.property_resp().encode('utf-8'))
+        with open(identity + '.question', 'w') as f:
+            f.write(a.question_resp().encode('utf-8'))
+        with open(identity + '.input', 'w') as f:
+            f.write('1\ntest is good')
