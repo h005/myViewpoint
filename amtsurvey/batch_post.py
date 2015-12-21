@@ -26,7 +26,7 @@ def prepare_env():
     os.environ['MTURK_CMD_HOME'] = AMT_DIR
 
 
-def walker(dir_path):
+def walker(dir_path, in_sandbox):
     if len(dir_path) == 0:
         dir_path = '.'
     
@@ -40,10 +40,11 @@ def walker(dir_path):
                 qf = os.path.join(abs_path, fname + '.question')
                 inf = os.path.join(abs_path, fname + '.input')
 
-                print pf, qf, inf
-
-                command = 'loadHITs -question %s -properties %s -input %s -sandbox' % (qf, pf, inf)
+                sandbox_opt = '-sandbox' if in_sandbox else ''
+                command = 'loadHITs -question %s -properties %s -input %s %s' % (qf, pf, inf, sandbox_opt)
                 wdir = os.path.join(AMT_DIR, 'bin')
+
+                print command
 
                 import subprocess
                 p = subprocess.Popen(command, cwd=wdir, stdout=subprocess.PIPE, shell=True)
@@ -61,7 +62,8 @@ if __name__ == '__main__':
     usage = 'Usage: %prog --dir=. [--force]' 
     parser = optparse.OptionParser(usage = usage)
     parser.add_option('-d', '--dir', dest='dir', default = '.', help="source file's dir")
+    parser.add_option('--production', dest='sandbox', default=True, action='store_false', help='run in production model')
     (options, args) = parser.parse_args()
 
     prepare_env()
-    walker(os.path.dirname(options.dir))
+    walker(os.path.dirname(options.dir), options.sandbox)
