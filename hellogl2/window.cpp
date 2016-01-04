@@ -187,6 +187,10 @@ void Window::align()
     float c;
     LMDLT::ModelRegistration(relation.getModelPoints().size(), &relation.getPtCloudPoints()[0], &relation.getModelPoints()[0], R, t, c);
 
+//    std::cout << glm::to_string(R) << std::endl;
+//    glm::mat3 aa = glm::transpose(R) * R;
+//    std::cout << c << std::endl;
+//    std::cout << glm::to_string(aa) << std::endl;
     glm::mat4 model2ptCloud = glm::mat4(c*R);
     model2ptCloud[3] = glm::vec4(t, 1.f);
 
