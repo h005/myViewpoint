@@ -59,7 +59,7 @@ if __name__ == '__main__':
     # For more details about optparser, Please visit:
     # https://docs.python.org/2/library/optparse.html#default-values
 
-    usage = 'Usage: %prog --dir=. [--force]' 
+    usage = 'Usage: %prog --dir=. [--production]' 
     parser = optparse.OptionParser(usage = usage)
     parser.add_option('-d', '--dir', dest='dir', default = '.', help="source file's dir")
     parser.add_option('--production', dest='sandbox', default=True, action='store_false', help='run in production model')

@@ -1,7 +1,9 @@
 #-*-coding:utf-8-*-
 import sys
 
-SLICE_N = 15
+SLICE_N = 30
+REWARD = 0.02
+ASSIGNMENTS = 10
 
 class Question:
     def __init__(self, item, idx):
@@ -72,8 +74,8 @@ u'''<?xml version="1.0" encoding="utf-8"?>
 u'''title:%s
 description:We need your opinions whether the viewpoints of photos are good or bad.
 keywords:viewpoint, evaluation 
-reward:0.01
-assignments:20
+reward:%f
+assignments:%d
 annotation:sample#command
 
 ######################################
@@ -88,17 +90,35 @@ hitlifetime:259200
 
 # this Auto Approval period is 60*60*24*15 = 15 days
 autoapprovaldelay:1296000'''
-        return template % self.identity
+        return template % (self.identity, REWARD, ASSIGNMENTS)
 
 
 if __name__ == '__main__':
+    import optparse
+    usage = 'Usage: %prog [--matrix-in] < kxm.txt'  
+    parser = optparse.OptionParser(usage = usage)
+    parser.add_option('--matrix-in', dest='matrix_in', default=False, action='store_true', help='using matrix format')
+    (options, args) = parser.parse_args()
+
     idx = 0
     items = []
-    #with open('list.txt', 'r') as inf:
-    for line in sys.stdin:
-        line = line.decode('utf-8').strip()
-        item = line.split()[0]
-        items.append(item)
+    if options.matrix_in:
+        # matrix format
+        while True:
+            first = sys.stdin.readline()
+            if not first:
+                break
+            first = first.strip()
+            for i in xrange(8):
+                sys.stdin.readline()
+            items.append(first)
+    else:
+        # list format
+        for line in sys.stdin:
+            line = line.decode('utf-8').strip()
+            item = line.split()[0]
+            items.append(item)
+
     for idx in xrange(0, len(items), SLICE_N):
         end_idx = idx + SLICE_N
         if end_idx >= len(items):
