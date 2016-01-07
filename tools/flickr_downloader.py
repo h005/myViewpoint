@@ -21,11 +21,11 @@ flickr = flickrapi.FlickrAPI(api_key, api_secret, format='json')
 
 if __name__ == '__main__':
     page_idx = 1
-    need = 1000
+    need = 2000
 
     while need > 0:
-        raw_json = flickr.photos.search(text='sydney opera house', sort='interestingness-desc', page=page_idx, has_geo='1')
-        #raw_json = flickr.photos.search(text='Burj Al Arab', sort='interestingness-desc')
+        #raw_json = flickr.photos.search(text='sydney opera house', sort='interestingness-desc', page=page_idx, has_geo='1')
+        raw_json = flickr.photos.search(text='Burj Al Arab', sort='interestingness-desc', page=page_idx)
         resp = json.loads(raw_json)
 
         page_idx = resp['photos']['page'] + 1
