@@ -37,7 +37,7 @@ if __name__ == '__main__':
         total_page = resp['photos']['pages']
 
         for photo in resp['photos']['photo']:
-            print need
+            print 'idx:', need
             print 'https://www.flickr.com/photos/%s/%s' % (photo['owner'], photo['id'])
             
             size_options = json.loads(flickr.photos.getSizes(photo_id=photo['id']))['sizes']['size']
