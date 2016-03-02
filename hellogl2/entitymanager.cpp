@@ -10,6 +10,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/matrix_inverse.hpp>
 #include <QSettings>
+#include <QDebug>
 
 EntityManager::EntityManager(const QString &basedir)
 {
@@ -27,11 +28,13 @@ bool EntityManager::load()
     // 读取模型的信息
     m_modelPath = QDir::cleanPath(QDir(m_basedir).filePath(settings.value("model/path").toString()));
     m_ptCloudPath = QDir::cleanPath(QDir(m_basedir).filePath(settings.value("model/ptCloudPath").toString()));
+
     // 读取配准文件
     m_registrationFile = QDir::cleanPath(QDir(m_basedir).filePath(settings.value("align/points").toString()));
 
     container.clear();
     QFile listFile(QDir(m_basedir).filePath("list.txt"));
+
     if (!listFile.open(QIODevice::ReadOnly | QIODevice::Text))
         return false;
     QFile bundleFile(QDir(m_basedir).filePath("bundle.out"));

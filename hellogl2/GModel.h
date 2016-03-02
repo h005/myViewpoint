@@ -20,7 +20,7 @@ void *imgData(const char *texturePath, int &width, int &height);
 class GModel
 {
     class MeshEntry {
-        static enum BUFFERS {
+        enum BUFFERS {
             VERTEX_BUFFER, TEXCOORD_BUFFER, NORMAL_BUFFER, TRIANGLE_INDEX_BUFFER, POLYGON_INDEX_BUFFER, BUFFER_COUNT
         };
     private:

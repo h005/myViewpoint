@@ -1,5 +1,5 @@
 ﻿#include <iostream>
-#include <gl/glew.h>
+#include <GL/glew.h>
 #include <math.h>
 #include <opencv2/opencv.hpp>
 #include <stdlib.h>
@@ -88,7 +88,7 @@ void recoveryLookAtWithModelView(
     // 另外，由于旋转矩阵R是正交矩阵，所以R^(-1) = R^T
     // 对正交矩阵用转置代替求逆能节省cpu资源
     eye = -glm::transpose(R) * t;
-    center = normalize(glm::transpose(R) * glm::vec3(0.f, 0.f, -1.f)) + eye;
+    center = glm::normalize(glm::transpose(R) * glm::vec3(0.f, 0.f, -1.f)) + eye;
     up = glm::normalize(glm::transpose(R) * glm::vec3(0.f, 1.f, 0.f));
 }
 

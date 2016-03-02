@@ -89,7 +89,7 @@ void MainEntryWindow::on_pushButton_clicked()
     }
 }
 
-
+// 模型对准
 void MainEntryWindow::on_labelFirstImageBtn_clicked()
 {
     if (manager != NULL) {
@@ -104,7 +104,7 @@ void MainEntryWindow::on_labelFirstImageBtn_clicked()
 }
 
 QString target="./img0006.jpg";
-
+// 预览标定结果
 void MainEntryWindow::on_executePreviewTargetBtn_clicked()
 {
     // 获得模型到点云的变换
@@ -121,7 +121,7 @@ void MainEntryWindow::on_executePreviewTargetBtn_clicked()
     w->show();
 }
 
-
+// 显示视点的聚集
 void MainEntryWindow::on_showAllViewpoints_clicked()
 {
     glm::mat4 model2ptCloud = getModel2PtCloudTrans();
@@ -139,7 +139,7 @@ void MainEntryWindow::on_showAllViewpoints_clicked()
     CameraShowWidget *w = new CameraShowWidget(manager->modelPath(), 1.f, mvMatrixs);
     w->show();
 }
-
+// 打印标定的MV矩阵
 void MainEntryWindow::on_printMvMatrixBtn_clicked()
 {
     // 输出MV
@@ -182,7 +182,7 @@ void MainEntryWindow::on_printMvMatrixBtn_clicked()
         matrixFile.close();
     }
 }
-
+// 打印标定的MVP矩阵
 void MainEntryWindow::on_printMvPMatrixBtn_clicked()
 {
     // 输出MV和P
@@ -284,7 +284,7 @@ void MainEntryWindow::on_saveLabeledImages_clicked()
             std::cout << "Please Open A Render Window First" << std::endl;
         }
 }
-
+// 打开渲染器
 void MainEntryWindow::on_openOffscreenRenderBtn_clicked()
 {
     if (manager != NULL) {

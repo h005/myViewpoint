@@ -2,7 +2,7 @@
 #define MAINENTRYWINDOW_H
 
 #include <QMainWindow>
-#include <Qstring>
+#include <QString>
 #include <glm/glm.hpp>
 
 namespace Ui {

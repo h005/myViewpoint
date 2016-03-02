@@ -15,8 +15,8 @@ static glm::mat3 RodtoR(const glm::vec3 &w)
     // 将向量表示的 绕轴旋转 转化成 3x3的旋转矩阵
     // ref http://en.wikipedia.org/wiki/Rodrigues'_rotation_formula#Matrix_notation
     float wLength = glm::length(w);
-    glm::mat3 K = matrixCross3(w) / wLength;
-    glm::mat3 R = glm::mat3(1.f) + sin(wLength) * K + (1-cos(wLength)) * K * K;
+    glm::mat3 K = glm::matrixCross3(w) / wLength;
+    glm::mat3 R = glm::mat3(1.f) + (float)sin(wLength) * K + (1.f - (float)cos(wLength)) * K * K;
     return R;
 }
 
@@ -29,7 +29,7 @@ static glm::vec3 RtoRod(const glm::mat3 &R)
 
     float trace = R[0][0] + R[1][1] + R[2][2];
     float wLength = acos((trace - 1) / 2);
-    glm::vec3 w = glm::vec3(R[1][2] - R[2][1], R[2][0] - R[0][2], R[0][1] - R[1][0]) * 1.f / 2.f / sin(wLength);
+    glm::vec3 w = glm::vec3(R[1][2] - R[2][1], R[2][0] - R[0][2], R[0][1] - R[1][0]) * 1.f / 2.f / (float)sin(wLength);
     return w * wLength;
 }
 
