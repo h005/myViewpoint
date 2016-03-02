@@ -1,8 +1,14 @@
 #-*-coding:utf-8-*-
 
-# monkey patching for socket and DNS resolve
-# pip install flickrapi
 # pip install pysocks
+# pip install flickrapi
+# pip install --upgrade urllib3
+# pip install pyopenssl ndg-httpsclient pyasn1
+# sudo apt-get install libffi-dev libssl-dev
+# https://www.phodal.com/blog/python-pip-openssl-issue/
+# https://urllib3.readthedocs.org/en/latest/security.html#snimissingwarning
+
+# monkey patching for socket and DNS resolve
 import urllib2
 import socket
 import socks
@@ -16,11 +22,11 @@ import flickrapi
 import json
 import sys
 import requests
-import piexif
 
 api_key = u'97ee5883c16a5c2811262eca5818cb42'
 api_secret = u'000dd6f561ce506b'
 flickr = flickrapi.FlickrAPI(api_key, api_secret, format='json')
+flickr2 = flickrapi.FlickrAPI(api_key, api_secret)
 
 if __name__ == '__main__':
     page_idx = 1
@@ -50,13 +56,24 @@ if __name__ == '__main__':
             url = largest_size['source']
             print 'file url:', url
 
-            #print flickr.photos.getExif(photo_id=photo['id'])
-
             # download image file
             r = requests.get(url)
             savefile = '%s@%s.jpg' % (photo['id'], photo['owner'])
             with open(savefile, 'wb') as f:
                 f.write(r.content)
+
+            try:
+                tags = flickr2.photos_getExif(photo_id=photo['id']).getiterator('exif')
+                with open('tags.xml', 'w') as tags_file:
+                    tags_file.write("<?xml version='1.0' encoding='UTF-8'?>\n<rdf:RDF xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#'>\n")
+                    for tag in tags:
+                        tags_file.write('<%s:%s>%s</%s:%s>\n'%(tag.attrib['tagspace'], tag.attrib['tag'], tag.getchildren()[0].text.strip().encode('utf-8'), tag.attrib['tagspace'], tag.attrib['tag']))
+                    tags_file.write('</rdf:RDF>\n')
+                os.system('exiftool -overwrite_original -tagsfromfile tags.xml %s' % savefile)
+            except:
+                pass
+
+            #print flickr.photos.getExif(photo_id=photo['id'])
 
             need -= 1
             if need == 0:
