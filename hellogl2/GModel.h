@@ -57,6 +57,7 @@ public:
     void bindDataToGL();
     void cleanUp();
     void draw(const glm::mat4 &inheritModelView, const glm::mat4 &projection);
+    glm::mat4 getInnerTransformation();
     std::pair<GLfloat, glm::mat4> recommandScaleAndShift();
 	~GModel();
 
@@ -64,5 +65,6 @@ private:
     float drawScale();
 	void apply_material(const aiMaterial *mtl);
     void recursive_create(const aiScene *sc, const aiNode* nd, const glm::mat4 &inheritedTransformation);
+
 };
 

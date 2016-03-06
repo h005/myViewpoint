@@ -51,6 +51,8 @@ private slots:
 
     void on_pushButton_2_clicked();
 
+    void on_cameraCalibration_clicked();
+
 private:
     Ui::MainEntryWindow *ui;
     EntityManager *manager;

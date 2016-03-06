@@ -16,8 +16,6 @@ using namespace std;
 
 GLuint LoadShaders(const char * vertex_file_path,const char * fragment_file_path){
 
-    std::cout << "shader "<< vertex_file_path << " fragment " << fragment_file_path << std::endl;
-
     // Create the shaders
     GLuint VertexShaderID = glCreateShader(GL_VERTEX_SHADER);
     GLuint FragmentShaderID = glCreateShader(GL_FRAGMENT_SHADER);

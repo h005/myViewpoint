@@ -5,6 +5,7 @@
 #include <QTextStream>
 #include <QStringList>
 #include <glm/gtx/string_cast.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include "GModel.h"
 
 PointsMatchRelation::PointsMatchRelation(QString filepath)
@@ -75,6 +76,48 @@ bool PointsMatchRelation::isPointsEqual()
     return ptCloudPoints.size() == modelPoints.size();
 }
 
+bool PointsMatchRelation::clearPoints()
+{
+    imgPoints.clear();
+    ptCloudPoints.clear();
+    modelPoints.clear();
+}
+
+bool PointsMatchRelation::ccaLoadFromFile()
+{
+    imgPoints.clear();
+    modelPoints.clear();
+
+    QFile file(filepath);
+    if( !file.open(QIODevice::ReadOnly | QIODevice::Text))
+        return false;
+
+
+//   float tmp[16] = {0.000926, 0.000000, 0.000000, 0.000000, 0.000000, 0.000926, 0.000000, 0.000000, 0.000000, 0.000000, 0.000926, 0.000000, -0.916903, -0.997222, 0.590807, 1.000000};
+    float tmp[16] = {0.036455, 0.000000, 0.000000, 0.000000, 0.000000, 0.036455, 0.000000, 0.000000, 0.000000, 0.000000, 0.036455, 0.000000, -0.916903, -0.997222, 0.590807, 1.000000};
+
+   glm::mat4 transform = glm::make_mat4(tmp);
+//   transform = glm::transpose(transform);
+
+//   std::cout <<  "transform" << std::endl;
+//   std::cout << glm::to_string(transform) << std::endl;
+
+    QTextStream in(&file);
+    while (!in.atEnd()) {
+        QString line = in.readLine();
+        QStringList tokens = line.split(' ', QString::SkipEmptyParts);
+        if (tokens.size() != 5)
+            return false;
+
+        glm::vec2 imgPoint = glm::vec2(tokens[0].toFloat(), tokens[1].toFloat());
+        glm::vec4 modelPoint = transform * glm::vec4(tokens[2].toFloat(), tokens[3].toFloat(), tokens[4].toFloat(), 1.f);
+        modelPoints.push_back(glm::vec3(modelPoint));
+        imgPoints.push_back(imgPoint);
+    }
+    file.close();
+    return true;
+}
+
 std::vector<glm::vec3>& PointsMatchRelation::getPtCloudPoints()
 {
     return ptCloudPoints;
@@ -92,6 +135,11 @@ std::vector<glm::vec3>& PointsMatchRelation::getModelPoints()
 void PointsMatchRelation::setModelPoints(const std::vector<glm::vec3> &value)
 {
     modelPoints = value;
+}
+
+std::vector<glm::vec2> &PointsMatchRelation::getImgPoints()
+{
+    return imgPoints;
 }
 
 

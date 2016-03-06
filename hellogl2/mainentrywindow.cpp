@@ -32,6 +32,8 @@
 #include "LMModelMainComponent.h"
 #include "externalimporter.h"
 
+#include "ccwindow.h"
+
 #define P_NEAR 0.00001f
 #define P_FAR 30.f
 
@@ -43,6 +45,9 @@ MainEntryWindow::MainEntryWindow(QWidget *parent) :
     manager(NULL)
 {
     ui->setupUi(this);
+
+    ui->pushButton->setShortcut(Qt::Key_L);
+
 }
 
 MainEntryWindow::~MainEntryWindow()
@@ -72,6 +77,8 @@ void MainEntryWindow::on_pushButton_clicked()
             tr("All files (*.*);;Config (*.ini)" ),
             &selfilter
     );
+
+//    QString fileName = "/home/h005/Documents/QtProject/viewpoint/model/config.ini";
 
     if (!fileName.isEmpty()) {
         QFileInfo file(fileName);
@@ -376,7 +383,7 @@ glm::mat4 MainEntryWindow::getModel2PtCloudTrans()
 {
     // 从文件中读取
     PointsMatchRelation relation(manager->registrationFile());
-    if (!relation.loadFromFile()) {
+    if (!relation.ccaLoadFromFile()) {
         std::cout << "read failed" << std::endl;
     }
 
@@ -425,4 +432,18 @@ void MainEntryWindow::on_pushButton_2_clicked()
 //            p.push_back(glm::vec3((float)i, 0, (float)j));
 
 //    std::cout << glm::to_string(LMPCA::PCAWithModelPoints(p.size(), &p[0])) << std::endl;
+}
+// 相机参数标定
+void MainEntryWindow::on_cameraCalibration_clicked()
+{
+    if(manager != NULL){
+        ui->cameraCalibration->setEnabled(false);
+
+        // initial ccWindow
+        QString imgPath = "/home/h005/Documents/QtProject/viewpoint/model/models/img0837.jpg";
+//        QString imgPath = "/home/h005/Documents/bigben/img0641.jpg";
+        CCWindow *ccWindow = new CCWindow(manager->modelPath(),imgPath,manager->registrationFile());
+        ccWindow->show();
+        ui->cameraCalibration->setEnabled(true);
+    }
 }

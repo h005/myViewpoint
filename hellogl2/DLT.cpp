@@ -165,11 +165,11 @@ cv::Mat phase1CalculateP(int imClick, int objClick, float imCords[][2], float ob
 	normalize_2D(imCords, (float(*)[2])cords2d, imClick, param2d);
     normalize_3D(objCords, (float(*)[3])cords3d, objClick, param3d);
 
-	/*printf("%f %f %f\n", param2d[0], param2d[1], param2d[2]);
+    printf("%f %f %f\n", param2d[0], param2d[1], param2d[2]);
 	printf("%f %f %f %f\n", param3d[0], param3d[1], param3d[2], param3d[3]);
 	for (int i = 0; i < imClick; i++) {
 	printf("%f %f %f %f %f\n", cords3d[i * 3 + 0], cords3d[i * 3 + 1], cords3d[i * 3 + 2], cords2d[i * 2 + 0], cords2d[i * 2 + 1]);
-	}*/
+    }
 
 	cv::Mat M = cv::Mat::zeros(3 * imClick, 12 + imClick, CV_32F);
 	for (int i = 0; i < imClick; i++) {
@@ -304,6 +304,7 @@ void DLTwithPoints(
     cv::Mat modelView, K;
     phase2ExtractParametersFromP(P, modelView, K);
 
+//    std::cout <<  "modelView Matrix"<< std::endl;
     std::cout << modelView << std::endl;
     std::cout << K << std::endl;
 

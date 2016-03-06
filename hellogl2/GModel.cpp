@@ -68,6 +68,11 @@ static void get_bounding_box_for_node(const aiScene *sc,
 	aiMatrix4x4 trafo = prev;
 	trafo *= nd->mTransformation;
 
+    for (int i = 0; i <  4; i++)
+        for (int j = 0; j < 4; j++)
+            std::cout << trafo[i][j] << " ";
+    std::cout << std::endl;
+
 	for (; n < nd->mNumMeshes; ++n) {
 		const aiMesh* mesh = sc->mMeshes[nd->mMeshes[n]];
 		for (t = 0; t < mesh->mNumVertices; ++t) {
@@ -94,6 +99,12 @@ static void get_bounding_box(const aiScene *sc, aiVector3D* min, aiVector3D* max
 {
 	// set identity
 	aiMatrix4x4 rootTransformation;
+
+    std::cout << "cmd ";
+    for (int i = 0; i <  4; i++)
+        for (int j = 0; j < 4; j++)
+            std::cout << rootTransformation[i][j] << " ";
+    std::cout << std::endl;
 
 	min->x = min->y = min->z = 1e10f;
 	max->x = max->y = max->z = -1e10f;
@@ -210,7 +221,9 @@ GModel::GModel()
 
 bool GModel::load(const char *modelPath) {
 	cleanUp();
-
+    std::cout << "GModel modelPath"<<std::endl;
+    std::cout << modelPath << std::endl;
+    std::cout << "GModel model path done" << std::endl;
 	pImporter = new Assimp::Importer();
 	scene = pImporter->ReadFile(modelPath, aiProcessPreset_TargetRealtime_Quality);
 	if (!scene) {
@@ -352,6 +365,10 @@ std::pair<GLfloat, glm::mat4> GModel::recommandScaleAndShift()
 {
     GLfloat scale = drawScale();
     glm::mat4 shiftTransform = glm::translate(glm::mat4(1.f), glm::vec3(-scene_center.x, -scene_center.y, -scene_center.z));
+    std::cout << "recommandScaleAndShift scale " << std::endl;
+    std::cout << scale << std::endl;
+    std::cout << "recommandScaleAndShift scene_center" << std::endl;
+    std::cout << scene_center.x << " " << scene_center.y << " " << scene_center.z << std::endl;
     return std::make_pair(scale, shiftTransform);
 }
 
@@ -582,3 +599,15 @@ void GModel::MeshEntry::render() {
 }
 
 
+glm::mat4 GModel::getInnerTransformation()
+{
+    float scale = drawScale();
+    glm::mat4 transformation = glm::scale(glm::mat4(1.f), glm::vec3(scale, scale, scale));
+    // 缩放矩阵 * 移中矩阵，表示先移中后缩放
+    transformation = glm::translate(transformation, glm::vec3(-scene_center.x, -scene_center.y, -scene_center.z));
+    std::cout << "getInnerTransformation scale " << std::endl;
+    std::cout << scale << std::endl;
+    std::cout << "getInnerTransformation scene_center" << std::endl;
+    std::cout << -scene_center.x << " " << -scene_center.y << " " << -scene_center.z << std::endl;
+    return transformation;
+}

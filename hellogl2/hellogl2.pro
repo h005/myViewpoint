@@ -27,7 +27,11 @@ HEADERS       = glwidget.h \
     bothwidget.h \
     RenderObject/axis.h \
     externalimporter.h \
-    LMModelMainComponent.h
+    LMModelMainComponent.h \
+    ccwindow.h \
+    ccmodelwidget.h \
+    imglabel.h
+
 SOURCES       = glwidget.cpp \
                 main.cpp \
                 window.cpp \
@@ -58,7 +62,10 @@ SOURCES       = glwidget.cpp \
     pointcloudoffscreenrender.cpp \
     bothwidget.cpp \
     RenderObject/axis.cpp \
-    LMModelMainComponent.cpp
+    LMModelMainComponent.cpp \
+    ccwindow.cpp \
+    ccmodelwidget.cpp \
+    imglabel.cpp
 
 OTHER_FILES += shader/*.vert shader/*.frag
 
