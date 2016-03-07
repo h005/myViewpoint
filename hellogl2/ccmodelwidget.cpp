@@ -121,6 +121,35 @@ void CCModelWidget::clearRelations()
     update();
 }
 
+void CCModelWidget::getScaleTranslateMatrix(glm::mat4 &cc_st)
+{
+    cc_st =  glm::scale(glm::mat4(1.f), glm::vec3(m_scaleBeforeRender)) * m_shiftBeforeRender;
+    return;
+}
+
+void CCModelWidget::getCCMVPmatrix(glm::mat4 &ccMV, glm::mat4 &ccProj)
+{
+    ccMV = getModelMatrix();
+    ccProj = m_proj;
+}
+
+void CCModelWidget::getSift()
+{
+    render2Image();
+    cc_sift = new CCSift(renderImage);
+//    cc_sift->showSift("renderImage");
+}
+
+CCSift *CCModelWidget::getCCSift()
+{
+    return cc_sift;
+}
+
+void CCModelWidget::siftMatch(CCSift *cc_sift)
+{
+    this->cc_sift->match(cc_sift);
+}
+
 void CCModelWidget::cleanup()
 {
     // 仅清理该子类生成的对象
@@ -132,6 +161,35 @@ void CCModelWidget::cleanup()
     }
     sphere.cleanup();
     model.cleanUp();
+
+    doneCurrent();
+}
+
+void CCModelWidget::render2Image()
+{
+    makeCurrent();
+
+    GLint viewport[4];
+    glGetIntegerv(GL_VIEWPORT,viewport);
+
+    GLfloat *img = new GLfloat[(viewport[2] - viewport[0]) * (viewport[3] - viewport[1])];
+    glReadBuffer(GL_BACK);
+    glReadPixels(0,
+                 0,
+                 viewport[2],
+                 viewport[3],
+                 GL_RGBA,
+                 GL_UNSIGNED_BYTE,
+                 img);
+
+    // 从这样构造出来的mat是BGRA的
+    renderImage = cv::Mat(viewport[3],viewport[2],CV_8UC4,img);
+    cv::flip(renderImage,renderImage,0);
+    // 这里要转一下，不然sift特征无法画在图像上
+    cv::cvtColor(renderImage,renderImage,CV_BGRA2BGR);
+//    cv::namedWindow("render");
+//    cv::imshow("render",renderImage);
+//    cv::waitKey(0);
 
     doneCurrent();
 }

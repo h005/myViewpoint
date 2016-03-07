@@ -28,10 +28,8 @@ bool EntityManager::load()
     // 读取模型的信息
     m_modelPath = QDir::cleanPath(QDir(m_basedir).filePath(settings.value("model/path").toString()));
     m_ptCloudPath = QDir::cleanPath(QDir(m_basedir).filePath(settings.value("model/ptCloudPath").toString()));
-    std::cout << "model Path "<< m_modelPath.toStdString()<< std::endl;
     // 读取配准文件
     m_registrationFile = QDir::cleanPath(QDir(m_basedir).filePath(settings.value("align/points").toString()));
-    std::cout << "registrationFile "<<m_registrationFile.toStdString()<<std::endl;
     container.clear();
     QFile listFile(QDir(m_basedir).filePath("list.txt"));
 

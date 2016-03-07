@@ -322,7 +322,7 @@ void DLTwithPoints(
             mvMatrix[j][i] = modelView.at<float>(i,j);
 
     // 使用生成的OpenGL投影矩阵
-    proj = constructProjectionMatrix(K, 0.1, 20, imgWidth, imgHeight);
+    proj = constructProjectionMatrix(K, 0.1, 10000, imgWidth, imgHeight);
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 4; j++) {
             projMatrix[j][i] = proj.at<float>(i, j);

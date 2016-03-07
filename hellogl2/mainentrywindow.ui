@@ -248,6 +248,38 @@
      <string>CameraCalibration</string>
     </property>
    </widget>
+   <widget class="QPushButton" name="ccConfig">
+    <property name="geometry">
+     <rect>
+      <x>130</x>
+      <y>50</y>
+      <width>89</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>cc config</string>
+    </property>
+   </widget>
+   <zorder>cameraCalibration</zorder>
+   <zorder>pushButton</zorder>
+   <zorder>labelFirstImageBtn</zorder>
+   <zorder>configFileLabel</zorder>
+   <zorder>changePreviewTargetBtn</zorder>
+   <zorder>executePreviewTargetBtn</zorder>
+   <zorder>saveLabeledImages</zorder>
+   <zorder>openOffscreenRenderBtn</zorder>
+   <zorder>printMvMatrixBtn</zorder>
+   <zorder>printMvPMatrixBtn</zorder>
+   <zorder>openPtCloudModelBtn</zorder>
+   <zorder>seeLabeledResultInPtCloudBtn</zorder>
+   <zorder>savePtCloudLabeledResultBtn</zorder>
+   <zorder>openPtCloudLabeledWindowBtn</zorder>
+   <zorder>line</zorder>
+   <zorder>line_2</zorder>
+   <zorder>showAllViewpoints</zorder>
+   <zorder>pushButton_2</zorder>
+   <zorder>ccConfig</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">

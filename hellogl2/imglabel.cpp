@@ -3,14 +3,22 @@
 #include <QKeyEvent>
 #include <QPaintEvent>
 #include <QPixmap>
+#include "opencv2/xfeatures2d.hpp"
 
 ImgLabel::ImgLabel(QString path, QWidget *parent) :
     QLabel(parent)
 {
+    cc_sift = NULL;
     this->path = path;
     readin();
     QPixmap pixmap = QPixmap::fromImage(img);
     this->setPixmap(pixmap);
+}
+
+ImgLabel::~ImgLabel()
+{
+    image.release();
+    delete cc_sift;
 }
 
 void ImgLabel::mousePressEvent(QMouseEvent *e)
@@ -91,7 +99,23 @@ void ImgLabel::setPoints(std::vector<glm::vec2> points)
 {
     this->points.clear();
     for(int i=0;i<points.size();i++)
-        this->points.push_back(QPointF(points[i][0],points[i][1]));
+        this->points.push_back(QPointF(points[i][0],image.rows - points[i][1]));
+}
+
+void ImgLabel::getSift()
+{
+    cc_sift = new CCSift(image);
+//    cc_sift->showSift("imgLabel");
+}
+
+CCSift *ImgLabel::getCCSift()
+{
+    return cc_sift;
+}
+
+void ImgLabel::siftMatch(CCSift *cc_sift)
+{
+    this->cc_sift->match(cc_sift);
 }
 
 void ImgLabel::readin()

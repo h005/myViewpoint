@@ -28,6 +28,7 @@ public:
 
 private:
     QString filepath;
+    glm::mat4 cc_st; // scale and translate matrix
     std::vector<glm::vec2> imgPoints;
     std::vector<glm::vec3> ptCloudPoints;
     std::vector<glm::vec3> modelPoints;

@@ -36,11 +36,13 @@ private slots:
     void exportInfo();
     void calibrate();
     void clearpoints();
+    void siftMatch();
 
 private:
     QPushButton *alignBtn;
     QPushButton *exportBtn;
     QPushButton *calibrateBtn;
+    QPushButton *siftMatchBtn;
     QPushButton *pointsClear;
     QScrollArea *scrollArea;
     ImgLabel *imgLabel;
@@ -55,6 +57,7 @@ private:
     QString modelPath;
     glm::mat4 cal_mv;
     glm::mat4 cal_proj;
+    glm::mat4 cc_st; // scale and translate matrix
 
 };
 

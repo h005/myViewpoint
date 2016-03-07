@@ -11,12 +11,14 @@
 #include <iostream>
 #include <vector>
 #include <glm/glm.hpp>
+#include "ccsift.h"
 
 class ImgLabel : public QLabel
 {
     Q_OBJECT
 public:
     ImgLabel(QString path,QWidget *parent = 0);
+    ~ImgLabel();
 
     void mousePressEvent(QMouseEvent *e);
     void mouseReleaseEvent(QMouseEvent *e);
@@ -32,6 +34,9 @@ public:
     void clearPoints();
     void setPoints(std::vector<glm::vec2> points);
 
+    void getSift();
+    CCSift* getCCSift();
+    void siftMatch(CCSift *cc_sift);
 private:
     void readin();
     QImage mat2QImage(cv::Mat &mat);
@@ -41,7 +46,7 @@ private:
     QImage img;
     cv::Mat image;
     std::vector<QPointF> points;
-//    std::vector<int> test;
+    CCSift *cc_sift;
 };
 
 #endif // IMGLABEL_H

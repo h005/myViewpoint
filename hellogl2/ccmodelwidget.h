@@ -6,6 +6,8 @@
 #include "dragablewidget.h"
 #include "GModel.h"
 #include "RenderObject/sphere.h"
+#include <opencv.hpp>
+#include "ccsift.h"
 
 QT_FORWARD_DECLARE_CLASS(QOpenGLShaderProgram)
 
@@ -27,9 +29,15 @@ public:
     void fixMVP(glm::mat4 &mv, glm::mat4 &proj);
     void clearRelations();
     PointsMatchRelation *m_relation;
+    void getScaleTranslateMatrix(glm::mat4 &cc_sc);
+    void getCCMVPmatrix(glm::mat4 &ccMV, glm::mat4 &ccProj);
 
+    void getSift();
+    CCSift* getCCSift();
+    void siftMatch(CCSift *cc_sift);
 private:
     void cleanup();
+    void render2Image();
 
 protected:
     void initializeGL() Q_DECL_OVERRIDE;
@@ -48,9 +56,12 @@ protected:
     GLuint m_sphereProgramID;
     Sphere sphere;
 
+    cv::Mat renderImage;
+
 private:
     bool m_transparent;
     bool f_fixMVP;
+    CCSift *cc_sift;
 };
 
 #endif // CCMODELWINDOW_H

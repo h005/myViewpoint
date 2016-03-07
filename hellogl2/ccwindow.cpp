@@ -5,6 +5,11 @@
 #include <glm/gtx/string_cast.hpp>
 #include "DLT.h"
 #include "alignresultwidget.h"
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <opencv.hpp>
+#include "opencv2/xfeatures2d.hpp"
+
 CCWindow::CCWindow()
 {
 
@@ -19,28 +24,30 @@ CCWindow::CCWindow(QString modelPath, QString imgPath, QString relationPath)
 
     setAttribute(Qt::WA_DeleteOnClose);
 
-    relation = new PointsMatchRelation(relationPath);
-    if(!relation->ccaLoadFromFile()){
-//        std::cout << "read failed"<<std::endl;
-    }
-
     alignBtn = new QPushButton(tr("Align && See"),this);
     exportBtn = new QPushButton(tr("ExportBtn"),this);
     calibrateBtn = new QPushButton(tr("Calibrate"),this);
     pointsClear = new QPushButton(tr("Clear"),this);
+    siftMatchBtn = new QPushButton(tr("SiftMatch"),this);
 
     scrollArea = new QScrollArea();
 
     imgLabel = new ImgLabel(imgPath);
-    imgLabel->setPoints(relation->getImgPoints());
 
     ccMW = new CCModelWidget(modelPath);
+    ccMW->getScaleTranslateMatrix(cc_st);
+    relation = new PointsMatchRelation(relationPath);
+    if(!relation->ccaLoadFromFile()){
+        std::cout << "relation file load failed" << std::endl;
+    }
+    imgLabel->setPoints(relation->getImgPoints());
     ccMW->m_relation = relation;
 
     connect(alignBtn,SIGNAL(clicked()),this,SLOT(align()));
     connect(exportBtn,SIGNAL(clicked()),this,SLOT(exportInfo()));
     connect(calibrateBtn,SIGNAL(clicked()),this,SLOT(calibrate()));
     connect(pointsClear,SIGNAL(clicked()),this,SLOT(clearpoints()));
+    connect(siftMatchBtn,SIGNAL(clicked()),this,SLOT(siftMatch()));
 
     QSizePolicy cellPolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
     cellPolicy.setHorizontalStretch(1);
@@ -50,6 +57,7 @@ CCWindow::CCWindow(QString modelPath, QString imgPath, QString relationPath)
     scrollArea->setWidget(imgLabel);
     // 中间一列放按钮
     QVBoxLayout *middleLayout = new QVBoxLayout;
+    middleLayout->addWidget(siftMatchBtn);
     middleLayout->addWidget(alignBtn);
     middleLayout->addWidget(exportBtn);
     middleLayout->addWidget(calibrateBtn);
@@ -155,23 +163,12 @@ void CCWindow::getDLTpoints3D(float points3D[][3])
 
 void CCWindow::align()
 {
-//    assert(imgLabel->getPoints().size() >=6 );
+    assert(imgLabel->getPoints().size() >=6 );
     calibrate();
 
-    std::cout << "cal_mv" << std::endl;
-    std::cout << glm::to_string(cal_mv) << std::endl;
-    std::cout << "cal_mv done" << std::endl;
-
-    std::cout << "cal_proj" << std::endl;
-    std::cout << glm::to_string(cal_proj) << std::endl;
-    std::cout << "cal_proj done" << std::endl;
     int imgWidth,imgHeight;
     imgLabel->getImageSize(imgWidth,imgHeight);
-    std::cout << "imgWidth " <<imgWidth << " imgHeight " << imgHeight << std::endl;
-//    ccMW->fixMVP(cal_mv,cal_proj);
-//    CCModelWidget *ccMWalign = new CCModelWidget(modelPath,cal_mv,cal_proj);
-//    ccMWalign->m_relation = relation;
-//    ccMWalign->show();
+
     AlignResultWidget *a =
             new AlignResultWidget(modelPath,
                                   imgWidth * 1.f / imgHeight,
@@ -200,51 +197,13 @@ void CCWindow::exportInfo()
 
 void CCWindow::calibrate()
 {
+    // DLT 检测相机参数的代码，2D图像中是的坐标系是x,y坐标系，即原点在图像的左下角
     int matchnum = imgLabel->getPoints().size();
-//    int matchnum = 14;
-//    float points2D[][2]={
-//        1639.34,1203.67,
-//        1594.72,1367.35,
-//        1660.48,945.74,
-//        427.45,1051.56,
-//        481.468,1208.63,
-//        807.927,729.145,
-//        422.752,704.344,
-//        988.771,939.126,
-//        1204.84,762.213,
-//        1641.69,791.974,
-//        1660.48,633.249,
-//        1134.39,768.827,
-//        993.468,598.527,
-//        984.073,125.658
-//    };
-//    float points3D[][3]={
-//        52.0976,41.3629,-1.78954,
-//        50.6093,49.6279,-3.31618,
-//        52.1027,41.3751,-30.5137,
-//        -1.84666,41.2625,-1.7354,
-//        -0.734041,49.392,-3.53277,
-//        15.3796,25.917,-3.74056,
-//        -0.287441,26.1702,-3.46828,
-//        25.3048,34.0983,-4.27587,
-//        34.9188,26.1183,-4.02905,
-//        50.0144,26.4673,-3.61542,
-//        50.2464,26.3998,-28.4199,
-//        24.7869,33.4816,-27.755,
-//        17.2732,25.6229,-28.5115,
-//        17.2796,0.154659,-28.0193
-//    };
 
     float points2D[matchnum][2];
     float points3D[matchnum][3];
     getDLTpoints2D(points2D);
     getDLTpoints3D(points3D);
-
-    std::cout << "points3D "<< std::endl;
-    for(int i=0;i<matchnum;i++)
-        std::cout << points3D[i][0] << " " << points3D[i][1] << " " << points3D[i][2]<< std::endl;
-    std::cout << "points3D done " << std::endl;
-
 
     int imgWidth, imgHeight;
     imgLabel->getImageSize(imgWidth,imgHeight);
@@ -254,11 +213,18 @@ void CCWindow::calibrate()
                   imgWidth,
                   imgHeight,
                   cal_mv,
-            cal_proj);
+                  cal_proj);
 }
 
 void CCWindow::clearpoints()
 {
     imgLabel->clearPoints();
     ccMW->clearRelations();
+}
+
+void CCWindow::siftMatch()
+{
+    imgLabel->getSift();
+    ccMW->getSift();
+    imgLabel->siftMatch(ccMW->getCCSift());
 }

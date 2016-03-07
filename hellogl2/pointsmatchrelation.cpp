@@ -9,7 +9,7 @@
 #include "GModel.h"
 
 PointsMatchRelation::PointsMatchRelation(QString filepath)
-    : filepath(filepath)
+    :filepath(filepath)
 {
     ptCloudPoints.clear();
     modelPoints.clear();
@@ -92,16 +92,6 @@ bool PointsMatchRelation::ccaLoadFromFile()
     if( !file.open(QIODevice::ReadOnly | QIODevice::Text))
         return false;
 
-
-//   float tmp[16] = {0.000926, 0.000000, 0.000000, 0.000000, 0.000000, 0.000926, 0.000000, 0.000000, 0.000000, 0.000000, 0.000926, 0.000000, -0.916903, -0.997222, 0.590807, 1.000000};
-    float tmp[16] = {0.036455, 0.000000, 0.000000, 0.000000, 0.000000, 0.036455, 0.000000, 0.000000, 0.000000, 0.000000, 0.036455, 0.000000, -0.916903, -0.997222, 0.590807, 1.000000};
-
-   glm::mat4 transform = glm::make_mat4(tmp);
-//   transform = glm::transpose(transform);
-
-//   std::cout <<  "transform" << std::endl;
-//   std::cout << glm::to_string(transform) << std::endl;
-
     QTextStream in(&file);
     while (!in.atEnd()) {
         QString line = in.readLine();
@@ -110,7 +100,8 @@ bool PointsMatchRelation::ccaLoadFromFile()
             return false;
 
         glm::vec2 imgPoint = glm::vec2(tokens[0].toFloat(), tokens[1].toFloat());
-        glm::vec4 modelPoint = transform * glm::vec4(tokens[2].toFloat(), tokens[3].toFloat(), tokens[4].toFloat(), 1.f);
+//        glm::vec4 modelPoint = cc_st * glm::vec4(tokens[2].toFloat(), tokens[3].toFloat(), tokens[4].toFloat(), 1.f);
+        glm::vec4 modelPoint = glm::vec4(tokens[2].toFloat(), tokens[3].toFloat(), tokens[4].toFloat(), 1.f);
         modelPoints.push_back(glm::vec3(modelPoint));
         imgPoints.push_back(imgPoint);
     }

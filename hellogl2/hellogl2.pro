@@ -30,7 +30,9 @@ HEADERS       = glwidget.h \
     LMModelMainComponent.h \
     ccwindow.h \
     ccmodelwidget.h \
-    imglabel.h
+    imglabel.h \
+    ccentitymanager.h \
+    ccsift.h
 
 SOURCES       = glwidget.cpp \
                 main.cpp \
@@ -65,7 +67,9 @@ SOURCES       = glwidget.cpp \
     LMModelMainComponent.cpp \
     ccwindow.cpp \
     ccmodelwidget.cpp \
-    imglabel.cpp
+    imglabel.cpp \
+    ccentitymanager.cpp \
+    ccsift.cpp
 
 OTHER_FILES += shader/*.vert shader/*.frag
 

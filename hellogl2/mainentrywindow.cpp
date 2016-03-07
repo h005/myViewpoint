@@ -13,6 +13,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/string_cast.hpp>
 
+#include "ccentitymanager.h"
 #include "entitymanager.h"
 #include "pointsmatchrelation.h"
 #include "alignwindow.h"
@@ -45,8 +46,9 @@ MainEntryWindow::MainEntryWindow(QWidget *parent) :
     manager(NULL)
 {
     ui->setupUi(this);
-
+    ccManager = NULL;
     ui->pushButton->setShortcut(Qt::Key_L);
+
 
 }
 
@@ -436,14 +438,40 @@ void MainEntryWindow::on_pushButton_2_clicked()
 // 相机参数标定
 void MainEntryWindow::on_cameraCalibration_clicked()
 {
-    if(manager != NULL){
+    if(ccManager != NULL){
         ui->cameraCalibration->setEnabled(false);
 
-        // initial ccWindow
-        QString imgPath = "/home/h005/Documents/QtProject/viewpoint/model/models/img0837.jpg";
-//        QString imgPath = "/home/h005/Documents/bigben/img0641.jpg";
-        CCWindow *ccWindow = new CCWindow(manager->modelPath(),imgPath,manager->registrationFile());
+        CCWindow *ccWindow = new CCWindow(ccManager->modelPath(),
+                                          ccManager->imagePath(),ccManager->relationPath());
         ccWindow->show();
         ui->cameraCalibration->setEnabled(true);
+    }
+}
+
+void MainEntryWindow::on_ccConfig_clicked()
+{
+    QString selfilter = tr("Config (*.ini)");
+    QString fileName = QFileDialog::getOpenFileName(
+                this,
+                QString("open config"),
+                QString(),
+                tr("All files (*.*);;Config (*.ini)"),
+                &selfilter
+                );
+
+    if(!fileName.isEmpty())
+    {
+        QFileInfo *file = new QFileInfo(fileName);
+        ccManager = new CCEntityManager(file->absoluteFilePath());
+
+        if(!ccManager->load())
+        {
+            QMessageBox::about(this,"hei hei ",fileName + " failed to open");
+            delete ccManager;
+            ccManager = NULL;
+            return;
+        }
+
+        ui->configFileLabel->setText(fileName);
     }
 }

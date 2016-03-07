@@ -39,18 +39,7 @@ void AlignResultWidget::paintGL()
     glEnable(GL_DEPTH_TEST);
     // 默认开启背面剔除:GL_CULL_FACE
 
-    float tmp[16] = {0.036455, 0.000000, 0.000000, 0.000000, 0.000000, 0.036455, 0.000000, 0.000000, 0.000000, 0.000000, 0.036455, 0.000000, -0.916903, -0.997222, 0.590807, 1.000000};
-    glm::mat4 transform = glm::make_mat4(tmp);
-
-    // 计算modelView矩阵
-//    glm::mat4 modelViewMatrix = m_customMV * glm::rotate(glm::mat4(1.f), m_angle, m_rotateN) * m_baseRotate * transform;
-    glm::mat4 modelViewMatrix = m_customMV * transform;
-
-    std::cout << "custom MV"<<std::endl;
-    std::cout << glm::to_string(m_customMV) << std::endl;
-    std::cout << "custom MV done" << std::endl;
-
     // 绘制模型
-    model.draw(modelViewMatrix, m_customProj);
+    model.draw(m_customMV, m_customProj);
 }
 

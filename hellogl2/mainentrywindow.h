@@ -10,6 +10,7 @@ class MainEntryWindow;
 }
 
 class EntityManager;
+class CCEntityManager;
 class OffscreenRender;
 class PointCloudOffscreenRender;
 
@@ -53,9 +54,12 @@ private slots:
 
     void on_cameraCalibration_clicked();
 
+    void on_ccConfig_clicked();
+
 private:
     Ui::MainEntryWindow *ui;
     EntityManager *manager;
+    CCEntityManager *ccManager;
     OffscreenRender *offscreenRender = NULL;
     PointCloudOffscreenRender *ptCloudOffscreenRender = NULL;
     glm::mat4 getModel2PtCloudTrans();
