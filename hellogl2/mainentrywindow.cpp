@@ -48,7 +48,7 @@ MainEntryWindow::MainEntryWindow(QWidget *parent) :
     ui->setupUi(this);
     ccManager = NULL;
     ui->pushButton->setShortcut(Qt::Key_L);
-
+    ui->ccConfig->setShortcut(Qt::Key_C);
 
 }
 
@@ -450,15 +450,15 @@ void MainEntryWindow::on_cameraCalibration_clicked()
 
 void MainEntryWindow::on_ccConfig_clicked()
 {
-    QString selfilter = tr("Config (*.ini)");
-    QString fileName = QFileDialog::getOpenFileName(
-                this,
-                QString("open config"),
-                QString(),
-                tr("All files (*.*);;Config (*.ini)"),
-                &selfilter
-                );
-
+//    QString selfilter = tr("Config (*.ini)");
+//    QString fileName = QFileDialog::getOpenFileName(
+//                this,
+//                QString("open config"),
+//                QString(),
+//                tr("All files (*.*);;Config (*.ini)"),
+//                &selfilter
+//                );
+    QString fileName = "/home/h005/Documents/QtProject/viewpoint/model/config.ini";
     if(!fileName.isEmpty())
     {
         QFileInfo *file = new QFileInfo(fileName);

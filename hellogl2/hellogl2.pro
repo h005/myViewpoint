@@ -32,7 +32,8 @@ HEADERS       = glwidget.h \
     ccmodelwidget.h \
     imglabel.h \
     ccentitymanager.h \
-    ccsift.h
+    ccsift.h \
+    ccsiftmatch.h
 
 SOURCES       = glwidget.cpp \
                 main.cpp \
@@ -69,7 +70,8 @@ SOURCES       = glwidget.cpp \
     ccmodelwidget.cpp \
     imglabel.cpp \
     ccentitymanager.cpp \
-    ccsift.cpp
+    ccsift.cpp \
+    ccsiftmatch.cpp
 
 OTHER_FILES += shader/*.vert shader/*.frag
 

@@ -136,6 +136,7 @@ void CCModelWidget::getCCMVPmatrix(glm::mat4 &ccMV, glm::mat4 &ccProj)
 void CCModelWidget::getSift()
 {
     render2Image();
+    // input RGB channels
     cc_sift = new CCSift(renderImage);
 //    cc_sift->showSift("renderImage");
 }
@@ -145,9 +146,20 @@ CCSift *CCModelWidget::getCCSift()
     return cc_sift;
 }
 
-void CCModelWidget::siftMatch(CCSift *cc_sift)
+cv::Mat &CCModelWidget::getRenderImage()
 {
-    this->cc_sift->match(cc_sift);
+    render2Image();
+    return renderImage;
+}
+
+void CCModelWidget::setPoints(std::vector<cv::Point2f> points)
+{
+    m_relation->clearPoints();
+    for(int i=0;i<points.size();i++)
+    {
+        QPoint p((int)points[i].x,(int)points[i].y);
+        addPoint(p);
+    }
 }
 
 void CCModelWidget::cleanup()
@@ -186,7 +198,7 @@ void CCModelWidget::render2Image()
     renderImage = cv::Mat(viewport[3],viewport[2],CV_8UC4,img);
     cv::flip(renderImage,renderImage,0);
     // 这里要转一下，不然sift特征无法画在图像上
-    cv::cvtColor(renderImage,renderImage,CV_BGRA2BGR);
+    cv::cvtColor(renderImage,renderImage,CV_RGBA2RGB);
 //    cv::namedWindow("render");
 //    cv::imshow("render",renderImage);
 //    cv::waitKey(0);

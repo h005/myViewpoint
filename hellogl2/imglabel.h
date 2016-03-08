@@ -13,6 +13,7 @@
 #include <glm/glm.hpp>
 #include "ccsift.h"
 
+//  imglabel 中的mat在readin之后是RGB格式的
 class ImgLabel : public QLabel
 {
     Q_OBJECT
@@ -33,10 +34,13 @@ public:
     void getImageSize(int &width,int &height);
     void clearPoints();
     void setPoints(std::vector<glm::vec2> points);
+    void setPoints(std::vector<cv::Point2f> points);
 
     void getSift();
     CCSift* getCCSift();
-    void siftMatch(CCSift *cc_sift);
+
+    cv::Mat& getImage();
+
 private:
     void readin();
     QImage mat2QImage(cv::Mat &mat);

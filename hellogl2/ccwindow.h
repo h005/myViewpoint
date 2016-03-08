@@ -9,6 +9,7 @@
 #include <QFileInfo>
 #include "imglabel.h"
 #include "ccmodelwidget.h"
+#include "ccsiftmatch.h"
 
 class PointsMatchRelation;
 class EntityManager;
@@ -58,6 +59,7 @@ private:
     glm::mat4 cal_mv;
     glm::mat4 cal_proj;
     glm::mat4 cc_st; // scale and translate matrix
+    CCSiftMatch *ccSiftMatch;
 
 };
 

@@ -34,7 +34,9 @@ public:
 
     void getSift();
     CCSift* getCCSift();
-    void siftMatch(CCSift *cc_sift);
+    cv::Mat& getRenderImage();
+    void setPoints(std::vector<cv::Point2f> points);
+
 private:
     void cleanup();
     void render2Image();

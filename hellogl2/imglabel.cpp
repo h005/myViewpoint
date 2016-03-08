@@ -100,12 +100,21 @@ void ImgLabel::setPoints(std::vector<glm::vec2> points)
     this->points.clear();
     for(int i=0;i<points.size();i++)
         this->points.push_back(QPointF(points[i][0],image.rows - points[i][1]));
+    update();
+}
+
+void ImgLabel::setPoints(std::vector<cv::Point2f> points)
+{
+    this->points.clear();
+    for(int i=0;i<points.size();i++)
+        this->points.push_back(QPointF(points[i].x,points[i].y));
+    update();
 }
 
 void ImgLabel::getSift()
 {
     cc_sift = new CCSift(image);
-//    cc_sift->showSift("imgLabel");
+    cc_sift->showSift("imgLabel");
 }
 
 CCSift *ImgLabel::getCCSift()
@@ -113,9 +122,9 @@ CCSift *ImgLabel::getCCSift()
     return cc_sift;
 }
 
-void ImgLabel::siftMatch(CCSift *cc_sift)
+cv::Mat &ImgLabel::getImage()
 {
-    this->cc_sift->match(cc_sift);
+    return image;
 }
 
 void ImgLabel::readin()

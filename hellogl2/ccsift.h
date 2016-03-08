@@ -3,6 +3,8 @@
 
 #include <opencv.hpp>
 #include <opencv2/xfeatures2d.hpp>
+#include <features2d.hpp>
+#include <opencv2/features2d/features2d.hpp>
 
 class CCSift
 {
@@ -13,8 +15,6 @@ public:
     ~CCSift();
 
     void showSift(std::string windowName);
-
-    void match(CCSift *sift);
 
     cv::Mat& getDescriptors();
     cv::Mat& getImage();

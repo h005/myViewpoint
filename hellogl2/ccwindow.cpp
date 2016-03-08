@@ -17,6 +17,7 @@ CCWindow::CCWindow()
 
 CCWindow::CCWindow(QString modelPath, QString imgPath, QString relationPath)
 {
+    ccSiftMatch = NULL;
     this->modelPath = modelPath;
     imgFile = new QFileInfo(imgPath);
     modelFile = new QFileInfo(modelPath);
@@ -29,6 +30,9 @@ CCWindow::CCWindow(QString modelPath, QString imgPath, QString relationPath)
     calibrateBtn = new QPushButton(tr("Calibrate"),this);
     pointsClear = new QPushButton(tr("Clear"),this);
     siftMatchBtn = new QPushButton(tr("SiftMatch"),this);
+
+    calibrateBtn->setEnabled(false);
+    alignBtn->setEnabled(false);
 
     scrollArea = new QScrollArea();
 
@@ -224,7 +228,12 @@ void CCWindow::clearpoints()
 
 void CCWindow::siftMatch()
 {
-    imgLabel->getSift();
-    ccMW->getSift();
-    imgLabel->siftMatch(ccMW->getCCSift());
+    ccSiftMatch = new CCSiftMatch(imgLabel->getImage(),
+                                  ccMW->getRenderImage());
+    ccSiftMatch->match();
+    imgLabel->setPoints(ccSiftMatch->getImagePoints());
+    ccMW->setPoints(ccSiftMatch->getModelPoints());
+
+    calibrateBtn->setEnabled(true);
+    alignBtn->setEnabled(true);
 }
