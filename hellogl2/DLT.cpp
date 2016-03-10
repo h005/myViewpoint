@@ -121,7 +121,7 @@ static cv::Mat removeEpsilon(cv::Mat &matrix) {
 	return result;
 }
 
-static cv::Mat constructProjectionMatrix(const cv::Mat &K, GLfloat n, GLfloat f, int iwidth, int iheight) {
+cv::Mat constructProjectionMatrix(const cv::Mat &K, GLfloat n, GLfloat f, int iwidth, int iheight) {
 	// Hacked from this: http://www.songho.ca/opengl/gl_projectionmatrix.html
 
 	// 先将NDC中的z和w分量计算好，其中w = -z
@@ -306,6 +306,7 @@ void DLTwithPoints(
 
 //    std::cout <<  "modelView Matrix"<< std::endl;
     std::cout << modelView << std::endl;
+    std::cout << "K matrix" << std::endl;
     std::cout << K << std::endl;
 
     // LM优化方法目前不靠谱
@@ -322,7 +323,7 @@ void DLTwithPoints(
             mvMatrix[j][i] = modelView.at<float>(i,j);
 
     // 使用生成的OpenGL投影矩阵
-    proj = constructProjectionMatrix(K, 0.1, 10000, imgWidth, imgHeight);
+    proj = constructProjectionMatrix(K, 0.1, 1000000000, imgWidth, imgHeight);
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 4; j++) {
             projMatrix[j][i] = proj.at<float>(i, j);

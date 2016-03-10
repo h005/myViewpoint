@@ -22,6 +22,14 @@ public:
                                   glm::mat3 &R,
                                   glm::vec3 &t,
                                   float &c);
+
+    static void CCalibrate(int matchnum,
+                           glm::vec2 imgPoints[],
+                           glm::vec2 imgSize,
+                           glm::vec3 modelPoints[],
+                           glm::mat3 &R,
+                           glm::vec3 &t,
+                           float &c);
 };
 
 #endif // LMDLT_H

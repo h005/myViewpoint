@@ -94,6 +94,45 @@ int CCModelWidget::addPoint(const QPoint &p)
     return points.size();
 }
 
+int CCModelWidget::addPoints(std::vector<cv::Point2f> pts, std::vector<int> &index)
+{
+    makeCurrent();
+    std::vector<glm::vec3> &points = m_relation->getModelPoints();
+    index.clear();
+    for(int i=0;i<pts.size();i++)
+    {
+        QPointF p(pts[i].x,pts[i].y);
+        GLfloat x = p.x();
+        GLfloat y = p.y();
+
+        GLint viewport[4];
+        GLdouble object_x, object_y, object_z;
+        GLfloat realy, winZ = 0;
+
+        glGetIntegerv(GL_VIEWPORT,viewport);
+        realy = (GLfloat)viewport[3] - (GLfloat)y;
+        glReadBuffer(GL_BACK);
+        glReadPixels(x,int(realy),1,1,GL_DEPTH_COMPONENT,GL_FLOAT,&winZ);
+        if (winZ < 1 - 1e-5) {
+            glm::mat4 modelViewMatrix = getModelViewMatrix();
+            glm::dmat4 mvDouble, projDouble;
+            for (int i = 0; i < 4; i++) {
+                for (int j = 0; j < 4; j++) {
+                    mvDouble[i][j] = modelViewMatrix[i][j];
+                    projDouble[i][j] = m_proj[i][j];
+                }
+            }
+            gluUnProject((GLdouble)x,(GLdouble)realy,winZ, glm::value_ptr(mvDouble), glm::value_ptr(projDouble),viewport,&object_x,&object_y,&object_z);
+            std::cout << "Un project " << i <<" "<< x << " " << y << " 3d points " << object_x << " " << object_y << " " << object_z << std::endl;
+            points.push_back(glm::vec3(object_x, object_y, object_z));
+            index.push_back(i);
+        }
+    }
+    doneCurrent();
+    update();
+    return points.size();
+}
+
 bool CCModelWidget::removeLastPoint()
 {
     std::vector<glm::vec3> &points = m_relation->getModelPoints();
@@ -152,14 +191,10 @@ cv::Mat &CCModelWidget::getRenderImage()
     return renderImage;
 }
 
-void CCModelWidget::setPoints(std::vector<cv::Point2f> points)
+void CCModelWidget::setPoints(std::vector<cv::Point2f> points, std::vector<int> &index)
 {
     m_relation->clearPoints();
-    for(int i=0;i<points.size();i++)
-    {
-        QPoint p((int)points[i].x,(int)points[i].y);
-        addPoint(p);
-    }
+    addPoints(points,index);
 }
 
 void CCModelWidget::cleanup()

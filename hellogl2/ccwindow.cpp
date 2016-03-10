@@ -9,6 +9,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <opencv.hpp>
 #include "opencv2/xfeatures2d.hpp"
+#include "lmdlt.h"
 
 CCWindow::CCWindow()
 {
@@ -21,18 +22,21 @@ CCWindow::CCWindow(QString modelPath, QString imgPath, QString relationPath)
     this->modelPath = modelPath;
     imgFile = new QFileInfo(imgPath);
     modelFile = new QFileInfo(modelPath);
-    relationFile = new QFileInfo(relationPath);
+    relationFile = new QFileInfo(relationPath + "/" + imgFile->baseName() + ".txt");
+
+    std::cout << "relation file info "<<relationFile->absoluteFilePath().toStdString() << std::endl;
 
     setAttribute(Qt::WA_DeleteOnClose);
 
     alignBtn = new QPushButton(tr("Align && See"),this);
+    alignDLTBtn = new QPushButton(tr("Aligen DLT"),this);
     exportBtn = new QPushButton(tr("ExportBtn"),this);
     calibrateBtn = new QPushButton(tr("Calibrate"),this);
     pointsClear = new QPushButton(tr("Clear"),this);
     siftMatchBtn = new QPushButton(tr("SiftMatch"),this);
 
-    calibrateBtn->setEnabled(false);
-    alignBtn->setEnabled(false);
+//    calibrateBtn->setEnabled(false);
+//    alignBtn->setEnabled(false);
 
     scrollArea = new QScrollArea();
 
@@ -40,7 +44,7 @@ CCWindow::CCWindow(QString modelPath, QString imgPath, QString relationPath)
 
     ccMW = new CCModelWidget(modelPath);
     ccMW->getScaleTranslateMatrix(cc_st);
-    relation = new PointsMatchRelation(relationPath);
+    relation = new PointsMatchRelation(relationFile->absoluteFilePath());
     if(!relation->ccaLoadFromFile()){
         std::cout << "relation file load failed" << std::endl;
     }
@@ -48,6 +52,7 @@ CCWindow::CCWindow(QString modelPath, QString imgPath, QString relationPath)
     ccMW->m_relation = relation;
 
     connect(alignBtn,SIGNAL(clicked()),this,SLOT(align()));
+    connect(alignDLTBtn,SIGNAL(clicked()),this,SLOT(alignDLT()));
     connect(exportBtn,SIGNAL(clicked()),this,SLOT(exportInfo()));
     connect(calibrateBtn,SIGNAL(clicked()),this,SLOT(calibrate()));
     connect(pointsClear,SIGNAL(clicked()),this,SLOT(clearpoints()));
@@ -63,6 +68,7 @@ CCWindow::CCWindow(QString modelPath, QString imgPath, QString relationPath)
     QVBoxLayout *middleLayout = new QVBoxLayout;
     middleLayout->addWidget(siftMatchBtn);
     middleLayout->addWidget(alignBtn);
+    middleLayout->addWidget(alignDLTBtn);
     middleLayout->addWidget(exportBtn);
     middleLayout->addWidget(calibrateBtn);
     middleLayout->addWidget(pointsClear);
@@ -165,9 +171,74 @@ void CCWindow::getDLTpoints3D(float points3D[][3])
     }
 }
 
+void CCWindow::calibrateLevmar(glm::mat3 &R, glm::vec3 &t, float &c)
+{
+    int num = imgLabel->numPoints();
+    int width,height;
+    imgLabel->getImageSize(width,height);
+    std::vector<QPointF> pts = imgLabel->getPoints();
+    // convert to std::vector<glm::vec2>
+    glm::vec2 vecPts[num];
+    for(int i=0;i<num;i++)
+    {
+        vecPts[i].x = pts[i].x();
+        vecPts[i].y = height - pts[i].y();
+    }
+    glm::vec2 imgSize(width,height);
+    LMDLT::CCalibrate(num,
+                      vecPts,
+                      imgSize,
+                      &relation->getModelPoints()[0],
+                      R,
+                      t,
+                      c);
+
+    cal_mv = glm::mat4(R);
+    cal_mv[3] = glm::vec4(t,1.f);
+
+    // set K
+    float Kval[9] = {c,0,width/2.f,0,c,height/2.f,0,0,1.f};
+    cv::Mat K(3,3,CV_32FC1,Kval);
+    cv::Mat proj = constructProjectionMatrix(K,0.1,1000000000,width,height);
+    for(int i=0;i<4;i++)
+        for(int j=0;j<4;j++)
+            cal_proj[j][i] = proj.at<float>(i,j);
+
+    std::cout << "calibrateLevmar"<< std::endl;
+    std::cout << "mv"<<std::endl;
+    std::cout << glm::to_string(cal_mv)<<std::endl;
+    std::cout << "proj"<<std::endl;
+    std::cout << glm::to_string(cal_proj)<<std::endl;
+}
+
 void CCWindow::align()
 {
-    assert(imgLabel->getPoints().size() >=6 );
+    // method 1 DLT directly
+//        assert(imgLabel->getPoints().size() >=6 );
+//        calibrate();
+
+    std::cout << "image keypoints size "<<imgLabel->getPoints().size()<<std::endl;
+    std::cout << "model keypoints size "<< relation->getModelPoints().size()<<std::endl;
+
+    glm::mat3 R;
+    glm::vec3 t;
+    float f;
+    calibrateLevmar(R,t,f);
+
+    int imgWidth,imgHeight;
+    imgLabel->getImageSize(imgWidth,imgHeight);
+
+    AlignResultWidget *a =
+            new AlignResultWidget(modelPath,
+                                  imgWidth * 1.f / imgHeight,
+                                  cal_mv,
+                                  cal_proj);
+    a->show();
+}
+
+void CCWindow::alignDLT()
+{
+    assert(imgLabel->getPoints().size() >= 6);
     calibrate();
 
     int imgWidth,imgHeight;
@@ -183,20 +254,24 @@ void CCWindow::align()
 
 void CCWindow::exportInfo()
 {
-    std::ofstream fout(relationFile->filePath().toStdString().c_str());
+    std::cout << "realtion file info " << relationFile->absoluteFilePath().toStdString() << std::endl;
+    std::ofstream fout(relationFile->absoluteFilePath().toStdString().c_str());
 
-    fout << imgFile->fileName().toStdString() << std::endl;
+//    fout << imgFile->fileName().toStdString() << std::endl;
 
     std::vector<QPointF> imgPoints = imgLabel->getPoints();
-    for(int i=0;i<imgPoints.size();i++)
-        fout << imgPoints[i].x() << " " << imgPoints[i].y() << std::endl;
+//    fout << modelFile->fileName().toStdString() << std::endl;
 
-    fout << modelFile->fileName().toStdString() << std::endl;
-
+    int width,height;
+    imgLabel->getImageSize(width,height);
     std::vector<glm::vec3> points = relation->getModelPoints();
-    for(int i=0;i<points.size();i++)
-        fout << points[i][0] << " " << points[i][1] << " " << points[i][2] << std::endl;
+    for(int i=0;i<imgPoints.size();i++)
+    {
+        fout << imgPoints[i].x() << " " << height - imgPoints[i].y() << " "
+                << points[i][0] << " " << points[i][1] << " " << points[i][2] << std::endl;;
+    }
     fout.close();
+    alignBtn->setEnabled(true);
 }
 
 void CCWindow::calibrate()
@@ -231,9 +306,17 @@ void CCWindow::siftMatch()
     ccSiftMatch = new CCSiftMatch(imgLabel->getImage(),
                                   ccMW->getRenderImage());
     ccSiftMatch->match();
-    imgLabel->setPoints(ccSiftMatch->getImagePoints());
-    ccMW->setPoints(ccSiftMatch->getModelPoints());
+    std::cout << "*****************sift Match****************"<<std::endl;
+    std::cout << "**** ccSiftMatch Image points size " << ccSiftMatch->getImagePoints().size() << std::endl;
+    std::cout << "**** ccSiftMatch Model points size " << ccSiftMatch->getModelPoints().size() << std::endl;
 
+    std::vector<int> index;
+    ccMW->setPoints(ccSiftMatch->getModelPoints(),index);
+    imgLabel->setPoints(ccSiftMatch->getImagePoints(),index);
+
+    std::cout << "*****************sift Match after****************"<<std::endl;
+    std::cout << "**** ccSiftMatch Image points size " << ccSiftMatch->getImagePoints().size() << std::endl;
+    std::cout << "**** ccSiftMatch Model points size " << ccSiftMatch->getModelPoints().size() << std::endl;
     calibrateBtn->setEnabled(true);
     alignBtn->setEnabled(true);
 }

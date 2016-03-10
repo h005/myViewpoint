@@ -31,9 +31,12 @@ protected:
 private:
     void getDLTpoints2D(float points2D[][2]);
     void getDLTpoints3D(float points3D[][3]);
+    void calibrateLevmar(glm::mat3 &R,glm::vec3 &t,float &c);
+
 
 private slots:
     void align();
+    void alignDLT();
     void exportInfo();
     void calibrate();
     void clearpoints();
@@ -45,6 +48,7 @@ private:
     QPushButton *calibrateBtn;
     QPushButton *siftMatchBtn;
     QPushButton *pointsClear;
+    QPushButton *alignDLTBtn;
     QScrollArea *scrollArea;
     ImgLabel *imgLabel;
     CCModelWidget *ccMW;

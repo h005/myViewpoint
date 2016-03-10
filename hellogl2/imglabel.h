@@ -34,7 +34,7 @@ public:
     void getImageSize(int &width,int &height);
     void clearPoints();
     void setPoints(std::vector<glm::vec2> points);
-    void setPoints(std::vector<cv::Point2f> points);
+    void setPoints(std::vector<cv::Point2f> points,std::vector<int> index);
 
     void getSift();
     CCSift* getCCSift();

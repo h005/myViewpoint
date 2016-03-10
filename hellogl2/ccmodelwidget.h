@@ -24,6 +24,7 @@ public:
     QSize minimumSizeHint() const Q_DECL_OVERRIDE;
     QSize sizeHint() const Q_DECL_OVERRIDE;
     int addPoint(const QPoint &p);
+    int addPoints(std::vector<cv::Point2f> points,std::vector<int> &index);
     bool removeLastPoint();
 
     void fixMVP(glm::mat4 &mv, glm::mat4 &proj);
@@ -35,7 +36,7 @@ public:
     void getSift();
     CCSift* getCCSift();
     cv::Mat& getRenderImage();
-    void setPoints(std::vector<cv::Point2f> points);
+    void setPoints(std::vector<cv::Point2f> points, std::vector<int> &index);
 
 private:
     void cleanup();

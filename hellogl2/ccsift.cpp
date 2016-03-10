@@ -21,7 +21,6 @@ CCSift::CCSift(cv::Mat &image)
     gftt->detect(image,keypoints);
     // step 2: calculate descriptors (features vectors)
     f2d->compute(image,keypoints,descriptors);
-    std::cout<<"keypoints size "<< keypoints.size()<< std::endl;
 }
 
 CCSift::~CCSift()

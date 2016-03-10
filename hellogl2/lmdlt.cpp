@@ -6,6 +6,7 @@
 #include <opencv2/opencv.hpp>
 #include <glm/gtx/matrix_cross_product.hpp>
 #include <glm/gtx/string_cast.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 using std::cout;
 using std::endl;
@@ -185,7 +186,9 @@ void LMDLT::ModelRegistration(int matchnum, glm::vec3 ptCloudPoints[], glm::vec3
     int LM_m = 1 + 3 + 3;
     int LM_n = 3*matchnum;
     std::vector<double> para(LM_m);
+    // 点云模型上的点
     std::vector<double> ptx(matchnum * 3);
+    // 网格模型上的点
     std::vector<double> inputPoints3d(matchnum * 3);
 
     for (int i = 0; i < matchnum; i++) {
@@ -223,3 +226,99 @@ void LMDLT::ModelRegistration(int matchnum, glm::vec3 ptCloudPoints[], glm::vec3
     t = glm::vec3(para[4], para[5], para[6]);
 }
 
+static void modelPoints2ImgPoints(double para[],
+                                  double newP[],
+                                  int LM_m,
+                                  int LM_n,
+                                  void *adata)
+{
+    glm::mat3 R = RodtoR(glm::vec3(para[1],para[2],para[3]));
+    glm::vec3 t = glm::vec3(para[4],para[5],para[6]);
+    double *p = (double *)adata;
+    int matchnum = LM_n / 5;
+
+    for(int i=0;i<matchnum;i++)
+    {
+        glm::vec3 point(p[5*i +0],p[5*i + 1],p[5*i + 2]);
+        float matk[9] = {para[0],0,0,0,para[0],0,p[5*i+3]/2.0,p[5*i+4]/2.0,1.f};
+        glm::mat3 K = glm::make_mat3(matk);
+        glm::vec3 dest = K * R * point + t;
+        newP[i*2 + 0] = dest[0] / dest[2];
+        newP[i*2 + 1] = dest[1] / dest[2];
+        std::cout << "newP "<< i <<" "<< newP[i*2 + 0]<< " "<< newP[i*2+1]
+                  << " point3D "<< point.x << " " << point.y <<" " << point.z << std::endl;
+    }
+}
+
+void LMDLT::CCalibrate(int matchnum, glm::vec2 imgPoints[], glm::vec2 imgSize, glm::vec3 modelPoints[], glm::mat3 &R, glm::vec3 &t, float &c)
+{
+//    matchnum = 20;
+//    void (*minfn)(double *p, double *hx, int m, int n, void *adata);
+    double opts[LM_OPTS_SZ], info[LM_INFO_SZ];
+    opts[0] = LM_INIT_MU;
+    opts[1] = 1E-12;
+    opts[2] = 1E-12;
+    opts[3] = 1E-15;
+    opts[4] = LM_DIFF_DELTA;
+
+    // c, R, t中一共有多少参数
+    int LM_m = 1 + 3 + 3;
+    int LM_n = 5 * matchnum;
+    std::vector<double> para(LM_m);
+    // points in mesh model and img width height
+    std::vector<double> mPts(matchnum * 5);
+    // points in img
+    std::vector<double> imgPts(matchnum * 2);
+
+    for(int i=0;i<matchnum;i++)
+    {
+        // img info
+        imgPts[i*2 + 0] = imgPoints[i].x;
+        imgPts[i*2 + 1] = imgPoints[i].y;
+        // model info
+        mPts[i*5 + 0] = modelPoints[i].x;
+        mPts[i*5 + 1] = modelPoints[i].y;
+        mPts[i*5 + 2] = modelPoints[i].z;
+        mPts[i*5 + 3] = imgSize.x;
+        mPts[i*5 + 4] = imgSize.y;
+        std::cout << "CCalibrate " << i << " "
+                  << imgPts[i*2 + 0] << " "
+                  << imgPts[i*2 +1] << " model points "
+                  << mPts[i*5 + 0] << " "
+                  << mPts[i*5 + 1] << " "
+                  << mPts[i*5 + 2] << " image size "
+                  << mPts[i*5 + 3] << " "
+                  << mPts[i*5 + 4] << endl;
+    }
+
+    // !!! 注意初始值要设置得有意义，起码计算结果中不能出现IND
+    float init_c = 10;
+    glm::vec3 init_w(0.5f,0.5f,0.5f);
+    glm::vec3 init_t(0.f);
+    para[0] = init_c;
+    para[1] = init_w[0];
+    para[2] = init_w[1];
+    para[3] = init_w[2];
+    para[4] = init_t[0];
+    para[5] = init_t[1];
+    para[6] = init_t[2];
+
+    int iter = dlevmar_dif(modelPoints2ImgPoints,
+                           &para[0],
+                           &imgPts[0],
+                           LM_m,
+                           LM_n,
+                           1000,
+                           opts,
+                           info,
+                           NULL,
+                           NULL,
+                           &mPts[0]);
+    printf("Levenberg-Marquardt returned in %g iter, reason %g, sumsq %g [%g]\n", info[5], info[6], info[1], info[0]);
+    std::cout << "Itered: " << iter << std::endl;
+
+    c = para[0];
+    R = RodtoR(glm::vec3(para[1],para[2],para[3]));
+    std::cout << "Rod " << glm::to_string(glm::vec3(para[1],para[2],para[3]));
+    t = glm::vec3(para[4],para[5],para[6]);
+}

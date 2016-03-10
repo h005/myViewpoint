@@ -103,11 +103,11 @@ void ImgLabel::setPoints(std::vector<glm::vec2> points)
     update();
 }
 
-void ImgLabel::setPoints(std::vector<cv::Point2f> points)
+void ImgLabel::setPoints(std::vector<cv::Point2f> points, std::vector<int> index)
 {
     this->points.clear();
-    for(int i=0;i<points.size();i++)
-        this->points.push_back(QPointF(points[i].x,points[i].y));
+    for(int i=0;i<index.size();i++)
+            this->points.push_back(QPointF(points[index[i]].x,points[index[i]].y));
     update();
 }
 
