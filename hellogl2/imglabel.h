@@ -12,6 +12,8 @@
 #include <vector>
 #include <glm/glm.hpp>
 #include "ccsift.h"
+#include "ccsiftmatch.h"
+#include "ccmodelwidget.h"
 
 //  imglabel 中的mat在readin之后是RGB格式的
 class ImgLabel : public QLabel
@@ -19,9 +21,11 @@ class ImgLabel : public QLabel
     Q_OBJECT
 public:
     ImgLabel(QString path,QWidget *parent = 0);
+    ImgLabel(CCSiftMatch *ccSiftMatch,CCModelWidget *ccMW,QWidget *parent = 0);
     ~ImgLabel();
 
     void mousePressEvent(QMouseEvent *e);
+    void mouseMoveEvent(QMouseEvent *e);
     void mouseReleaseEvent(QMouseEvent *e);
     void keyPressEvent(QKeyEvent *e);
     void paintEvent(QPaintEvent *e);
@@ -41,16 +45,30 @@ public:
 
     cv::Mat& getImage();
 
+    void updateImg();
+
 private:
     void readin();
     QImage mat2QImage(cv::Mat &mat);
+    void clearRegionPoints();
+    void showMatchResult();
+    void showRawMatch();
 
 private:
+    QPointF from;
+    QPointF to;
+    bool flagMatch;
+    bool flagDrawRect;
     QString path;
     QImage img;
+    QImage rawImg;
     cv::Mat image;
+    cv::Mat rawImage;
     std::vector<QPointF> points;
     CCSift *cc_sift;
+    CCSiftMatch *ccSiftMatch;
+    CCModelWidget *ccMW;
+
 };
 
 #endif // IMGLABEL_H

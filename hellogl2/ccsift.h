@@ -16,6 +16,7 @@ public:
 
     void showSift(std::string windowName);
 
+    cv::Mat& getDescriptors(std::vector<cv::KeyPoint> keypoints);
     cv::Mat& getDescriptors();
     cv::Mat& getImage();
     std::vector<cv::KeyPoint>& getKeyPoints();

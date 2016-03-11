@@ -34,7 +34,7 @@ CCWindow::CCWindow(QString modelPath, QString imgPath, QString relationPath)
     calibrateBtn = new QPushButton(tr("Calibrate"),this);
     pointsClear = new QPushButton(tr("Clear"),this);
     siftMatchBtn = new QPushButton(tr("SiftMatch"),this);
-
+    ccSMW = new CCSiftMatchWindow();
 //    calibrateBtn->setEnabled(false);
 //    alignBtn->setEnabled(false);
 
@@ -57,6 +57,7 @@ CCWindow::CCWindow(QString modelPath, QString imgPath, QString relationPath)
     connect(calibrateBtn,SIGNAL(clicked()),this,SLOT(calibrate()));
     connect(pointsClear,SIGNAL(clicked()),this,SLOT(clearpoints()));
     connect(siftMatchBtn,SIGNAL(clicked()),this,SLOT(siftMatch()));
+//    connect(ccSMW,SIGNAL(relationDone()),this,SLOT(this->showPoints()));
 
     QSizePolicy cellPolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
     cellPolicy.setHorizontalStretch(1);
@@ -88,7 +89,7 @@ CCWindow::CCWindow(QString modelPath, QString imgPath, QString relationPath)
 
     setCentralWidget(w);
     setWindowTitle(tr("Camera Calibration"));
-
+    this->resize(1600,1024);
 }
 
 CCWindow::~CCWindow()
@@ -98,7 +99,7 @@ CCWindow::~CCWindow()
 
 QSize CCWindow::sizeHint() const
 {
-    return QSize(1024,768);
+    return QSize(1600,1024);
 }
 
 void CCWindow::keyPressEvent(QKeyEvent *event)
@@ -303,20 +304,23 @@ void CCWindow::clearpoints()
 
 void CCWindow::siftMatch()
 {
+
     ccSiftMatch = new CCSiftMatch(imgLabel->getImage(),
                                   ccMW->getRenderImage());
     ccSiftMatch->match();
-    std::cout << "*****************sift Match****************"<<std::endl;
-    std::cout << "**** ccSiftMatch Image points size " << ccSiftMatch->getImagePoints().size() << std::endl;
-    std::cout << "**** ccSiftMatch Model points size " << ccSiftMatch->getModelPoints().size() << std::endl;
 
+    ccSMW = new CCSiftMatchWindow(ccSiftMatch,ccMW,imgLabel);
+
+    ccSMW->show();
+
+    showPoints();
+}
+
+void CCWindow::showPoints()
+{
+    std::cout<<"show Points called"<<std::endl;
     std::vector<int> index;
     ccMW->setPoints(ccSiftMatch->getModelPoints(),index);
     imgLabel->setPoints(ccSiftMatch->getImagePoints(),index);
-
-    std::cout << "*****************sift Match after****************"<<std::endl;
-    std::cout << "**** ccSiftMatch Image points size " << ccSiftMatch->getImagePoints().size() << std::endl;
-    std::cout << "**** ccSiftMatch Model points size " << ccSiftMatch->getModelPoints().size() << std::endl;
-    calibrateBtn->setEnabled(true);
-    alignBtn->setEnabled(true);
 }
+

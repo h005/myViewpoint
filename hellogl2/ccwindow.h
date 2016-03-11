@@ -10,6 +10,7 @@
 #include "imglabel.h"
 #include "ccmodelwidget.h"
 #include "ccsiftmatch.h"
+#include "ccsiftmatchwindow.h"
 
 class PointsMatchRelation;
 class EntityManager;
@@ -41,6 +42,7 @@ private slots:
     void calibrate();
     void clearpoints();
     void siftMatch();
+    void showPoints();
 
 private:
     QPushButton *alignBtn;
@@ -55,6 +57,7 @@ private:
     QFileInfo *imgFile;
     QFileInfo *modelFile;
     QFileInfo *relationFile; // export path
+    CCSiftMatchWindow *ccSMW;
 
 private:
     PointsMatchRelation *relation;
