@@ -30,7 +30,7 @@ flickr2 = flickrapi.FlickrAPI(api_key, api_secret)
 
 if __name__ == '__main__':
     page_idx = 1
-    need = 5
+    need = 800
 
     while need > 0:
         raw_json = flickr.photos.search(text='sydney opera house', sort='interestingness-desc', page=page_idx, has_geo='1')
@@ -43,16 +43,14 @@ if __name__ == '__main__':
         total_page = resp['photos']['pages']
 
         for photo in resp['photos']['photo']:
+            size_options = json.loads(flickr.photos.getSizes(photo_id=photo['id']))['sizes']['size']
+            largest_size = size_options[-1]
+            if largest_size['label'] != u'Original':
+                continue
+
             print 'idx:', need
             print 'https://www.flickr.com/photos/%s/%s' % (photo['owner'], photo['id'])
             
-            size_options = json.loads(flickr.photos.getSizes(photo_id=photo['id']))['sizes']['size']
-            i = 1
-            while i <= len(size_options):
-                largest_size = size_options[-i]
-                if int(largest_size['height']) <= 800:
-                    break
-                i += 1
             url = largest_size['source']
             print 'file url:', url
 
@@ -72,8 +70,6 @@ if __name__ == '__main__':
                 os.system('exiftool -overwrite_original -tagsfromfile tags.xml %s' % savefile)
             except:
                 pass
-
-            #print flickr.photos.getExif(photo_id=photo['id'])
 
             need -= 1
             if need == 0:
