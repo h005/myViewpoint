@@ -16,14 +16,13 @@ CameraShowWidget::CameraShowWidget(const QString &modelPath, const float imgRati
         m_estimatedMVMatrixs.push_back(glm::inverse(*it));
 
     m_cameraModel.load("camera/camera_adjust.obj");
-    //recoveryLookAtWithModelView(mvMatrix, m_eye, m_center, m_up);
 }
 
 CameraShowWidget::~CameraShowWidget()
 {
     makeCurrent();
 
-    // axis无需清理
+    // axis不占有显存资源，无需清理
     model.cleanUp();
 
     doneCurrent();
@@ -75,7 +74,7 @@ void CameraShowWidget::paintGL()
 
 //    for (auto it = m_estimatedMVMatrixs.begin(); it != m_estimatedMVMatrixs.end(); it++) {
 //        glm::mat4 axisMV = modelViewMatrix * (*it);
-//        axisMV = glm::scale(axisMV, glm::vec3(0.00005 / m_scaleBeforeRender));
+//        axisMV = glm::scale(axisMV, glm::vec3(0.5 / m_scaleBeforeRender));
 //        m_cameraModel.draw(axisMV, m_proj);
 //    }
 

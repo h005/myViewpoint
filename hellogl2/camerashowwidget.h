@@ -22,7 +22,6 @@ protected:
     glm::mat4 getModelViewMatrix();
 
 private:
-    glm::vec3 m_eye, m_center, m_up;
     float m_imgRatio;
     std::vector<glm::mat4> m_estimatedMVMatrixs;
     Axis m_axis;

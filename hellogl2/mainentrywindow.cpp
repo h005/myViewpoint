@@ -135,6 +135,8 @@ void MainEntryWindow::on_showAllViewpoints_clicked()
         Q_ASSERT(manager->getEntity(*it, want));
         glm::mat4 wantMVMatrix = want.mvMatrix * model2ptCloud;
         wantMVMatrix = normalizedModelView(wantMVMatrix);
+
+        // 此处不用inverse，CameraShowWidget会inverse
         mvMatrixs.push_back(wantMVMatrix);
     }
 
