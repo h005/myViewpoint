@@ -26,6 +26,7 @@ private:
     std::vector<glm::mat4> m_estimatedMVMatrixs;
     Axis m_axis;
     GModel m_cameraModel;
+    GLuint _axisProgramID = 0;
 
 };
 

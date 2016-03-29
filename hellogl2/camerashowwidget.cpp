@@ -7,6 +7,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/string_cast.hpp>
 #include "TransformationUtils.h"
+#include "shader.hpp"
 
 CameraShowWidget::CameraShowWidget(const QString &modelPath, const float imgRatio, const std::vector<glm::mat4> &mvMatrixs, QWidget *parent)
     :GLWidget(modelPath, parent)
@@ -24,6 +25,11 @@ CameraShowWidget::~CameraShowWidget()
 
     // axis不占有显存资源，无需清理
     model.cleanUp();
+
+    if (_axisProgramID) {
+        glDeleteProgram(_axisProgramID);
+        _axisProgramID = 0;
+    }
 
     doneCurrent();
 }
@@ -46,6 +52,8 @@ void CameraShowWidget::initializeGL()
 
     GLuint args[] = {0};
     m_axis.bindDataToGL(args);
+
+    _axisProgramID = LoadShaders("shader/axisShader.vert", "shader/axisShader.frag");
 }
 
 void CameraShowWidget::paintGL()
@@ -61,7 +69,7 @@ void CameraShowWidget::paintGL()
     model.draw(modelViewMatrix, m_proj);
 
     // 绘制坐标系
-    glUseProgram(m_sphereProgramID);
+    glUseProgram(_axisProgramID);
     GLuint projMatrixID = glGetUniformLocation(m_sphereProgramID, "projMatrix");
     GLuint mvMatrixID = glGetUniformLocation(m_sphereProgramID, "mvMatrix");
     for (auto it = m_estimatedMVMatrixs.begin(); it != m_estimatedMVMatrixs.end(); it++) {

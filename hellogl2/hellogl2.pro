@@ -98,3 +98,7 @@ INCLUDEPATH += $$_PRO_FILE_PWD_/../vendor/glm
 
 FORMS += \
     mainentrywindow.ui
+
+DISTFILES += \
+    shader/axisShader.frag \
+    shader/axisShader.vert
