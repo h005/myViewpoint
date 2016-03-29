@@ -92,6 +92,16 @@ void recoveryLookAtWithModelView(
     up = glm::normalize(glm::transpose(R) * glm::vec3(0.f, 1.f, 0.f));
 }
 
+glm::mat4 normalizedModelView(const glm::mat4 &mvMatrix)
+{
+    glm::mat3 R = glm::mat3(mvMatrix);
+    float c = glm::length(R[0]);
+    glm::mat4 normalizedModelView = mvMatrix;
+    normalizedModelView /= c;
+    normalizedModelView[3][3] = 1.f;
+    return normalizedModelView;
+}
+
 glm::vec3 projection(
         const glm::vec3 &vec,
         const glm::vec3 &N) {

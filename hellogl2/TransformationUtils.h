@@ -29,6 +29,11 @@ void recoveryLookAtWithModelView(
         glm::vec3 &eye,
         glm::vec3 &center,
         glm::vec3 &up);
+///
+/// \brief 构造等价的变换矩阵，消除左上角旋转矩阵中的尺度变换
+/// \param mvMatrix
+///
+glm::mat4 normalizedModelView(const glm::mat4 &mvMatrix);
 
 glm::mat4 projectionMatrixWithFocalLength(
         float f,

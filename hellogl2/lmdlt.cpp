@@ -219,7 +219,8 @@ void LMDLT::ModelRegistration(int matchnum, glm::vec3 ptCloudPoints[], glm::vec3
 
     c = para[0];
     R = RodtoR(glm::vec3(para[1], para[2], para[3]));
-    std::cout << "Rod " << glm::to_string(glm::vec3(para[1], para[2], para[3]))  << " " << glm::length(glm::vec3(para[1], para[2], para[3]))<< std::endl;
+    std::cout << "Scale: " << c << std::endl;
+    std::cout << "w = " << glm::to_string(glm::vec3(para[1], para[2], para[3]))  << ", ||w|| = " << glm::length(glm::vec3(para[1], para[2], para[3]))<< std::endl;
     t = glm::vec3(para[4], para[5], para[6]);
 }
 

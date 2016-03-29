@@ -32,8 +32,8 @@
 #include "LMModelMainComponent.h"
 #include "externalimporter.h"
 
-#define P_NEAR 0.00001f
-#define P_FAR 30.f
+#define P_NEAR 0.5f
+#define P_FAR 100000.f
 
 //#define USE_DEFAULT_PROJECTION
 
@@ -114,6 +114,7 @@ void MainEntryWindow::on_executePreviewTargetBtn_clicked()
     Q_ASSERT(manager->getEntity(target, want));
     QSize imgSize = GetImageParamter(target);
     glm::mat4 wantMVMatrix = want.mvMatrix * model2ptCloud;
+    wantMVMatrix = normalizedModelView(wantMVMatrix);
 
     std::vector<glm::mat4> mvMatrixs;
     mvMatrixs.push_back(wantMVMatrix);
@@ -133,6 +134,7 @@ void MainEntryWindow::on_showAllViewpoints_clicked()
         Entity want;
         Q_ASSERT(manager->getEntity(*it, want));
         glm::mat4 wantMVMatrix = want.mvMatrix * model2ptCloud;
+        wantMVMatrix = normalizedModelView(wantMVMatrix);
         mvMatrixs.push_back(wantMVMatrix);
     }
 
@@ -169,6 +171,7 @@ void MainEntryWindow::on_printMvMatrixBtn_clicked()
             Entity want;
             Q_ASSERT(manager->getEntity(*it, want));
             glm::mat4 wantMVMatrix = want.mvMatrix * model2ptCloud;
+            wantMVMatrix = normalizedModelView(wantMVMatrix);
 
             matrixFile << it->toUtf8().constData() << std::endl;
             for (int i = 0; i < 4; i++) {
@@ -212,6 +215,7 @@ void MainEntryWindow::on_printMvPMatrixBtn_clicked()
             Entity want;
             Q_ASSERT(manager->getEntity(*it, want));
             glm::mat4 wantMVMatrix = want.mvMatrix * model2ptCloud;
+            wantMVMatrix = normalizedModelView(wantMVMatrix);
 
             matrixFile << it->toUtf8().constData() << std::endl;
             for (int i = 0; i < 4; i++) {
@@ -267,6 +271,7 @@ void MainEntryWindow::on_saveLabeledImages_clicked()
                     Q_ASSERT(manager->getEntity(*it, want));
                     QSize imgSize = GetImageParamter(*it);
                     glm::mat4 wantMVMatrix = want.mvMatrix * model2ptCloud;
+                    wantMVMatrix = normalizedModelView(wantMVMatrix);
                     glm::mat4 wantProjMatrix = projectionMatrixWithFocalLength(want.f, imgSize.width(), imgSize.height(), P_NEAR, P_FAR);
 
                     // 将图片生成到选定目录中，文件名与之前一致，但后缀改为.m.png，方便对照
