@@ -31,6 +31,7 @@
 #include "lmdlt.h"
 #include "LMModelMainComponent.h"
 #include "externalimporter.h"
+#include "clustermanager.h"
 
 #define P_NEAR 0.5f
 #define P_FAR 100000.f
@@ -142,6 +143,37 @@ void MainEntryWindow::on_showAllViewpoints_clicked()
 
     CameraShowWidget *w = new CameraShowWidget(manager->modelPath(), 1.f, mvMatrixs);
     w->show();
+}
+
+
+void MainEntryWindow::on_showClusteredViewpointBtn_clicked()
+{
+    QString selfilter = tr("Cluster Results (*.cluster)");
+    QString fileName = QFileDialog::getOpenFileName(
+            this,
+            QString("Open Cluster Results"),
+            QString(),
+            tr("All files (*.*);;Cluster Results (*.cluster)" ),
+            &selfilter
+    );
+
+    if (!fileName.isEmpty()) {
+        ClusterManager cm(fileName.toStdString());
+
+        std::vector<glm::mat4> mvMatrixs;
+        int index = 7;
+        mvMatrixs.assign(cm.getCluster(index).begin(), cm.getCluster(index).end());
+        mvMatrixs.push_back(cm.getCenter(index));
+
+        for (auto it = mvMatrixs.begin(); it != mvMatrixs.end(); it++) {
+            glm::vec3 eye, center, up;
+            recoveryLookAtWithModelView(*it, eye, center, up);
+            std::cout << glm::to_string(eye) << std::endl;
+        }
+
+        CameraShowWidget *w = new CameraShowWidget(manager->modelPath(), 1.f, mvMatrixs);
+        w->show();
+    }
 }
 
 void MainEntryWindow::on_printMvMatrixBtn_clicked()
@@ -433,3 +465,4 @@ void MainEntryWindow::on_pushButton_2_clicked()
 
 //    std::cout << glm::to_string(LMPCA::PCAWithModelPoints(p.size(), &p[0])) << std::endl;
 }
+

@@ -235,6 +235,19 @@
      <string>求取主方向</string>
     </property>
    </widget>
+   <widget class="QPushButton" name="showClusteredViewpointBtn">
+    <property name="geometry">
+     <rect>
+      <x>190</x>
+      <y>520</y>
+      <width>121</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>显示聚类结果</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
