@@ -14,8 +14,9 @@ public:
     ClusterManager(std::string path);
     ~ClusterManager();
 
-    VP_ARRAY &getCluster(int index);
-    glm::mat4 getCenter(int index);
+    int         getClusterNums();
+    VP_ARRAY    &getCluster(int index);
+    glm::mat4   getCenter(int index);
 
 
 private:

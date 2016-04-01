@@ -26,7 +26,6 @@ void Axis::draw()
         std::cout << "please call init() before draw()" << std::endl;
     }
 
-    glColor3ub(250, 250, 100);
     glBegin(GL_LINE_STRIP);
     glVertex3f(0.0, 0.0, 0.0);
     glVertex3f(1.0, 0.0, 0.0);

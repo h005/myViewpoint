@@ -63,6 +63,11 @@ ClusterManager::~ClusterManager()
 
 }
 
+int ClusterManager::getClusterNums()
+{
+    return _vps.size();
+}
+
 ClusterManager::VP_ARRAY &ClusterManager::getCluster(int index)
 {
     assert(index <= _vps.size());

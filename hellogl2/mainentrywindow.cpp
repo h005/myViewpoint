@@ -119,7 +119,9 @@ void MainEntryWindow::on_executePreviewTargetBtn_clicked()
 
     std::vector<glm::mat4> mvMatrixs;
     mvMatrixs.push_back(wantMVMatrix);
-    CameraShowWidget *w = new CameraShowWidget(manager->modelPath(), imgSize.width() / 1.0 / imgSize.height(), mvMatrixs);
+    // dummy value
+    std::vector<int> clusterIndices(mvMatrixs.size(), 1);
+    CameraShowWidget *w = new CameraShowWidget(manager->modelPath(), imgSize.width() / 1.0 / imgSize.height(), mvMatrixs, clusterIndices);
     w->show();
 }
 
@@ -137,11 +139,14 @@ void MainEntryWindow::on_showAllViewpoints_clicked()
         glm::mat4 wantMVMatrix = want.mvMatrix * model2ptCloud;
         wantMVMatrix = normalizedModelView(wantMVMatrix);
 
+
         // 此处不用inverse，CameraShowWidget会inverse
         mvMatrixs.push_back(wantMVMatrix);
     }
 
-    CameraShowWidget *w = new CameraShowWidget(manager->modelPath(), 1.f, mvMatrixs);
+    // dummy value
+    std::vector<int> clusterIndices(mvMatrixs.size(), 1);
+    CameraShowWidget *w = new CameraShowWidget(manager->modelPath(), 1.f, mvMatrixs, clusterIndices);
     w->show();
 }
 
@@ -161,17 +166,17 @@ void MainEntryWindow::on_showClusteredViewpointBtn_clicked()
         ClusterManager cm(fileName.toStdString());
 
         std::vector<glm::mat4> mvMatrixs;
-        int index = 7;
-        mvMatrixs.assign(cm.getCluster(index).begin(), cm.getCluster(index).end());
-        mvMatrixs.push_back(cm.getCenter(index));
+        std::vector<int> clusterIndices;
 
-        for (auto it = mvMatrixs.begin(); it != mvMatrixs.end(); it++) {
-            glm::vec3 eye, center, up;
-            recoveryLookAtWithModelView(*it, eye, center, up);
-            std::cout << glm::to_string(eye) << std::endl;
+
+        for (int i = 1; i <= cm.getClusterNums(); i++) {
+            mvMatrixs.insert(mvMatrixs.begin(), cm.getCluster(i).begin(), cm.getCluster(i).end());
+
+            std::vector<int> dummy(cm.getCluster(i).size(), i);
+            clusterIndices.insert(clusterIndices.end(), dummy.begin(), dummy.end());
         }
 
-        CameraShowWidget *w = new CameraShowWidget(manager->modelPath(), 1.f, mvMatrixs);
+        CameraShowWidget *w = new CameraShowWidget(manager->modelPath(), 1.f, mvMatrixs, clusterIndices);
         w->show();
     }
 }
@@ -456,7 +461,8 @@ void MainEntryWindow::on_pushButton_2_clicked()
 
     std::vector<glm::mat4> mvMatrixs;
     mvMatrixs.push_back(mv);
-    CameraShowWidget *w = new CameraShowWidget(manager->modelPath(), 1.0, mvMatrixs);
+    std::vector<int> clusterIndices(mvMatrixs.size(), 1);
+    CameraShowWidget *w = new CameraShowWidget(manager->modelPath(), 1.0, mvMatrixs, clusterIndices);
     w->show();
 //    std::vector<glm::vec3> p;
 //    for (int i = -100; i <= 100; i++)

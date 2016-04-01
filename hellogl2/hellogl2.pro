@@ -28,7 +28,8 @@ HEADERS       = glwidget.h \
     RenderObject/axis.h \
     externalimporter.h \
     LMModelMainComponent.h \
-    clustermanager.h
+    clustermanager.h \
+    colormap.h
 SOURCES       = glwidget.cpp \
                 main.cpp \
                 window.cpp \
@@ -60,7 +61,8 @@ SOURCES       = glwidget.cpp \
     bothwidget.cpp \
     RenderObject/axis.cpp \
     LMModelMainComponent.cpp \
-    clustermanager.cpp
+    clustermanager.cpp \
+    colormap.cpp
 
 OTHER_FILES += shader/*.vert shader/*.frag
 
