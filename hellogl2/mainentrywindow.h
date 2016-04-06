@@ -56,6 +56,8 @@ private slots:
 
     void on_ccConfig_clicked();
 
+    void on_showClusterBtn_clicked();
+
 private:
     Ui::MainEntryWindow *ui;
     EntityManager *manager;

@@ -32,6 +32,7 @@
 #include "lmdlt.h"
 #include "LMModelMainComponent.h"
 #include "externalimporter.h"
+#include "clustermanager.h"
 
 #include "ccwindow.h"
 
@@ -126,27 +127,46 @@ void MainEntryWindow::on_executePreviewTargetBtn_clicked()
 
     std::vector<glm::mat4> mvMatrixs;
     mvMatrixs.push_back(wantMVMatrix);
-    CameraShowWidget *w = new CameraShowWidget(manager->modelPath(), imgSize.width() / 1.0 / imgSize.height(), mvMatrixs);
+    std::vector<int> clusterIndices(mvMatrixs.size(), 1);
+    CameraShowWidget *w = new CameraShowWidget(manager->modelPath(), imgSize.width() / 1.0 / imgSize.height(), mvMatrixs,clusterIndices);
     w->show();
 }
 
 // 显示视点的聚集
 void MainEntryWindow::on_showAllViewpoints_clicked()
 {
-    glm::mat4 model2ptCloud = getModel2PtCloudTrans();
+    QString selfilter = tr("Cluster Results (*.cluster)");
+    QString fileName = QFileDialog::getOpenFileName(
+            this,
+            QString("Open Cluster Results"),
+            QString(),
+            tr("All files (*.*);;Cluster Results (*.cluster)" ),
+            &selfilter
+    );
 
-    std::vector<QString> list;
-    manager->getImageList(list);
-    std::vector<glm::mat4> mvMatrixs;
-    for (auto it = list.begin(); it != list.end(); it++) {
-        Entity want;
-        Q_ASSERT(manager->getEntity(*it, want));
-        glm::mat4 wantMVMatrix = want.mvMatrix * model2ptCloud;
-        mvMatrixs.push_back(wantMVMatrix);
+    if (!fileName.isEmpty()) {
+            ClusterManager cm(fileName.toStdString());
+
+            std::vector<glm::mat4> mvMatrixs;
+            std::vector<int> clusterIndices;
+
+            int index = 1;
+            scanf("%d",&index);
+            std::cout << "index "<< index << std::endl;
+            mvMatrixs.assign(cm.getCluster(index).begin(), cm.getCluster(index).end());
+            mvMatrixs.push_back(cm.getCenter(index));
+
+            for(auto it = mvMatrixs.begin(); it != mvMatrixs.end(); it++)
+            {
+                glm::vec3 eye,center,up;
+                recoveryLookAtWithModelView(*it,eye,center,up);
+                std::cout << glm::to_string(eye) << std::endl;
+                clusterIndices.push_back(index);
+            }
+
+            CameraShowWidget *w = new CameraShowWidget(manager->modelPath(), 1.f, mvMatrixs, clusterIndices);
+            w->show();
     }
-
-    CameraShowWidget *w = new CameraShowWidget(manager->modelPath(), 1.f, mvMatrixs);
-    w->show();
 }
 // 打印标定的MV矩阵
 void MainEntryWindow::on_printMvMatrixBtn_clicked()
@@ -426,7 +446,8 @@ void MainEntryWindow::on_pushButton_2_clicked()
 
     std::vector<glm::mat4> mvMatrixs;
     mvMatrixs.push_back(mv);
-    CameraShowWidget *w = new CameraShowWidget(manager->modelPath(), 1.0, mvMatrixs);
+    std::vector<int> clusterIndices(mvMatrixs.size(),1);
+    CameraShowWidget *w = new CameraShowWidget(manager->modelPath(), 1.0, mvMatrixs,clusterIndices);
     w->show();
 //    std::vector<glm::vec3> p;
 //    for (int i = -100; i <= 100; i++)
@@ -450,15 +471,15 @@ void MainEntryWindow::on_cameraCalibration_clicked()
 
 void MainEntryWindow::on_ccConfig_clicked()
 {
-//    QString selfilter = tr("Config (*.ini)");
-//    QString fileName = QFileDialog::getOpenFileName(
-//                this,
-//                QString("open config"),
-//                QString(),
-//                tr("All files (*.*);;Config (*.ini)"),
-//                &selfilter
-//                );
-    QString fileName = "/home/h005/Documents/QtProject/viewpoint/model/config.ini";
+    QString selfilter = tr("Config (*.ini)");
+    QString fileName = QFileDialog::getOpenFileName(
+                this,
+                QString("open config"),
+                QString(),
+                tr("All files (*.*);;Config (*.ini)"),
+                &selfilter
+                );
+//    QString fileName = "/home/h005/Documents/QtProject/viewpoint/model/config.ini";
     if(!fileName.isEmpty())
     {
         QFileInfo *file = new QFileInfo(fileName);
@@ -473,5 +494,35 @@ void MainEntryWindow::on_ccConfig_clicked()
         }
 
         ui->configFileLabel->setText(fileName);
+    }
+}
+
+void MainEntryWindow::on_showClusterBtn_clicked()
+{
+    QString selfilter = tr("Cluster Results (*.cluster)");
+    QString fileName = QFileDialog::getOpenFileName(
+            this,
+            QString("Open Cluster Results"),
+            QString(),
+            tr("All files (*.*);;Cluster Results (*.cluster)" ),
+            &selfilter
+    );
+
+    if (!fileName.isEmpty()) {
+            ClusterManager cm(fileName.toStdString());
+
+            std::vector<glm::mat4> mvMatrixs;
+            std::vector<int> clusterIndices;
+
+
+            for (int i = 1; i <= cm.getClusterNums(); i++) {
+                mvMatrixs.insert(mvMatrixs.begin(), cm.getCluster(i).begin(), cm.getCluster(i).end());
+
+                std::vector<int> dummy(cm.getCluster(i).size(), i);
+                clusterIndices.insert(clusterIndices.end(), dummy.begin(), dummy.end());
+            }
+
+            CameraShowWidget *w = new CameraShowWidget(manager->modelPath(), 1.f, mvMatrixs, clusterIndices);
+            w->show();
     }
 }

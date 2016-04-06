@@ -15,6 +15,9 @@
 #include "ccsiftmatch.h"
 #include "ccmodelwidget.h"
 
+#define WIDTH 500
+#define HEIGHT 500
+
 //  imglabel 中的mat在readin之后是RGB格式的
 class ImgLabel : public QLabel
 {
@@ -39,6 +42,7 @@ public:
     void clearPoints();
     void setPoints(std::vector<glm::vec2> points);
     void setPoints(std::vector<cv::Point2f> points,std::vector<int> index);
+    double getScaleRatio();
 
     void getSift();
     CCSift* getCCSift();
@@ -49,12 +53,15 @@ public:
 
 private:
     void readin();
+    void imageResize();
     QImage mat2QImage(cv::Mat &mat);
     void clearRegionPoints();
     void showMatchResult();
     void showRawMatch();
 
 private:
+    double scaleRatio;
+    QSize iniSize;
     QPointF from;
     QPointF to;
     bool flagMatch;

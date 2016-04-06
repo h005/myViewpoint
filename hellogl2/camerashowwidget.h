@@ -10,7 +10,7 @@
 class CameraShowWidget: public GLWidget
 {
 public:
-    CameraShowWidget(const QString &modelPath, const float imgRatio, const std::vector<glm::mat4> &mvMatrixs, QWidget *parent = 0);
+    CameraShowWidget(const QString &modelPath, const float imgRatio, const std::vector<glm::mat4> &mvMatrixs, const std::vector<int> &clusterIndices, QWidget *parent = 0);
     ~CameraShowWidget();
 
     QSize minimumSizeHint() const Q_DECL_OVERRIDE;
@@ -25,9 +25,10 @@ private:
     glm::vec3 m_eye, m_center, m_up;
     float m_imgRatio;
     std::vector<glm::mat4> m_estimatedMVMatrixs;
+    std::vector<int> m_clusterIndices;
     Axis m_axis;
     GModel m_cameraModel;
-
+    GLuint _axisProgramID = 0;
 };
 
 #endif // CAMERASHOWWIDGET_H

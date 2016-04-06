@@ -8,6 +8,7 @@
 ImgLabel::ImgLabel(QString path, QWidget *parent) :
     QLabel(parent)
 {
+    scaleRatio = 1.0;
     ccSiftMatch = NULL;
     flagMatch = false;
     flagDrawRect = false;
@@ -183,6 +184,11 @@ void ImgLabel::setPoints(std::vector<cv::Point2f> points, std::vector<int> index
     update();
 }
 
+double ImgLabel::getScaleRatio()
+{
+    return scaleRatio;
+}
+
 void ImgLabel::getSift()
 {
     cc_sift = new CCSift(image);
@@ -227,7 +233,27 @@ void ImgLabel::updateImg()
 void ImgLabel::readin()
 {
     image = cv::imread(path.toStdString().c_str());
+    iniSize = QSize(image.cols,image.rows);
+
+    imageResize();
+
     img = mat2QImage(image);
+}
+
+void ImgLabel::imageResize()
+{
+    if(image.rows <= HEIGHT && image.cols <= WIDTH)
+        return;
+    else
+    {
+        double ratioWidth = (double)WIDTH / image.cols;
+        double ratioHeight = (double)HEIGHT / image.rows;
+        std::cout << "rate " << ratioWidth << " " << ratioHeight << std::endl;
+        scaleRatio = ratioWidth < ratioHeight ? ratioWidth : ratioHeight;
+        cv::Size dsize(image.cols * scaleRatio,image.rows * scaleRatio);
+        std::cout << "dsize " << dsize.width << " " << dsize.height << std::endl;
+        cv::resize(image,image,dsize);
+    }
 }
 
 QImage ImgLabel::mat2QImage(cv::Mat &mat)

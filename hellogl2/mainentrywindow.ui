@@ -261,6 +261,19 @@
      <string>cc config</string>
     </property>
    </widget>
+   <widget class="QPushButton" name="showClusterBtn">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>370</y>
+      <width>89</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>ShowClusters</string>
+    </property>
+   </widget>
    <zorder>cameraCalibration</zorder>
    <zorder>pushButton</zorder>
    <zorder>labelFirstImageBtn</zorder>
@@ -280,6 +293,7 @@
    <zorder>showAllViewpoints</zorder>
    <zorder>pushButton_2</zorder>
    <zorder>ccConfig</zorder>
+   <zorder>showClusterBtn</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">

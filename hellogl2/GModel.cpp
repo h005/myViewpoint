@@ -100,11 +100,11 @@ static void get_bounding_box(const aiScene *sc, aiVector3D* min, aiVector3D* max
 	// set identity
 	aiMatrix4x4 rootTransformation;
 
-    std::cout << "cmd ";
-    for (int i = 0; i <  4; i++)
-        for (int j = 0; j < 4; j++)
-            std::cout << rootTransformation[i][j] << " ";
-    std::cout << std::endl;
+//    std::cout << "cmd ";
+//    for (int i = 0; i <  4; i++)
+//        for (int j = 0; j < 4; j++)
+//            std::cout << rootTransformation[i][j] << " ";
+//    std::cout << std::endl;
 
 	min->x = min->y = min->z = 1e10f;
 	max->x = max->y = max->z = -1e10f;
@@ -135,6 +135,8 @@ void GModel::apply_material(const aiMaterial *mtl)
 		unsigned int texId = *textureIdMap[texPath.data];
 		glBindTexture(GL_TEXTURE_2D, texId);
 	}
+//    else
+//        std::cout << "apply materils "<< std::endl;
 
 	set_float4(c, 0.8f, 0.8f, 0.8f, 1.0f);
 	if (AI_SUCCESS == aiGetMaterialColor(mtl, AI_MATKEY_COLOR_DIFFUSE, &diffuse))
@@ -332,18 +334,22 @@ void GModel::draw(const glm::mat4 &inheritModelView, const glm::mat4 &projection
 
         if (mesh->HasNormals())
         {
-            glDisable(GL_LIGHTING);
+//            std::cout << "gldisable lighting color" << std::endl;
+            glEnable(GL_LIGHTING);
         }
         else
         {
-            glEnable(GL_LIGHTING);
+//            std::cout << "glenable lighting color" << std::endl;
+            glDisable(GL_LIGHTING);
         }
         if (mesh->mColors[0] != NULL)
         {
+//            std::cout  << "glenable material color" << std::endl;
             glEnable(GL_COLOR_MATERIAL);
         }
         else
         {
+//            std::cout  << "gldisable material color" << std::endl;
             glDisable(GL_COLOR_MATERIAL);
         }
 
@@ -464,6 +470,14 @@ GModel::MeshEntry::MeshEntry(const aiMesh *mesh, const glm::mat4 &transformation
             glVertexAttribPointer(vertexUVID, 2, GL_FLOAT, GL_FALSE, 0, NULL);
             glEnableVertexAttribArray (vertexUVID);
         }
+        else
+        {
+            std::cout << "mesh without texture coords 1" << std::endl;
+        }
+    }
+    else
+    {
+        std::cout << "mesh without texture coords 2" << std::endl;
     }
 
     if(mesh->HasNormals()) {

@@ -35,8 +35,6 @@ CCWindow::CCWindow(QString modelPath, QString imgPath, QString relationPath)
     pointsClear = new QPushButton(tr("Clear"),this);
     siftMatchBtn = new QPushButton(tr("SiftMatch"),this);
     ccSMW = new CCSiftMatchWindow();
-//    calibrateBtn->setEnabled(false);
-//    alignBtn->setEnabled(false);
 
     scrollArea = new QScrollArea();
 
@@ -150,12 +148,17 @@ void CCWindow::getDLTpoints2D(float points2D[][2])
     std::vector<QPointF> imgPoints = imgLabel->getPoints();
     int width,height;
     imgLabel->getImageSize(width,height);
+    double scale = imgLabel->getScaleRatio();
+    std::cout << "image size " << std::endl;
+    std::cout << "width " << width << " height " << height << " scale " << scale << std::endl;
     if(imgPoints.size() == 0)
         return ;
     for(int i=0;i<imgPoints.size();i++)
     {
         points2D[i][0] = imgPoints[i].x();
         points2D[i][1] = height - imgPoints[i].y();
+        points2D[i][0] /= scale;
+        points2D[i][1] /= scale;
     }
 }
 
@@ -250,6 +253,12 @@ void CCWindow::alignDLT()
                                   imgWidth * 1.f / imgHeight,
                                   cal_mv,
                                   cal_proj);
+
+    std::cout << "camera mv matrix ..." << std::endl;
+    std::cout << glm::to_string(cal_mv) << std::endl;
+    std::cout << "camera proj matrix ..." << std::endl;
+    std::cout << glm::to_string(cal_proj) << std::endl;
+
     a->show();
 }
 
@@ -286,12 +295,13 @@ void CCWindow::calibrate()
     getDLTpoints3D(points3D);
 
     int imgWidth, imgHeight;
+    double scale = imgLabel->getScaleRatio();
     imgLabel->getImageSize(imgWidth,imgHeight);
     DLTwithPoints(matchnum,
                   (float(*)[2])&points2D[0],
                   (float(*)[3])&points3D[0],
-                  imgWidth,
-                  imgHeight,
+                  int((double)imgWidth/scale),
+                  int((double)imgHeight/scale),
                   cal_mv,
                   cal_proj);
 }

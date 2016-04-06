@@ -7,14 +7,17 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/string_cast.hpp>
 #include "TransformationUtils.h"
+#include "shader.hpp"
+#include "colormap.h"
 
-CameraShowWidget::CameraShowWidget(const QString &modelPath, const float imgRatio, const std::vector<glm::mat4> &mvMatrixs, QWidget *parent)
+CameraShowWidget::CameraShowWidget(const QString &modelPath, const float imgRatio, const std::vector<glm::mat4> &mvMatrixs, const std::vector<int> &clusterIndices,  QWidget *parent)
     :GLWidget(modelPath, parent)
 {
     m_imgRatio = imgRatio;
     for (auto it = mvMatrixs.begin(); it != mvMatrixs.end(); it++)
         m_estimatedMVMatrixs.push_back(glm::inverse(*it));
 
+    m_clusterIndices = clusterIndices;
     m_cameraModel.load("camera/camera_adjust.obj");
     //recoveryLookAtWithModelView(mvMatrix, m_eye, m_center, m_up);
 }
@@ -25,6 +28,12 @@ CameraShowWidget::~CameraShowWidget()
 
     // axis无需清理
     model.cleanUp();
+
+    if(_axisProgramID)
+    {
+        glDeleteProgram(_axisProgramID);
+        _axisProgramID = 0;
+    }
 
     doneCurrent();
 }
@@ -47,6 +56,8 @@ void CameraShowWidget::initializeGL()
 
     GLuint args[] = {0};
     m_axis.bindDataToGL(args);
+
+    _axisProgramID = LoadShaders("shader/axisShader.vert", "shader/axisShader.frag");
 }
 
 void CameraShowWidget::paintGL()
@@ -62,16 +73,20 @@ void CameraShowWidget::paintGL()
     model.draw(modelViewMatrix, m_proj);
 
     // 绘制坐标系
-    glUseProgram(m_sphereProgramID);
+    glUseProgram(_axisProgramID);
     GLuint projMatrixID = glGetUniformLocation(m_sphereProgramID, "projMatrix");
     GLuint mvMatrixID = glGetUniformLocation(m_sphereProgramID, "mvMatrix");
-    for (auto it = m_estimatedMVMatrixs.begin(); it != m_estimatedMVMatrixs.end(); it++) {
-        glm::mat4 axisMV = modelViewMatrix * (*it);
-        axisMV = glm::scale(axisMV, glm::vec3(500.f));
-        glUniformMatrix4fv(projMatrixID, 1, GL_FALSE, glm::value_ptr(m_proj));
-        glUniformMatrix4fv(mvMatrixID, 1, GL_FALSE, glm::value_ptr(axisMV));
-        m_axis.draw();
-    }
+    for (int i = 0; i < m_estimatedMVMatrixs.size(); i++) {
+            glm::mat4 axisMV = modelViewMatrix * (m_estimatedMVMatrixs[i]);
+            axisMV = glm::scale(axisMV, glm::vec3(500.f));
+            glUniformMatrix4fv(projMatrixID, 1, GL_FALSE, glm::value_ptr(m_proj));
+            glUniformMatrix4fv(mvMatrixID, 1, GL_FALSE, glm::value_ptr(axisMV));
+
+            double color[3];
+            ColorMap::jet(color, m_clusterIndices[i], 0, 50);
+            glColor3ub(color[0] * 255, color[1]  * 255, color[2] * 255);
+            m_axis.draw();
+     }
 
 //    for (auto it = m_estimatedMVMatrixs.begin(); it != m_estimatedMVMatrixs.end(); it++) {
 //        glm::mat4 axisMV = modelViewMatrix * (*it);
