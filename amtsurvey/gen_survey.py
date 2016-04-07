@@ -3,6 +3,7 @@ import sys
 import random
 from random import randint
 
+ID_PREFIX= 'kxm_'
 SLICE_N = 30
 REWARD = 0.02
 ASSIGNMENTS = 20
@@ -11,7 +12,7 @@ class Question:
     def __init__(self, item, answer_id, idx):
         self.item = item
         self.answer_id = answer_id
-        self.url = 'http://dn-goodview.qbox.me/' + item
+        self.url = 'http://7xoro6.com1.z0.glb.clouddn.com/' + item
         self.idx = idx
 
     def resp(self):
@@ -147,8 +148,9 @@ if __name__ == '__main__':
     for idx in xrange(0, len(items), SLICE_N):
         end_idx = idx + SLICE_N
         if end_idx >= len(items):
+            # 如果最后一批图片少于SLICE_N张，则放弃生成该批图片
             break
-        identity = 'goodview_%d-%d' % (idx, end_idx - 1)
+        identity = '%s%d-%d' % (ID_PREFIX, idx, end_idx - 1)
         current_items = items[idx:end_idx]
         # add item for evaluation
         traps = []

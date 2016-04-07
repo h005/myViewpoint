@@ -54,7 +54,6 @@ def walker(dir_path, in_sandbox):
                 abs_path = os.path.abspath(root)
                 question_file = os.path.join(abs_path, name)
                 submit(question_file, in_sandbox)
-                sys.exit(0)
 
 
 if __name__ == '__main__':
