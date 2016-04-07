@@ -1,0 +1,5 @@
+./img0000.jpg
+./img0001.jpg
+./img0004.jpg
+./img0005.jpg
+
