@@ -44,7 +44,7 @@ def generate_file(label_file, feature_files, output_libsvm=True):
     output_list = StringIO.StringIO()
     if output_libsvm:
         # length的长度含有开头的label
-        for key in data:
+        for key in sorted(data.keys()):
             output_list.write(key + "\n")
             elements = data[key].strip().split(' ')
 
@@ -57,7 +57,7 @@ def generate_file(label_file, feature_files, output_libsvm=True):
     else:
         # length的长度含有开头的label
         output_data.write('%d %d\n' % (len(data), length-1))
-        for key in data:
+        for key in sorted(data.keys()):
             output_list.write(key + "\n")
             output_data.write(data[key] + "\n")
 
