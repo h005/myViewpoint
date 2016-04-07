@@ -1,6 +1,4 @@
 #-*- coding:utf-8 -*-
-import cv2
-import numpy
 import optparse
 import os
 import sys
@@ -26,34 +24,38 @@ def prepare_env():
     os.environ['MTURK_CMD_HOME'] = AMT_DIR
 
 
+def submit(filepath, in_sandbox):
+    # must use absolute path, as working directory will be changed to $AMT_DIR/bin
+    filepath = os.path.abspath(filepath)
+    prefix, _ = os.path.splitext(filepath)
+    pf = prefix + '.properties'
+    qf = prefix + '.question'
+    inf = prefix + '.input'
+
+    sandbox_opt = '-sandbox' if in_sandbox else ''
+    command = 'loadHITs -question %s -properties %s -input %s %s' % (qf, pf, inf, sandbox_opt)
+    wdir = os.path.join(AMT_DIR, 'bin')
+
+    print command
+
+    import subprocess
+    p = subprocess.Popen(command, cwd=wdir, stdout=subprocess.PIPE, shell=True)
+    print p.communicate()[0]
+
+
 def walker(dir_path, in_sandbox):
     if len(dir_path) == 0:
         dir_path = '.'
     
-    count = 0
     for root, dirs, files in os.walk(dir_path):
         for name in files:
             fname, ext = os.path.splitext(name)
-            if ext.lower() in ('.properties',):
+            if ext.lower() in ('.question',):
                 abs_path = os.path.abspath(root)
-                pf = os.path.join(abs_path, fname + '.properties')
-                qf = os.path.join(abs_path, fname + '.question')
-                inf = os.path.join(abs_path, fname + '.input')
+                question_file = os.path.join(abs_path, name)
+                submit(question_file, in_sandbox)
+                sys.exit(0)
 
-                sandbox_opt = '-sandbox' if in_sandbox else ''
-                command = 'loadHITs -question %s -properties %s -input %s %s' % (qf, pf, inf, sandbox_opt)
-                wdir = os.path.join(AMT_DIR, 'bin')
-
-                print command
-
-                import subprocess
-                p = subprocess.Popen(command, cwd=wdir, stdout=subprocess.PIPE, shell=True)
-                print p.communicate()[0]
-
-                count += 1
-                if count == 2:
-                    break
-                
 
 if __name__ == '__main__':
     # For more details about optparser, Please visit:
@@ -63,7 +65,12 @@ if __name__ == '__main__':
     parser = optparse.OptionParser(usage = usage)
     parser.add_option('-d', '--dir', dest='dir', default = '.', help="source file's dir")
     parser.add_option('--production', dest='sandbox', default=True, action='store_false', help='run in production model')
+    parser.add_option('--single', dest='single', help='push a single task')
+    
     (options, args) = parser.parse_args()
 
     prepare_env()
-    walker(os.path.dirname(options.dir), options.sandbox)
+    if options.single: # 提交单个文件
+        submit(options.single, options.sandbox)
+    else:              # 提交某个目录下的所有文件
+        walker(os.path.dirname(options.dir), options.sandbox)

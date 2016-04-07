@@ -5,11 +5,12 @@ from random import randint
 
 SLICE_N = 30
 REWARD = 0.02
-ASSIGNMENTS = 10
+ASSIGNMENTS = 20
 
 class Question:
-    def __init__(self, item, idx):
+    def __init__(self, item, answer_id, idx):
         self.item = item
+        self.answer_id = answer_id
         self.url = 'http://dn-goodview.qbox.me/' + item
         self.idx = idx
 
@@ -35,23 +36,23 @@ u'''
         <StyleSuggestion>radiobutton</StyleSuggestion>  
         <Selections> 
           <Selection> 
-            <SelectionIdentifier>1[{0}]</SelectionIdentifier>  
+            <SelectionIdentifier>1[{4}]</SelectionIdentifier>  
             <Text>1: I think the viewpoint is poor</Text> 
           </Selection>
           <Selection> 
-            <SelectionIdentifier>2[{0}]</SelectionIdentifier>  
+            <SelectionIdentifier>2[{4}]</SelectionIdentifier>  
             <Text>2: I think the viewpoint is fair</Text> 
           </Selection> 
           <Selection> 
-            <SelectionIdentifier>3[{0}]</SelectionIdentifier>  
+            <SelectionIdentifier>3[{4}]</SelectionIdentifier>  
             <Text>3: I think the viewpoint is satisfactory</Text> 
           </Selection> 
           <Selection> 
-            <SelectionIdentifier>4[{0}]</SelectionIdentifier>  
+            <SelectionIdentifier>4[{4}]</SelectionIdentifier>  
             <Text>4: I think the viewpoint is good</Text> 
           </Selection>  
           <Selection> 
-            <SelectionIdentifier>5[{0}]</SelectionIdentifier>  
+            <SelectionIdentifier>5[{4}]</SelectionIdentifier>  
             <Text>5: I think the viewpoint is excellent</Text> 
           </Selection> 
         </Selections> 
@@ -59,13 +60,16 @@ u'''
     </AnswerSpecification> 
   </Question>
 '''
-        return template.format(self.item, self.idx+1, SLICE_N, self.url)
+        # answer_id在陷阱图片中，和item会有不同
+        return template.format(self.item, self.idx+1, SLICE_N, self.url, self.answer_id)
 
 
 class Survey:
-    def __init__(self, identity, items):
+    def __init__(self, identity, items, traps):
         self.identity = identity
-        self.questions = [Question(item, idx) for idx, item in enumerate(items)]
+        self.questions = [Question(item, item, idx) for idx, item in enumerate(items)]
+        for item in traps:
+            self.questions.insert(randint(0,len(self.questions)), Question(item, item + '*', idx))
 
     def question_resp(self):
         template = \
@@ -147,10 +151,11 @@ if __name__ == '__main__':
         identity = 'goodview_%d-%d' % (idx, end_idx - 1)
         current_items = items[idx:end_idx]
         # add item for evaluation
+        traps = []
         if len(bad_items) > 0:
-            current_items.insert(randint(0,len(current_items)),random.choice(bad_items))
+            traps.append(random.choice(bad_items))
 
-        a = Survey(identity, current_items)
+        a = Survey(identity, current_items, traps)
         with open(identity + '.properties', 'w') as f:
             f.write(a.property_resp().encode('utf-8'))
         with open(identity + '.question', 'w') as f:

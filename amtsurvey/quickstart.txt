@@ -1,20 +1,20 @@
-先将kxm.txt或者kxm.matrix中的名称替换为
+﻿先将kxm.txt或者kxm.matrix中的名称替换为
 kxm/foreground/img0001.jpg
 
 支持两种输入模式
-python gen_survey.py < kxm.txt
+python gen_survey.py --bad-item-file=bad.txt < kxm.txt
 或者
-python gen_survey.py --matrix-in < kxm.matrix
+python gen_survey.py --bad-item-file=bad.txt --matrix-in < kxm.matrix
 
 更改bin目录下的配置
 1.设置access_key和secret_key
 2.把service_url的方式改为https, 否则容易报错
 
+修改post_utility.py中的目录
 
 单个提交
-cd D:\aws-mturk-clt-1.3.1\bin
-loadHITs -question  C:\Users\mzd\Desktop\viewpoint\amtsurvey\moviesurvey.question -properties C:\Users\mzd\Desktop\viewpoint\amtsurvey\moviesurvey.properties -input C:\Users\mzd\Desktop\viewpoint\amtsurvey\moviesurvey.input -sandbox
+python post_utility.py --single=moviesurvey.input
 
 
 批量提交
-python batch_post.py --dir=. [--production]
+python post_utility.py --dir=. [--production]
