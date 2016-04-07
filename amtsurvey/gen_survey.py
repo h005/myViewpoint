@@ -1,5 +1,7 @@
 #-*-coding:utf-8-*-
 import sys
+import random
+from random import randint
 
 SLICE_N = 30
 REWARD = 0.02
@@ -15,16 +17,16 @@ class Question:
         template = \
 u'''
   <Question> 
-    <QuestionIdentifier>%s</QuestionIdentifier>  
+    <QuestionIdentifier>{0}</QuestionIdentifier>  
     <IsRequired>true</IsRequired>
     <QuestionContent> 
-      <Text>Progress %d/%d: %s</Text>  
+      <Text>Progress {1}/{2}: {0}</Text>  
       <Binary> 
         <MimeType> 
           <Type>image</Type>  
           <SubType>jpg</SubType> 
         </MimeType>  
-        <DataURL>%s</DataURL>  
+        <DataURL>{3}</DataURL>  
         <AltText>Focus on the viewpoint of this photo</AltText> 
       </Binary> 
     </QuestionContent>  
@@ -33,19 +35,31 @@ u'''
         <StyleSuggestion>radiobutton</StyleSuggestion>  
         <Selections> 
           <Selection> 
-            <SelectionIdentifier>good[%s]</SelectionIdentifier>  
-            <Text>I think the viewpoint is good</Text> 
+            <SelectionIdentifier>1[{0}]</SelectionIdentifier>  
+            <Text>1: I think the viewpoint is poor</Text> 
+          </Selection>
+          <Selection> 
+            <SelectionIdentifier>2[{0}]</SelectionIdentifier>  
+            <Text>2: I think the viewpoint is fair</Text> 
+          </Selection> 
+          <Selection> 
+            <SelectionIdentifier>3[{0}]</SelectionIdentifier>  
+            <Text>3: I think the viewpoint is satisfactory</Text> 
+          </Selection> 
+          <Selection> 
+            <SelectionIdentifier>4[{0}]</SelectionIdentifier>  
+            <Text>4: I think the viewpoint is good</Text> 
           </Selection>  
           <Selection> 
-            <SelectionIdentifier>bad[%s]</SelectionIdentifier>  
-            <Text>I think the viewpoint is bad</Text> 
-          </Selection>
+            <SelectionIdentifier>5[{0}]</SelectionIdentifier>  
+            <Text>5: I think the viewpoint is excellent</Text> 
+          </Selection> 
         </Selections> 
       </SelectionAnswer> 
     </AnswerSpecification> 
   </Question>
 '''
-        return template % (self.item, self.idx+1, SLICE_N, self.item, self.url, self.item, self.item)
+        return template.format(self.item, self.idx+1, SLICE_N, self.url)
 
 
 class Survey:
@@ -67,7 +81,7 @@ u'''<?xml version="1.0" encoding="utf-8"?>
 </QuestionForm>
 '''
         strs = [q.resp() for q in self.questions]
-        return template % (SLICE_N, '\n'.join(strs))
+        return template % (SLICE_N + 1, '\n'.join(strs))
 
     def property_resp(self):
         template = \
@@ -98,7 +112,14 @@ if __name__ == '__main__':
     usage = 'Usage: %prog [--matrix-in] < kxm.txt'  
     parser = optparse.OptionParser(usage = usage)
     parser.add_option('--matrix-in', dest='matrix_in', default=False, action='store_true', help='using matrix format')
+    parser.add_option('--bad-item-file', dest='bad_item_f', help='the file which has bad item names')
     (options, args) = parser.parse_args()
+
+    bad_items = []
+    if options.bad_item_f:
+        with open(options.bad_item_f, 'r') as f:
+            for line in f:
+                bad_items.append(line.strip())
 
     idx = 0
     items = []
@@ -124,7 +145,12 @@ if __name__ == '__main__':
         if end_idx >= len(items):
             break
         identity = 'goodview_%d-%d' % (idx, end_idx - 1)
-        a = Survey(identity, items[idx:end_idx])
+        current_items = items[idx:end_idx]
+        # add item for evaluation
+        if len(bad_items) > 0:
+            current_items.insert(randint(0,len(current_items)),random.choice(bad_items))
+
+        a = Survey(identity, current_items)
         with open(identity + '.properties', 'w') as f:
             f.write(a.property_resp().encode('utf-8'))
         with open(identity + '.question', 'w') as f:

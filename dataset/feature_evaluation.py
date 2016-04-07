@@ -45,4 +45,4 @@ if __name__ == '__main__':
 
     result = list(sorted(result.items(), key=lambda d:d[1], reverse=True))
     for item in result:
-        print '\text{{{0}}}_{{{1}}} & {2} \\\\'.format(item[0], len(fnames[item[0]]), item[1])
+        print '\\text{{{0}}}_{{{1}}} & {2} \\\\'.format(item[0], len(fnames[item[0]]), item[1])
