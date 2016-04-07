@@ -35,7 +35,10 @@ void CCSiftMatch::match(int first)
     }
     else
     {
+        std::cout << "....................debug ..................." << std::endl;
+        std::cout << "ccsift1 descriptors size "<< keypointsCCsift1.size() << std::endl;
         matcher.match(ccsift1->getDescriptors(keypointsCCsift1),ccsift2->getDescriptors(),matches);
+        std::cout << "matches size "<< matches.size() << std::endl;
         std::cout << "call another time " <<std::endl;
     }
 
@@ -65,6 +68,9 @@ void CCSiftMatch::match(int first)
     }
 
     std::vector<uchar> m_RANSACStatus;
+
+    if(ptCount <8 )
+        return;
 
     cv::Mat m_Fundamental = cv::findFundamentalMat(p1,
                                                    p2,
@@ -114,9 +120,9 @@ void CCSiftMatch::match(int first)
                     imMatch);
     if(first)
     {
-        std::cout << "rematch .........." <<std::endl;
-        for(int i=0;i<key1.size();i++)
-            std::cout << key1[i].pt.x <<  " " << key1[i].pt.y << std::endl;
+//        std::cout << "rematch .........." <<std::endl;
+//        for(int i=0;i<key1.size();i++)
+//            std::cout << key1[i].pt.x <<  " " << key1[i].pt.y << std::endl;
     }
 
     std::vector<cv::KeyPoint> rawKey1(0);

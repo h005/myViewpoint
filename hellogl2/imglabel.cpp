@@ -60,6 +60,25 @@ ImgLabel::~ImgLabel()
     delete cc_sift;
 }
 
+void ImgLabel::setImage(QString path)
+{
+    scaleRatio = 1.0;
+    if(ccSiftMatch)
+        delete ccSiftMatch;
+    ccSiftMatch = NULL;
+    flagMatch = false;
+    flagDrawRect = false;
+    if(cc_sift)
+        delete cc_sift;
+    cc_sift = NULL;
+    this->path = path;
+    image.release();
+    readin();
+    QPixmap pixmap = QPixmap::fromImage(img);
+    this->setPixmap(pixmap);
+    this->resize(img.width(),img.height());
+}
+
 void ImgLabel::mousePressEvent(QMouseEvent *e)
 {
     if(!flagMatch)
@@ -238,6 +257,9 @@ void ImgLabel::readin()
     imageResize();
 
     img = mat2QImage(image);
+//    std::cout << "readin .................................................................." << std::endl;
+//    std::cout << image.cols << " "<< image.rows << std::endl;
+//    std::cout << img.width() << " " << img.height() << std::endl;
 }
 
 void ImgLabel::imageResize()

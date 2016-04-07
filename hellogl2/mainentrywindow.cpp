@@ -463,7 +463,10 @@ void MainEntryWindow::on_cameraCalibration_clicked()
         ui->cameraCalibration->setEnabled(false);
 
         CCWindow *ccWindow = new CCWindow(ccManager->modelPath(),
-                                          ccManager->imagePath(),ccManager->relationPath());
+                                          ccManager->imagesFilePath(),
+                                          ccManager->imgsDir(),
+                                          ccManager->outputFile(),
+                                          ccManager->relationPath());
         ccWindow->show();
         ui->cameraCalibration->setEnabled(true);
     }
@@ -487,7 +490,7 @@ void MainEntryWindow::on_ccConfig_clicked()
 
         if(!ccManager->load())
         {
-            QMessageBox::about(this,"hei hei ",fileName + " failed to open");
+            QMessageBox::about(this,"suoga ",fileName + " failed to open");
             delete ccManager;
             ccManager = NULL;
             return;

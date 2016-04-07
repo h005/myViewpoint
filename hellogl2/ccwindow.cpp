@@ -16,13 +16,21 @@ CCWindow::CCWindow()
 
 }
 
-CCWindow::CCWindow(QString modelPath, QString imgPath, QString relationPath)
+CCWindow::CCWindow(QString modelPath, QString imgFilePath, QString imgDir, QString outputPath, QString relationPath)
 {
+    this->imgDir = imgDir;
+    tcase = 0;
     ccSiftMatch = NULL;
     this->modelPath = modelPath;
-    imgFile = new QFileInfo(imgPath);
+    imgsFile = new QFileInfo(imgFilePath);
     modelFile = new QFileInfo(modelPath);
-    relationFile = new QFileInfo(relationPath + "/" + imgFile->baseName() + ".txt");
+    outputFile = new QFileInfo(outputPath);
+//    relationFile = new QFileInfo(relationPath + "/" + imgFile->baseName() + ".txt");
+    relationFile = new QFileInfo();
+
+    // read images from imgsFile
+    // read outputFile
+    fillImgsVec();
 
     std::cout << "relation file info "<<relationFile->absoluteFilePath().toStdString() << std::endl;
 
@@ -34,11 +42,16 @@ CCWindow::CCWindow(QString modelPath, QString imgPath, QString relationPath)
     calibrateBtn = new QPushButton(tr("Calibrate"),this);
     pointsClear = new QPushButton(tr("Clear"),this);
     siftMatchBtn = new QPushButton(tr("SiftMatch"),this);
+    confirmBtn = new QPushButton(tr("confirm"),this);
     ccSMW = new CCSiftMatchWindow();
+
+    exportBtn->setShortcut(Qt::Key_E);
+    alignDLTBtn->setShortcut(Qt::Key_C);
 
     scrollArea = new QScrollArea();
 
-    imgLabel = new ImgLabel(imgPath);
+    // imgLabel show image
+    imgLabel = new ImgLabel(imgsVec[tcase]);
 
     ccMW = new CCModelWidget(modelPath);
     ccMW->getScaleTranslateMatrix(cc_st);
@@ -51,10 +64,11 @@ CCWindow::CCWindow(QString modelPath, QString imgPath, QString relationPath)
 
     connect(alignBtn,SIGNAL(clicked()),this,SLOT(align()));
     connect(alignDLTBtn,SIGNAL(clicked()),this,SLOT(alignDLT()));
-    connect(exportBtn,SIGNAL(clicked()),this,SLOT(exportInfo()));
+    connect(exportBtn,SIGNAL(clicked()),this,SLOT(exportMVP()));
     connect(calibrateBtn,SIGNAL(clicked()),this,SLOT(calibrate()));
     connect(pointsClear,SIGNAL(clicked()),this,SLOT(clearpoints()));
     connect(siftMatchBtn,SIGNAL(clicked()),this,SLOT(siftMatch()));
+    connect(confirmBtn,SIGNAL(clicked()),this,SLOT(confirm()));
 //    connect(ccSMW,SIGNAL(relationDone()),this,SLOT(this->showPoints()));
 
     QSizePolicy cellPolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
@@ -66,10 +80,11 @@ CCWindow::CCWindow(QString modelPath, QString imgPath, QString relationPath)
     // 中间一列放按钮
     QVBoxLayout *middleLayout = new QVBoxLayout;
     middleLayout->addWidget(siftMatchBtn);
-    middleLayout->addWidget(alignBtn);
+    middleLayout->addWidget(confirmBtn);
+//    middleLayout->addWidget(alignBtn);
     middleLayout->addWidget(alignDLTBtn);
     middleLayout->addWidget(exportBtn);
-    middleLayout->addWidget(calibrateBtn);
+//    middleLayout->addWidget(calibrateBtn);
     middleLayout->addWidget(pointsClear);
 
     // 左边放入imgLable，中间放按钮，右边放ccMW
@@ -135,6 +150,22 @@ void CCWindow::keyPressEvent(QKeyEvent *event)
                       && (p.y() >= 0 && p.y() < lsize.height())) {
             std::cout << imgLabel->removeLastPoint() << std::endl;
         }
+    }
+    else if(event->key() == Qt::Key_A)
+    {
+        tcase--;
+        if(tcase < 0)
+            tcase = imgsVec.size()-1;
+        clearpoints();
+        imgLabel->setImage(imgsVec[tcase]);
+    }
+    else if(event->key() == Qt::Key_D)
+    {
+        tcase++;
+        if(tcase >= imgsVec.size())
+            tcase = 0;
+        clearpoints();
+        imgLabel->setImage(imgsVec[tcase]);
     }
 }
 
@@ -215,6 +246,58 @@ void CCWindow::calibrateLevmar(glm::mat3 &R, glm::vec3 &t, float &c)
     std::cout << glm::to_string(cal_proj)<<std::endl;
 }
 
+void CCWindow::fillImgsVec()
+{
+    imgsMV.clear();
+    imgsProj.clear();
+    std::ifstream in(outputFile->absoluteFilePath().toStdString().c_str());
+    std::string tmps;
+    while(in >> tmps)
+    {
+        QString ss(tmps.c_str());
+        // read in parameters
+        glm::mat4 mv;
+        glm::mat4 proj;
+        float tmpf;
+        for(int i=0;i<4;i++)
+            for(int j=0;j<4;j++)
+            {
+                in>> tmpf;
+                mv[j][i] = tmpf;
+            }
+        for(int i=0;i<4;i++)
+            for(int j=0;j<4;j++)
+            {
+                in >> tmpf;
+                proj[j][i] = tmpf;
+            }
+
+        imgsMV.insert( std::pair<QString, glm::mat4>(ss,mv) );
+        imgsProj.insert( std::pair<QString, glm::mat4>(ss,proj) );
+
+    }
+    in.close();
+
+    imgsVec.clear();
+    in.open(imgsFile->absoluteFilePath().toStdString().c_str());
+
+    while(std::getline(in,tmps))
+    {
+        QString ss(tmps.c_str());
+        QStringList sslist = ss.split(" ", QString::SkipEmptyParts);
+        if(sslist.size() == 0)
+            continue;
+        QFileInfo file(sslist[0]);
+        QString fn = imgDir + "/" + file.fileName();
+        std::map<QString,glm::mat4>::iterator it = imgsMV.find(fn);
+//        if(it != imgsMV.find(fn))
+        if(it == imgsMV.end())
+            imgsVec.push_back(fn);
+    }
+
+    in.close();
+}
+
 void CCWindow::align()
 {
     // method 1 DLT directly
@@ -284,6 +367,33 @@ void CCWindow::exportInfo()
     alignBtn->setEnabled(true);
 }
 
+void CCWindow::exportMVP()
+{
+    std::ofstream out;
+    out.open(outputFile->absoluteFilePath().toStdString().c_str(),std::ofstream::out);
+
+    std::map<QString,glm::mat4>::iterator it = imgsMV.begin();
+    for(;it != imgsMV.end();it++)
+    {
+        out << (it->first).toStdString() << std::endl;
+        for(int i=0;i<4;i++)
+        {
+            for(int j=0;j<4;j++)
+                out << (it->second)[j][i]<<" ";
+            out << std::endl;
+        }
+        std::map<QString,glm::mat4>::iterator itProj = imgsProj.find(it->first);
+        for(int i=0;i<4;i++)
+        {
+            for(int j=0;j<4;j++)
+                out << (itProj->second)[j][i]<<" ";
+            out << std::endl;
+        }
+    }
+
+    out.close();
+}
+
 void CCWindow::calibrate()
 {
     // DLT 检测相机参数的代码，2D图像中是的坐标系是x,y坐标系，即原点在图像的左下角
@@ -332,5 +442,13 @@ void CCWindow::showPoints()
     std::vector<int> index;
     ccMW->setPoints(ccSiftMatch->getModelPoints(),index);
     imgLabel->setPoints(ccSiftMatch->getImagePoints(),index);
+}
+
+void CCWindow::confirm()
+{
+    // insert in
+    imgsMV.insert( std::pair<QString,glm::mat4>(imgsVec[tcase], cal_mv) );
+    imgsProj.insert( std::pair<QString,glm::mat4>(imgsVec[tcase], cal_proj));
+    imgsVec.erase( imgsVec.begin() + tcase);
 }
 

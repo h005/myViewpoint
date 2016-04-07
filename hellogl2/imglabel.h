@@ -27,6 +27,8 @@ public:
     ImgLabel(CCSiftMatch *ccSiftMatch,CCModelWidget *ccMW,QWidget *parent = 0);
     ~ImgLabel();
 
+    void setImage(QString path);
+
     void mousePressEvent(QMouseEvent *e);
     void mouseMoveEvent(QMouseEvent *e);
     void mouseReleaseEvent(QMouseEvent *e);

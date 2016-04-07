@@ -11,6 +11,7 @@
 #include "ccmodelwidget.h"
 #include "ccsiftmatch.h"
 #include "ccsiftmatchwindow.h"
+#include <set>
 
 class PointsMatchRelation;
 class EntityManager;
@@ -20,7 +21,7 @@ class CCWindow : public QMainWindow
 
 public:
     CCWindow();
-    CCWindow(QString modelPath,QString imgPath,QString relationPath);
+    CCWindow(QString modelPath, QString imgFilePath, QString imgDir, QString outputPath, QString relationPath);
     ~CCWindow();
 
     QSize sizeHint() const Q_DECL_OVERRIDE;
@@ -34,15 +35,18 @@ private:
     void getDLTpoints3D(float points3D[][3]);
     void calibrateLevmar(glm::mat3 &R,glm::vec3 &t,float &c);
 
+    void fillImgsVec();
 
 private slots:
     void align();
     void alignDLT();
     void exportInfo();
+    void exportMVP();
     void calibrate();
     void clearpoints();
     void siftMatch();
     void showPoints();
+    void confirm();
 
 private:
     QPushButton *alignBtn;
@@ -51,14 +55,21 @@ private:
     QPushButton *siftMatchBtn;
     QPushButton *pointsClear;
     QPushButton *alignDLTBtn;
+    QPushButton *confirmBtn;
     QScrollArea *scrollArea;
     ImgLabel *imgLabel;
     CCModelWidget *ccMW;
-    QFileInfo *imgFile;
+    QFileInfo *imgsFile;
     QFileInfo *modelFile;
     QFileInfo *relationFile; // export path
+    QFileInfo *outputFile;
+    QString imgDir;
     CCSiftMatchWindow *ccSMW;
-
+    std::vector<QString> imgsVec;
+    // calibraeted done
+    std::map<QString,glm::mat4> imgsMV;
+    std::map<QString,glm::mat4> imgsProj;
+    int tcase;
 private:
     PointsMatchRelation *relation;
 
