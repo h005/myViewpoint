@@ -104,8 +104,8 @@ annotation:sample#command
 # this Assignment Duration value is 60 * 60 = 1 hour
 assignmentduration:3600
 
-# this HIT Lifetime value is 60*60*24*3 = 3 days
-hitlifetime:259200
+# this HIT Lifetime value is 60*60*24*5 = 5 days
+hitlifetime:432000
 
 # this Auto Approval period is 60*60*24*15 = 15 days
 autoapprovaldelay:1296000'''
