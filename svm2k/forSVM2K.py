@@ -7,20 +7,22 @@ import StringIO
 def prepare_for_SVM2K(label_file, f2d_files, f3d_files, mask=None):
     label = {}
     length = -1
-    with open(label_file, 'r') as labelfile:
-        while True:
-            key = labelfile.readline().strip()
-            value = labelfile.readline().strip()
-            if not key:
-                break
+    
+    if label_file:
+        with open(label_file, 'r') as labelfile:
+            while True:
+                key = labelfile.readline().strip()
+                value = labelfile.readline().strip()
+                if not key:
+                    break
 
-            label[key] = value 
-            # 检查向量的长度是否一致
-            current_length = len(label[key].split(' '))
-            if length < 0:
-                length = current_length
-            else:
-                assert(length == current_length)
+                label[key] = value 
+                # 检查向量的长度是否一致
+                current_length = len(label[key].split(' '))
+                if length < 0:
+                    length = current_length
+                else:
+                    assert(length == current_length)
 
     f2d = {}
     for feature_file in f2d_files:
@@ -64,20 +66,18 @@ def prepare_for_SVM2K(label_file, f2d_files, f3d_files, mask=None):
                 else:
                     assert(length == current_length)
 
-    assert len(f2d) == len(f3d) == len(label)
-
     output_filename = StringIO.StringIO()
     output_label = StringIO.StringIO()
     output_f2d = StringIO.StringIO()
     output_f3d = StringIO.StringIO()
 
-    for idx, key in enumerate(sorted(label.keys())):
+    for idx, key in enumerate(sorted(f3d.keys())):
         if mask is not None and idx not in mask:
             continue
         output_filename.write(key + '\n')
-        output_label.write(label[key] + "\n")
-        output_f2d.write(f2d[key] + "\n")
-        output_f3d.write(f3d[key] + "\n")
+        output_label.write(label.get(key, '1') + "\n")
+        output_f2d.write(f2d.get(key, '') + "\n")
+        output_f3d.write(f3d.get(key, '') + "\n")
 
     return output_filename.getvalue(), output_label.getvalue(), output_f2d.getvalue(), output_f3d.getvalue()
 
