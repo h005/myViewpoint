@@ -39,7 +39,7 @@ void MainWindow::startMyProcess()
         mesh.release_vertex_normals();
     }
 #else
-    if (!ExternalImporter<MyMesh>::read_mesh(mesh, "dragon.off") )
+    if (!ExternalImporter<MyMesh>::read_mesh(mesh, "D:\\tt\\bigben\\bigben\\bigben.obj", true))
     {
         std::cerr << "Error: Cannot read mesh from " << std::endl;
         return;
@@ -64,6 +64,8 @@ void MainWindow::startMyProcess()
     // 创建两个对象，分别用于提取高斯曲率和平均曲率
     GaussCurvature<MyMesh> a(mesh);
     MeanCurvature<MyMesh> b(mesh);
+
+    std::cout << "aaa " << std::endl;
 
     // 将每个点的平均曲率以颜色的形式附加到mesh对象上，并进行输出
     // 之后就可以使用meshlab软件打开模型文件，直观地查看每个点的平均曲率
