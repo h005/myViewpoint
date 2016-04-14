@@ -193,6 +193,7 @@ void Window::align()
 //    std::cout << glm::to_string(aa) << std::endl;
     glm::mat4 model2ptCloud = glm::mat4(c*R);
     model2ptCloud[3] = glm::vec4(t, 1.f);
+    // 此处描述的是从网格三维模型到点云模型的变换，不是最终的渲染矩阵，千万不要应用normalizedModelView过程!!!
 
     BothWidget *w = new BothWidget(m_ptCloudPath.toStdString(), m_modelpath.toStdString(), model2ptCloud);
     w->show();
