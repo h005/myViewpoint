@@ -114,11 +114,14 @@ autoapprovaldelay:1296000'''
 
 if __name__ == '__main__':
     import optparse
-    usage = 'Usage: %prog [--matrix-in] < kxm.txt'  
+    usage = 'Usage: %prog --prefix=kxm_ [--matrix-in] < kxm.txt'  
     parser = optparse.OptionParser(usage = usage)
     parser.add_option('--matrix-in', dest='matrix_in', default=False, action='store_true', help='using matrix format')
+    parser.add_option('--prefix', dest='prefix', default='kxm_', help='survey prefix')
     parser.add_option('--bad-item-file', dest='bad_item_f', help='the file which has bad item names')
     (options, args) = parser.parse_args()
+
+    ID_PREFIX = options.prefix
 
     bad_items = []
     if options.bad_item_f:
