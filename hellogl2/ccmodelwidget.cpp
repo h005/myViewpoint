@@ -24,10 +24,10 @@ CCModelWidget::CCModelWidget(const QString &modelPath,
     m_shiftBeforeRender = scaleAndShift.second;
     f_fixMVP = false;
 
-    std::cout << "ccmodelwidget transform matrix" << std::endl;
-    glm::mat4 tmp = model.getInnerTransformation();
-    std::cout << glm::to_string(tmp) << std::endl;
-    std::cout << "ccmodelwidget transform matrix done" << std::endl;
+//    std::cout << "ccmodelwidget transform matrix" << std::endl;
+//    glm::mat4 tmp = model.getInnerTransformation();
+//    std::cout << glm::to_string(tmp) << std::endl;
+//    std::cout << "ccmodelwidget transform matrix done" << std::endl;
 }
 
 CCModelWidget::CCModelWidget(const QString &modelPath,

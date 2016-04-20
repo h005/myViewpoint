@@ -74,6 +74,7 @@ CCWindow::CCWindow(QString modelPath, QString imgFilePath, QString imgDir, QStri
     QSizePolicy cellPolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
     cellPolicy.setHorizontalStretch(1);
     scrollArea->setSizePolicy(cellPolicy);
+    ccMW->show();
     ccMW->setSizePolicy(cellPolicy);
 
     scrollArea->setWidget(imgLabel);

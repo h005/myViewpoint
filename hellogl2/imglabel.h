@@ -15,8 +15,8 @@
 #include "ccsiftmatch.h"
 #include "ccmodelwidget.h"
 
-#define WIDTH 500
-#define HEIGHT 500
+#define WIDTH 900
+#define HEIGHT 900
 
 //  imglabel 中的mat在readin之后是RGB格式的
 class ImgLabel : public QLabel

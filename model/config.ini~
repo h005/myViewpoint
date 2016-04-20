@@ -1,6 +1,6 @@
 [model]
-testpath=/home/h005/Documents/QtProject/viewpoint/models/CCTV_headquaters/CCTV+Headquarters_modified.obj
-path=/home/h005/Documents/QtProject/viewpoint/model/models/model.obj
+path=/home/h005/Documents/QtProject/viewpoint/models/CCTV_headquaters/CCTV+Headquarters_modified.obj
+testpath=/home/h005/Documents/QtProject/viewpoint/model/models/model.obj
 ptCloudPath=/home/h005/Documents/QtProject/viewpoint/model/kxm-01.15.ply
 
 [image]
@@ -9,7 +9,7 @@ path=/home/h005/Documents/QtProject/viewpoint/model/models/img0004.jpg
 [images]
 path=/home/h005/Documents/QtProject/viewpoint/model/list.txt
 dir=/home/h005/Documents/vpDataSet/kxm/imgs
-output=/home/h005/Documents/QtProject/viewpoint/model/output.txt
+output0=/home/h005/Documents/QtProject/viewpoint/model/output.txt
 
 [relation]
 path=/home/h005/Documents/QtProject/viewpoint/model

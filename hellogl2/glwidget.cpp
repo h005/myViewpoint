@@ -118,10 +118,10 @@ void GLWidget::initializeGL()
     // the signal will be followed by an invocation of initializeGL() where we
     // can recreate all resources.
     initializeOpenGLFunctions();
-    glClearColor(0, 0, 0, m_transparent ? 0 : 1);
-    glEnable(GL_COLOR_MATERIAL);
-    glColorMaterial(GL_FRONT,GL_AMBIENT);
-    glColor3f(1.0,1.0,1.0);
+    glClearColor(0.368, 0.368, 0.733, m_transparent ? 0 : 1);
+//    glEnable(GL_COLOR_MATERIAL);
+//    glColorMaterial(GL_FRONT,GL_AMBIENT);
+//    glColor3f(1.0,1.0,1.0);
     // Our camera never changes in this example.
     // Equal to:
     // m_camera = glm::translate(glm::mat4(), glm::vec3(0.f, 0.f, -3.f));
@@ -171,7 +171,7 @@ void GLWidget::paintGL()
 
 void GLWidget::resizeGL(int w, int h)
 {
-    m_proj = glm::perspective(glm::pi<float>() / 3, GLfloat(w) / h, 0.01f, 100.0f);
+    m_proj = glm::perspective(glm::pi<float>() / 3, GLfloat(w) / h, 0.01f, 1000000.0f);
 }
 
 glm::mat4 GLWidget::getModelViewMatrix()

@@ -68,10 +68,10 @@ static void get_bounding_box_for_node(const aiScene *sc,
 	aiMatrix4x4 trafo = prev;
 	trafo *= nd->mTransformation;
 
-    for (int i = 0; i <  4; i++)
-        for (int j = 0; j < 4; j++)
-            std::cout << trafo[i][j] << " ";
-    std::cout << std::endl;
+//    for (int i = 0; i <  4; i++)
+//        for (int j = 0; j < 4; j++)
+//            std::cout << trafo[i][j] << " ";
+//    std::cout << std::endl;
 
 	for (; n < nd->mNumMeshes; ++n) {
 		const aiMesh* mesh = sc->mMeshes[nd->mMeshes[n]];
@@ -223,9 +223,7 @@ GModel::GModel()
 
 bool GModel::load(const char *modelPath) {
 	cleanUp();
-    std::cout << "GModel modelPath"<<std::endl;
-    std::cout << modelPath << std::endl;
-    std::cout << "GModel model path done" << std::endl;
+
 	pImporter = new Assimp::Importer();
 	scene = pImporter->ReadFile(modelPath, aiProcessPreset_TargetRealtime_Quality);
 	if (!scene) {
@@ -334,22 +332,18 @@ void GModel::draw(const glm::mat4 &inheritModelView, const glm::mat4 &projection
 
         if (mesh->HasNormals())
         {
-//            std::cout << "gldisable lighting color" << std::endl;
             glEnable(GL_LIGHTING);
         }
         else
         {
-//            std::cout << "glenable lighting color" << std::endl;
             glDisable(GL_LIGHTING);
         }
         if (mesh->mColors[0] != NULL)
         {
-//            std::cout  << "glenable material color" << std::endl;
             glEnable(GL_COLOR_MATERIAL);
         }
         else
         {
-//            std::cout  << "gldisable material color" << std::endl;
             glDisable(GL_COLOR_MATERIAL);
         }
 
@@ -371,10 +365,6 @@ std::pair<GLfloat, glm::mat4> GModel::recommandScaleAndShift()
 {
     GLfloat scale = drawScale();
     glm::mat4 shiftTransform = glm::translate(glm::mat4(1.f), glm::vec3(-scene_center.x, -scene_center.y, -scene_center.z));
-    std::cout << "recommandScaleAndShift scale " << std::endl;
-    std::cout << scale << std::endl;
-    std::cout << "recommandScaleAndShift scene_center" << std::endl;
-    std::cout << scene_center.x << " " << scene_center.y << " " << scene_center.z << std::endl;
     return std::make_pair(scale, shiftTransform);
 }
 
@@ -613,15 +603,15 @@ void GModel::MeshEntry::render() {
 }
 
 
-glm::mat4 GModel::getInnerTransformation()
-{
-    float scale = drawScale();
-    glm::mat4 transformation = glm::scale(glm::mat4(1.f), glm::vec3(scale, scale, scale));
-    // 缩放矩阵 * 移中矩阵，表示先移中后缩放
-    transformation = glm::translate(transformation, glm::vec3(-scene_center.x, -scene_center.y, -scene_center.z));
-    std::cout << "getInnerTransformation scale " << std::endl;
-    std::cout << scale << std::endl;
-    std::cout << "getInnerTransformation scene_center" << std::endl;
-    std::cout << -scene_center.x << " " << -scene_center.y << " " << -scene_center.z << std::endl;
-    return transformation;
-}
+//glm::mat4 GModel::getInnerTransformation()
+//{
+//    float scale = drawScale();
+//    glm::mat4 transformation = glm::scale(glm::mat4(1.f), glm::vec3(scale, scale, scale));
+//    // 缩放矩阵 * 移中矩阵，表示先移中后缩放
+//    transformation = glm::translate(transformation, glm::vec3(-scene_center.x, -scene_center.y, -scene_center.z));
+////    std::cout << "getInnerTransformation scale " << std::endl;
+////    std::cout << scale << std::endl;
+////    std::cout << "getInnerTransformation scene_center" << std::endl;
+////    std::cout << -scene_center.x << " " << -scene_center.y << " " << -scene_center.z << std::endl;
+//    return transformation;
+//}
