@@ -1,13 +1,16 @@
-#version 120
+﻿#version 330 core
 
 // Interpolated values from the vertex shaders
-varying vec2 UV;
+in vec2 UV;
+in vec4 vColor;
+
+// 输出类型要与GLOffscreenRenderFramework创建的buffer一致
+out vec4 rgba;
 
 // Values that stay constant for the whole mesh.
 uniform sampler2D myTextureSampler;
 
 void main(){
-
-	// Output color = color of the texture at the specified UV
-	gl_FragColor = texture2D( myTextureSampler, UV );
+    vec3 color = texture2D( myTextureSampler, UV ).rgb + vColor.rgb;
+    rgba = vec4(color, 1.f);
 }

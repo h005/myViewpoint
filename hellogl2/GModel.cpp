@@ -126,13 +126,17 @@ void GModel::apply_material(const aiMaterial *mtl)
 	}
 
 	set_float4(c, 0.8f, 0.8f, 0.8f, 1.0f);
-	if (AI_SUCCESS == aiGetMaterialColor(mtl, AI_MATKEY_COLOR_DIFFUSE, &diffuse))
+    if (AI_SUCCESS == aiGetMaterialColor(mtl, AI_MATKEY_COLOR_DIFFUSE, &diffuse)) {
 		color4_to_float4(&diffuse, c);
+        std::cout << "AI_MATKEY_COLOR_DIFFUSE"  << c[0] << " " << c[1] << " " << c[2] << std::endl;
+    }
 	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, c);
 
 	set_float4(c, 0.0f, 0.0f, 0.0f, 1.0f);
-	if (AI_SUCCESS == aiGetMaterialColor(mtl, AI_MATKEY_COLOR_SPECULAR, &specular))
-		color4_to_float4(&specular, c);
+    if (AI_SUCCESS == aiGetMaterialColor(mtl, AI_MATKEY_COLOR_SPECULAR, &specular)) {
+        color4_to_float4(&specular, c);
+        std::cout << "AI_MATKEY_COLOR_SPECULAR" << std::endl;
+    }
 	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, c);
 
 	set_float4(c, 0.2f, 0.2f, 0.2f, 1.0f);
@@ -299,6 +303,7 @@ void GModel::draw(const glm::mat4 &inheritModelView, const glm::mat4 &projection
     GLuint mvMatrixID = glGetUniformLocation(m_programID, "mvMatrix");
     GLuint normalMatrixID = glGetUniformLocation(m_programID, "normalMatrix");
     GLuint TextureID = glGetUniformLocation(m_programID, "myTextureSampler");
+    GLuint diffuseID = glGetUniformLocation(m_programID, "diffuse");
     glUniformMatrix4fv(projMatrixID, 1, GL_FALSE, glm::value_ptr(projection));
 
     std::vector<GModel::MeshEntry *>::iterator it;
@@ -314,24 +319,31 @@ void GModel::draw(const glm::mat4 &inheritModelView, const glm::mat4 &projection
         const aiMesh *mesh = (*it)->mesh;
         // 一个aiMesh拥有一致的纹理和材质
         glActiveTexture(GL_TEXTURE0);
-        apply_material(scene->mMaterials[mesh->mMaterialIndex]);
-        glUniform1i(TextureID, GL_TEXTURE0);
 
-        if (mesh->HasNormals())
+        // 应用材质或环境光
         {
-            glDisable(GL_LIGHTING);
-        }
-        else
-        {
-            glEnable(GL_LIGHTING);
-        }
-        if (mesh->mColors[0] != NULL)
-        {
-            glEnable(GL_COLOR_MATERIAL);
-        }
-        else
-        {
-            glDisable(GL_COLOR_MATERIAL);
+            auto mtl = scene->mMaterials[mesh->mMaterialIndex];
+
+            unsigned int texId = 0;
+            int texIndex = 0;
+            aiString texPath;	//contains filename of texture
+            if (AI_SUCCESS == mtl->GetTexture(aiTextureType_DIFFUSE, texIndex, &texPath) && textureIdMap[texPath.data])
+            {
+                //bind texture
+                texId = *textureIdMap[texPath.data];
+                glBindTexture(GL_TEXTURE_2D, texId);
+            }
+            glBindTexture(GL_TEXTURE_2D, texId);
+            glUniform1i(TextureID, GL_TEXTURE0);
+
+
+            glm::vec4 c(0.f);
+            if (texId == 0) { // 纹理不存在，则使用材质颜色
+                 aiColor4D diffuse;
+                 if (texId == 0 && AI_SUCCESS == aiGetMaterialColor(mtl, AI_MATKEY_COLOR_DIFFUSE, &diffuse))
+                     color4_to_float4(&diffuse, glm::value_ptr(c));
+            }
+            glUniform4fv(diffuseID, 1, glm::value_ptr(c));
         }
 
         // 计算最终的model view矩阵以及对应的法向变换矩阵
@@ -469,6 +481,9 @@ GModel::MeshEntry::MeshEntry(const aiMesh *mesh, const glm::mat4 &transformation
             glEnableVertexAttribArray (vertexNormal_modelspaceID);
         }
     }
+
+    if (mesh->HasVertexColors(0))
+        std::cout << "mesh->HasVertexColors(0)" << std::endl;
 
     if(mesh->HasFaces()) {
         std::vector<GLuint> indices;
