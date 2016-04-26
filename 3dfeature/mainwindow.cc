@@ -40,6 +40,7 @@ void MainWindow::startMyProcess()
     }
 #else
     if (!ExternalImporter<MyMesh>::read_mesh(mesh, "D:\\tt\\bigben\\bigben\\bigben.obj", true))
+    //if (!ExternalImporter<MyMesh>::read_mesh(mesh, "C:\\Users\\mzd\\Desktop\\3ds\\utah.obj", true))
     {
         std::cerr << "Error: Cannot read mesh from " << std::endl;
         return;
@@ -70,7 +71,7 @@ void MainWindow::startMyProcess()
     // 将每个点的平均曲率以颜色的形式附加到mesh对象上，并进行输出
     // 之后就可以使用meshlab软件打开模型文件，直观地查看每个点的平均曲率
     // 暂时没什么用，可以删除
-    b.assignVertexColor();
+    a.assignVertexColor();
     OpenMesh::IO::Options opt(OpenMesh::IO::Options::VertexColor);
     OpenMesh::IO::write_mesh(mesh, "temp.off", opt);
 
