@@ -472,3 +472,50 @@ void MainEntryWindow::on_pushButton_2_clicked()
 //    std::cout << glm::to_string(LMPCA::PCAWithModelPoints(p.size(), &p[0])) << std::endl;
 }
 
+
+void MainEntryWindow::on_printViewpointBtn_clicked()
+{
+    // 输出MV
+    QString selfilter = tr("Viewpoint info file (*.vp)");
+    QString fileName = QFileDialog::getSaveFileName(
+            this,
+            QString("打开配置文件"),
+            QString(),
+            tr("All files (*.*);;Viewpoint info file (*.vp)" ),
+            &selfilter
+    );
+
+    // 获得模型到点云的变换
+    glm::mat4 model2ptCloud = getModel2PtCloudTrans();
+    if (!fileName.isEmpty()) {
+        qDebug() << fileName;
+        std::ofstream vpFile;
+        vpFile.open(fileName.toUtf8().constData());
+
+        std::vector<QString> list;
+        manager->getImageList(list);
+        std::vector<QString>::iterator it;
+        for (it = list.begin(); it != list.end(); it++) {
+
+            qDebug() << "********************* " << it - list.begin() << " ****************";
+
+            Entity want;
+            Q_ASSERT(manager->getEntity(*it, want));
+            glm::mat4 wantMVMatrix = want.mvMatrix * model2ptCloud;
+            wantMVMatrix = normalizedModelView(wantMVMatrix);
+
+            glm::vec3 eye, center, up, forward;
+            recoveryLookAtWithModelView( wantMVMatrix, eye, center, up );
+
+            forward = center - eye;
+            vpFile << it->toUtf8().constData() << std::endl;
+            vpFile << eye.x << " " << eye.y << " " << eye.z << std::endl;
+            vpFile << forward.x << " " << forward.y << " " << forward.z << std::endl;
+            vpFile << up.x << " " << up.y << " " << up.z << std::endl;
+
+        }
+
+        qDebug() << "output finished";
+        vpFile.close();
+    }
+}

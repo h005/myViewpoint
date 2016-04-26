@@ -53,6 +53,8 @@ private slots:
 
     void on_showClusteredViewpointBtn_clicked();
 
+    void on_printViewpointBtn_clicked();
+
 private:
     Ui::MainEntryWindow *ui;
     EntityManager *manager;
