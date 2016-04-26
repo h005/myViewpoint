@@ -7,7 +7,7 @@ in vec3 EyeDirection_cameraspace;
 in vec3 LightDirection_cameraspace;
 
 // Ouput data
-out vec3 color;
+out vec4 rgba;
 
 // Values that stay constant for the whole mesh.
 uniform mat4 MV;
@@ -46,11 +46,12 @@ void main(){
         //  - Looking elsewhere -> < 1
         float cosAlpha = clamp( dot( E,R ), 0,1 );
 
-        color =
+        vec3 color =
                 // Ambient : simulates indirect lighting
                 MaterialAmbientColor +
                 // Diffuse : "color" of the object
                 MaterialDiffuseColor * LightColor * LightPower * cosTheta / (distance*distance) +
                 // Specular : reflective highlight, like a mirror
                 MaterialSpecularColor * LightColor * LightPower * pow(cosAlpha,5) / (distance*distance);
+        rgba = vec4(color, 1.f);
 }
