@@ -24,7 +24,7 @@ def get_image_url_list(key_word, num, interval=1):
             sys.stderr.write(img_url + '\n')
 
             # download image file
-            r = requests.get(img_url)
+            r = requests.get(img_url, timeout=10)
             savefile = os.path.basename(img_url)
             with open(savefile, 'wb') as f:
                 f.write(r.content)
@@ -36,5 +36,5 @@ def get_image_url_list(key_word, num, interval=1):
 
 
 if __name__ == '__main__':
-    img_urls = get_image_url_list(u'泰姬陵', 2000)
+    img_urls = get_image_url_list(u'中央电视台总部大楼', 2000)
     print '\n'.join(img_urls)
