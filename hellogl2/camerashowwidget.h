@@ -6,6 +6,7 @@
 #include "glwidget.h"
 #include "RenderObject/axis.h"
 #include "GModel.h"
+#include <map>
 
 class CameraShowWidget: public GLWidget
 {
@@ -28,7 +29,9 @@ private:
     std::vector<int> m_clusterIndices;
     Axis m_axis;
     GModel m_cameraModel;
+    std::vector<GModel> m_cameraModels;
     GLuint _axisProgramID = 0;
+    std::map<int,int> cameraID;
 };
 
 #endif // CAMERASHOWWIDGET_H

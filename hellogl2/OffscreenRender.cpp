@@ -45,6 +45,8 @@ void OffscreenRender::renderToImageFile(glm::mat4 mvMatrix, glm::mat4 projMatrix
     GLint viewport[4];
     glGetIntegerv(GL_VIEWPORT,viewport);
 
+    std::cout << "viewport " << viewport[0] << " " << viewport[1] << " " << viewport[2] << " " << viewport[3] << std::endl;
+
     // 默认开启背面剔除:GL_CULL_FACE
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
@@ -55,12 +57,12 @@ void OffscreenRender::renderToImageFile(glm::mat4 mvMatrix, glm::mat4 projMatrix
 
     if (!filePath.isNull())
     {
-        std::vector<GLubyte> img(BUFFER_WIDTH * BUFFER_HEIGHT * 4);
+        std::vector<GLubyte> img((viewport[2] - viewport[0])*(viewport[3] - viewport[1])*4);
         glReadBuffer(GL_BACK_LEFT);
         glReadPixels(0,
                     0,
-                    BUFFER_WIDTH,
-                    BUFFER_HEIGHT,
+                    (viewport[2] - viewport[0]),
+                    (viewport[3] - viewport[1]),
                     GL_BGRA,
                     GL_UNSIGNED_BYTE,
                     &img[0]);
@@ -68,7 +70,7 @@ void OffscreenRender::renderToImageFile(glm::mat4 mvMatrix, glm::mat4 projMatrix
         // 创建图片并写入路径
         // 由于OpenGL坐标原点位于左下角，保存前需要沿着x轴翻转图片
         qDebug()<<"save to" << filePath;
-        cv::Mat image = cv::Mat(BUFFER_WIDTH, BUFFER_HEIGHT,CV_8UC4, &img[0]);
+        cv::Mat image = cv::Mat((viewport[3] - viewport[1]), (viewport[2] - viewport[0]),CV_8UC4, &img[0]);
         cv::Mat flipped;
         cv::flip(image, flipped, 0);
 

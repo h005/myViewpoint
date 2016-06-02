@@ -58,6 +58,8 @@ private slots:
 
     void on_showClusterBtn_clicked();
 
+    void on_pushButton_3_clicked();
+
 private:
     Ui::MainEntryWindow *ui;
     EntityManager *manager;

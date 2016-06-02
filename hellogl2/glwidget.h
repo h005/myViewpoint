@@ -77,6 +77,8 @@ protected:
     glm::mat4 getModelViewMatrix();
     virtual glm::mat4 getModelMatrix() override;
 
+    void keyPressEvent(QKeyEvent *e);
+
 protected:
     glm::mat4 m_camera;
     glm::mat4 m_proj;
@@ -85,6 +87,7 @@ protected:
     GModel model;
     GLuint m_sphereProgramID = 0;
     Sphere sphere;
+    glm::vec3 cameraPos;
 
 private:
 

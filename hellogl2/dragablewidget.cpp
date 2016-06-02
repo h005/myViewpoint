@@ -57,10 +57,11 @@ void DragableWidget::mouseMoveEvent(QMouseEvent *event)
 void DragableWidget::wheelEvent(QWheelEvent *event)
 {
     m_scale += event->delta() / (120.f * 50);
+//    m_scale += event->delta() / (120.f * 5);
     if (m_scale < 0.01)
         m_scale = 0.01;
-    if (m_scale > 5)
-        m_scale = 5;
+    if (m_scale > 1000)
+        m_scale = 1000;
     update();
 }
 

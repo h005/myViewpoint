@@ -82,6 +82,7 @@ void MainEntryWindow::on_pushButton_clicked()
     );
 
 //    QString fileName = "/home/h005/Documents/QtProject/viewpoint/model/config.ini";
+//    QString fileName = "/home/h005/Documents/vpDataSet/villa7_1/model/config.ini";
 
     if (!fileName.isEmpty()) {
         QFileInfo file(fileName);
@@ -97,6 +98,7 @@ void MainEntryWindow::on_pushButton_clicked()
 
         ui->configFileLabel->setText(fileName);
     }
+    std::cout << fileName.toStdString() << std::endl;
 }
 
 // 模型对准
@@ -151,7 +153,7 @@ void MainEntryWindow::on_showAllViewpoints_clicked()
             std::vector<int> clusterIndices;
 
             int index = 1;
-            scanf("%d",&index);
+//            scanf("%d",&index);
             std::cout << "index "<< index << std::endl;
             mvMatrixs.assign(cm.getCluster(index).begin(), cm.getCluster(index).end());
             mvMatrixs.push_back(cm.getCenter(index));
@@ -163,7 +165,7 @@ void MainEntryWindow::on_showAllViewpoints_clicked()
                 std::cout << glm::to_string(eye) << std::endl;
                 clusterIndices.push_back(index);
             }
-
+            std::cout << "camera show widget begin" << std::endl;
             CameraShowWidget *w = new CameraShowWidget(manager->modelPath(), 1.f, mvMatrixs, clusterIndices);
             w->show();
     }
@@ -319,9 +321,12 @@ void MainEntryWindow::on_openOffscreenRenderBtn_clicked()
     if (manager != NULL) {
         if (offscreenRender == NULL) {
             offscreenRender = new OffscreenRender(manager->modelPath(), NULL);
+            std::cout << "offscreenRender" << std::endl;
             offscreenRender->resize(offscreenRender->sizeHint());
         }
+        std::cout << "offscreenRender ...." << std::endl;
         offscreenRender->show();
+        std::cout << "offscreenRender ... show after " << std::endl;
         this->activateWindow();
     } else
         std::cout << "Please load config file first" << std::endl;
@@ -517,15 +522,104 @@ void MainEntryWindow::on_showClusterBtn_clicked()
             std::vector<glm::mat4> mvMatrixs;
             std::vector<int> clusterIndices;
 
-
-            for (int i = 1; i <= cm.getClusterNums(); i++) {
-                mvMatrixs.insert(mvMatrixs.begin(), cm.getCluster(i).begin(), cm.getCluster(i).end());
-
-                std::vector<int> dummy(cm.getCluster(i).size(), i);
-                clusterIndices.insert(clusterIndices.end(), dummy.begin(), dummy.end());
+            int showSetLen = 15;
+//            int* showSet = new int[showSetLen]{3,9,10,11,12,13,14};
+            int* showSet = new int[showSetLen]{1,2,3,4,5,6,7,8,9,10,11,12,13,14,15};
+//            int* showSet = new int[showSetLen]{19};
+            for (int i=0;i<showSetLen;i++)
+            {
+                mvMatrixs.insert(mvMatrixs.end(),cm.getCluster(showSet[i]).begin(), cm.getCluster(showSet[i]).end());
+                std::vector<int> dummy(cm.getCluster(showSet[i]).size(),showSet[i]);
+                clusterIndices.insert(clusterIndices.end(),dummy.begin(),dummy.end());
             }
+
+            for(int i=0;i<clusterIndices.size();i++)
+            {
+                std::cout << "clusterIndices " << clusterIndices[i] << std::endl;
+            }
+
+
+//            for (int i = 1; i <= cm.getClusterNums(); i++) {
+//                mvMatrixs.insert(mvMatrixs.begin(), cm.getCluster(i).begin(), cm.getCluster(i).end());
+//                // insert cluster ID
+//                std::vector<int> dummy(cm.getCluster(i).size(), i);
+//                clusterIndices.insert(clusterIndices.end(), dummy.begin(), dummy.end());
+//            }
 
             CameraShowWidget *w = new CameraShowWidget(manager->modelPath(), 1.f, mvMatrixs, clusterIndices);
             w->show();
+    }
+}
+
+// render MVP matrix
+void MainEntryWindow::on_pushButton_3_clicked()
+{
+    if (offscreenRender != NULL && offscreenRender->isVisible()) {
+    if (offscreenRender != NULL) {
+//            QString outputDir = QFileDialog::getExistingDirectory(
+//                    this,
+//                    QString("选定输出目录"),
+//                    QString()
+//            );
+        QString outputDir = "/home/h005/Documents/vpDataSet/villa7_1/imgs/model/";
+//            QString matrixFile = "/home/h005/Documents/vpDataSet/gostHouse/model/gostHouse.matrix";
+//            QString matrixFile ="/home/h005/Documents/vpDataSet/villa2/model/villa.matrix";
+              QString matrixFile ="/home/h005/Documents/vpDataSet/villa7_1/model/villa.matrix";
+//            QString matrixFile = "/home/h005/Documents/vpDataSet/zwz/virtual/virtual.matrix";
+            QStringList fileName;
+            std::vector<glm::mat4> m_modelList;
+            std::vector<glm::mat4> m_viewList;
+            std::vector<glm::mat4> m_projectionList;
+
+            // read in matrix file
+            freopen(matrixFile.toStdString().c_str(),"r",stdin);
+            char tmpss[200];
+            while(scanf("%s",tmpss)!=EOF)
+            {
+                QString tmpPath = outputDir;
+                QString tmp = QDir::cleanPath(tmpPath);
+                int pos = tmp.lastIndexOf('/');
+                tmp = tmp.left(pos+1);
+                tmp = QDir::cleanPath(tmp.append(QString(tmpss)));
+
+                fileName.push_back(tmp);
+
+                glm::mat4 m,v,p;
+                float tmpNum;
+                for(int i=0;i<16;i++)
+                {
+                    scanf("%f",&tmpNum);
+                    m[i%4][i/4] = tmpNum;
+                }
+                m_modelList.push_back(m);
+                m_viewList.push_back(v);
+
+                for(int i=0;i<16;i++)
+                {
+                    scanf("%f",&tmpNum);
+                    p[i%4][i/4] = tmpNum;
+                }
+                m_projectionList.push_back(p);
+            }
+
+            qDebug() << "Selected Dir:" << outputDir;
+            if(!outputDir.isEmpty())
+            {
+                QSize imgSize(800,600);
+
+
+                for(int i=0;i<fileName.size();i++)
+                {
+                    QString finalPath = QDir(outputDir).filePath(fileName.at(i));
+                    QString depthImgPath = finalPath+".bmp";
+                    offscreenRender->renderToImageFile(m_viewList[i]*m_modelList[i], m_projectionList[i], finalPath, NULL,imgSize);
+                }
+
+            }
+            else
+            {
+                std::cout << "Please Open A Render Window First " << std::endl;
+            }
+    }
     }
 }

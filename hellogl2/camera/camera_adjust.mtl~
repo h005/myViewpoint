@@ -36,8 +36,8 @@ newmtl _modelmaterial_3_1_8
 	Kd 0.6400 0.6400 0.6400
 	Ks 0.5000 0.5000 0.5000
 	Ke 0.0000 0.0000 0.0000
-	map_Ka ./images/texture0.jpg
-	map_Kd ./images/texture0.jpg
+	map_Ka .\images\texture0.jpg
+	map_Kd .\images\texture0.jpg
 
 newmtl _modelmaterial_2_24
 	Ns 96.0784

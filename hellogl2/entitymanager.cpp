@@ -24,7 +24,7 @@ EntityManager::~EntityManager()
 
 bool EntityManager::load()
 {
-    QSettings settings(QDir(m_basedir).filePath("config2.ini"), QSettings::IniFormat);
+    QSettings settings(QDir(m_basedir).filePath("config.ini"), QSettings::IniFormat);
     // 读取模型的信息
     m_modelPath = QDir::cleanPath(QDir(m_basedir).filePath(settings.value("model/path").toString()));
     m_ptCloudPath = QDir::cleanPath(QDir(m_basedir).filePath(settings.value("model/ptCloudPath").toString()));

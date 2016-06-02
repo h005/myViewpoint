@@ -274,6 +274,19 @@
      <string>ShowClusters</string>
     </property>
    </widget>
+   <widget class="QPushButton" name="pushButton_3">
+    <property name="geometry">
+     <rect>
+      <x>170</x>
+      <y>370</y>
+      <width>89</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>render MVP</string>
+    </property>
+   </widget>
    <zorder>cameraCalibration</zorder>
    <zorder>pushButton</zorder>
    <zorder>labelFirstImageBtn</zorder>
@@ -294,6 +307,7 @@
    <zorder>pushButton_2</zorder>
    <zorder>ccConfig</zorder>
    <zorder>showClusterBtn</zorder>
+   <zorder>pushButton_3</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">

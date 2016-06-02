@@ -8,187 +8,178 @@
 #include "shader.hpp"
 
 void *imgData(const char *texturePath, int &width, int &height) {
-	cv::Mat img = cv::imread(texturePath);
-	if (img.rows <= 0 || img.cols <= 0) {
-		return NULL;
-	}
-	assert(img.channels() == 3);
+    cv::Mat img = cv::imread(texturePath);
+    if (img.rows <= 0 || img.cols <= 0) {
+        return NULL;
+    }
+    assert(img.channels() == 3);
 
     size_t mem = img.rows * img.cols * img.channels();
-	uchar *data = new uchar[mem];
+    uchar *data = new uchar[mem];
     size_t rowSize = img.cols * img.channels();
-	uchar *pivot = data;
+    uchar *pivot = data;
     for (int i = 0; i < img.rows; i++) {
         uchar *ptr = img.ptr(i);
-		memcpy(pivot, ptr, rowSize);
-		pivot += rowSize;
-	}
-	assert(pivot - data == mem);
+        memcpy(pivot, ptr, rowSize);
+        pivot += rowSize;
+    }
+    assert(pivot - data == mem);
     width = img.size().width;
     height = img.size().height;
-	return data;
+    return data;
 }
 
 // Can't send color down as a pointer to aiColor4D because AI colors are ABGR.
 static void Color4f(const aiColor4D *color)
 {
-	glColor4f(color->r, color->g, color->b, color->a);
+    glColor4f(color->r, color->g, color->b, color->a);
 }
 
 static void set_float4(float f[4], float a, float b, float c, float d)
 {
-	f[0] = a;
-	f[1] = b;
-	f[2] = c;
-	f[3] = d;
+    f[0] = a;
+    f[1] = b;
+    f[2] = c;
+    f[3] = d;
 }
 
 static void color4_to_float4(const aiColor4D *c, float f[4])
 {
-	f[0] = c->r;
-	f[1] = c->g;
-	f[2] = c->b;
-	f[3] = c->a;
+    f[0] = c->r;
+    f[1] = c->g;
+    f[2] = c->b;
+    f[3] = c->a;
 }
 
 static std::string getBasePath(const std::string& path)
 {
-	size_t pos = path.find_last_of("\\/");
-	return (std::string::npos == pos) ? "" : path.substr(0, pos + 1);
+    size_t pos = path.find_last_of("\\/");
+    return (std::string::npos == pos) ? "" : path.substr(0, pos + 1);
 }
 
 static void get_bounding_box_for_node(const aiScene *sc,
-	const aiNode* nd,
-	aiVector3D* min,
-	aiVector3D* max,
-	aiMatrix4x4 &prev
-	){
-	unsigned int n = 0, t;
+    const aiNode* nd,
+    aiVector3D* min,
+    aiVector3D* max,
+    aiMatrix4x4 &prev
+    ){
+    unsigned int n = 0, t;
 
-	aiMatrix4x4 trafo = prev;
-	trafo *= nd->mTransformation;
+    aiMatrix4x4 trafo = prev;
+    trafo *= nd->mTransformation;
 
-//    for (int i = 0; i <  4; i++)
-//        for (int j = 0; j < 4; j++)
-//            std::cout << trafo[i][j] << " ";
-//    std::cout << std::endl;
+    for (; n < nd->mNumMeshes; ++n) {
+        const aiMesh* mesh = sc->mMeshes[nd->mMeshes[n]];
+        for (t = 0; t < mesh->mNumVertices; ++t) {
 
-	for (; n < nd->mNumMeshes; ++n) {
-		const aiMesh* mesh = sc->mMeshes[nd->mMeshes[n]];
-		for (t = 0; t < mesh->mNumVertices; ++t) {
+            aiVector3D tmp = mesh->mVertices[t];
+            tmp *= trafo;
 
-			aiVector3D tmp = mesh->mVertices[t];
-			tmp *= trafo;
+            min->x = aisgl_min(min->x, tmp.x);
+            min->y = aisgl_min(min->y, tmp.y);
+            min->z = aisgl_min(min->z, tmp.z);
 
-			min->x = aisgl_min(min->x, tmp.x);
-			min->y = aisgl_min(min->y, tmp.y);
-			min->z = aisgl_min(min->z, tmp.z);
+            max->x = aisgl_max(max->x, tmp.x);
+            max->y = aisgl_max(max->y, tmp.y);
+            max->z = aisgl_max(max->z, tmp.z);
+        }
+    }
 
-			max->x = aisgl_max(max->x, tmp.x);
-			max->y = aisgl_max(max->y, tmp.y);
-			max->z = aisgl_max(max->z, tmp.z);
-		}
-	}
-
-	for (n = 0; n < nd->mNumChildren; ++n) {
-		get_bounding_box_for_node(sc, nd->mChildren[n], min, max, trafo);
-	}
+    for (n = 0; n < nd->mNumChildren; ++n) {
+        get_bounding_box_for_node(sc, nd->mChildren[n], min, max, trafo);
+    }
 }
 
 static void get_bounding_box(const aiScene *sc, aiVector3D* min, aiVector3D* max)
 {
-	// set identity
-	aiMatrix4x4 rootTransformation;
+    // set identity
+    aiMatrix4x4 rootTransformation;
 
-//    std::cout << "cmd ";
-//    for (int i = 0; i <  4; i++)
-//        for (int j = 0; j < 4; j++)
-//            std::cout << rootTransformation[i][j] << " ";
-//    std::cout << std::endl;
-
-	min->x = min->y = min->z = 1e10f;
-	max->x = max->y = max->z = -1e10f;
-	get_bounding_box_for_node(sc, sc->mRootNode, min, max, rootTransformation);
+    min->x = min->y = min->z = 1e10f;
+    max->x = max->y = max->z = -1e10f;
+    get_bounding_box_for_node(sc, sc->mRootNode, min, max, rootTransformation);
 }
 
 void GModel::apply_material(const aiMaterial *mtl)
 {
-	float c[4];
+    float c[4];
 
-	GLenum fill_mode;
-	int ret1, ret2;
-	aiColor4D diffuse;
-	aiColor4D specular;
-	aiColor4D ambient;
-	aiColor4D emission;
-	float shininess, strength;
-	int two_sided;
-	int wireframe;
-	unsigned int max;	// changed: to unsigned
+    GLenum fill_mode;
+    int ret1, ret2;
+    aiColor4D diffuse;
+    aiColor4D specular;
+    aiColor4D ambient;
+    aiColor4D emission;
+    float shininess, strength;
+    int two_sided;
+    int wireframe;
+    unsigned int max;	// changed: to unsigned
 
-	int texIndex = 0;
-	aiString texPath;	//contains filename of texture
+    int texIndex = 0;
+    aiString texPath;	//contains filename of texture
 
-	if (AI_SUCCESS == mtl->GetTexture(aiTextureType_DIFFUSE, texIndex, &texPath) && textureIdMap[texPath.data])
-	{
-		//bind texture
-		unsigned int texId = *textureIdMap[texPath.data];
-		glBindTexture(GL_TEXTURE_2D, texId);
-	}
-//    else
-//        std::cout << "apply materils "<< std::endl;
+    if (AI_SUCCESS == mtl->GetTexture(aiTextureType_DIFFUSE, texIndex, &texPath) && textureIdMap[texPath.data])
+    {
+        //bind texture
+        unsigned int texId = *textureIdMap[texPath.data];
+        glBindTexture(GL_TEXTURE_2D, texId);
+    }
 
-	set_float4(c, 0.8f, 0.8f, 0.8f, 1.0f);
-	if (AI_SUCCESS == aiGetMaterialColor(mtl, AI_MATKEY_COLOR_DIFFUSE, &diffuse))
-		color4_to_float4(&diffuse, c);
-	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, c);
+    set_float4(c, 0.8f, 0.8f, 0.8f, 1.0f);
+    if (AI_SUCCESS == aiGetMaterialColor(mtl, AI_MATKEY_COLOR_DIFFUSE, &diffuse)) {
+        color4_to_float4(&diffuse, c);
+        std::cout << "AI_MATKEY_COLOR_DIFFUSE"  << c[0] << " " << c[1] << " " << c[2] << std::endl;
+    }
+    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, c);
 
-	set_float4(c, 0.0f, 0.0f, 0.0f, 1.0f);
-	if (AI_SUCCESS == aiGetMaterialColor(mtl, AI_MATKEY_COLOR_SPECULAR, &specular))
-		color4_to_float4(&specular, c);
-	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, c);
+    set_float4(c, 0.0f, 0.0f, 0.0f, 1.0f);
+    if (AI_SUCCESS == aiGetMaterialColor(mtl, AI_MATKEY_COLOR_SPECULAR, &specular)) {
+        color4_to_float4(&specular, c);
+        std::cout << "AI_MATKEY_COLOR_SPECULAR" << std::endl;
+    }
+    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, c);
 
-	set_float4(c, 0.2f, 0.2f, 0.2f, 1.0f);
-	if (AI_SUCCESS == aiGetMaterialColor(mtl, AI_MATKEY_COLOR_AMBIENT, &ambient))
-		color4_to_float4(&ambient, c);
-	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, c);
+    set_float4(c, 0.2f, 0.2f, 0.2f, 1.0f);
+    if (AI_SUCCESS == aiGetMaterialColor(mtl, AI_MATKEY_COLOR_AMBIENT, &ambient))
+        color4_to_float4(&ambient, c);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, c);
 
-	set_float4(c, 0.0f, 0.0f, 0.0f, 1.0f);
-	if (AI_SUCCESS == aiGetMaterialColor(mtl, AI_MATKEY_COLOR_EMISSIVE, &emission))
-		color4_to_float4(&emission, c);
-	glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, c);
+    set_float4(c, 0.0f, 0.0f, 0.0f, 1.0f);
+    if (AI_SUCCESS == aiGetMaterialColor(mtl, AI_MATKEY_COLOR_EMISSIVE, &emission))
+        color4_to_float4(&emission, c);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, c);
 
-	max = 1;
-	ret1 = aiGetMaterialFloatArray(mtl, AI_MATKEY_SHININESS, &shininess, &max);
-	max = 1;
-	ret2 = aiGetMaterialFloatArray(mtl, AI_MATKEY_SHININESS_STRENGTH, &strength, &max);
-	if ((ret1 == AI_SUCCESS) && (ret2 == AI_SUCCESS))
-		glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, shininess * strength);
-	else {
-		glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 0.0f);
-		set_float4(c, 0.0f, 0.0f, 0.0f, 0.0f);
-		glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, c);
-	}
+    max = 1;
+    ret1 = aiGetMaterialFloatArray(mtl, AI_MATKEY_SHININESS, &shininess, &max);
+    max = 1;
+    ret2 = aiGetMaterialFloatArray(mtl, AI_MATKEY_SHININESS_STRENGTH, &strength, &max);
+    if ((ret1 == AI_SUCCESS) && (ret2 == AI_SUCCESS))
+        glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, shininess * strength);
+    else {
+        glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 0.0f);
+        set_float4(c, 0.0f, 0.0f, 0.0f, 0.0f);
+        glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, c);
+    }
 
-	max = 1;
-	if (AI_SUCCESS == aiGetMaterialIntegerArray(mtl, AI_MATKEY_ENABLE_WIREFRAME, &wireframe, &max))
-		fill_mode = wireframe ? GL_LINE : GL_FILL;
-	else
-		fill_mode = GL_FILL;
-	glPolygonMode(GL_FRONT_AND_BACK, fill_mode);
+    max = 1;
+    if (AI_SUCCESS == aiGetMaterialIntegerArray(mtl, AI_MATKEY_ENABLE_WIREFRAME, &wireframe, &max))
+        fill_mode = wireframe ? GL_LINE : GL_FILL;
+    else
+        fill_mode = GL_FILL;
+    glPolygonMode(GL_FRONT_AND_BACK, fill_mode);
 
-	max = 1;
-	if ((AI_SUCCESS == aiGetMaterialIntegerArray(mtl, AI_MATKEY_TWOSIDED, &two_sided, &max)) && two_sided)
-		glEnable(GL_CULL_FACE);
-	else
-		glDisable(GL_CULL_FACE);
+    max = 1;
+    if ((AI_SUCCESS == aiGetMaterialIntegerArray(mtl, AI_MATKEY_TWOSIDED, &two_sided, &max)) && two_sided)
+        glEnable(GL_CULL_FACE);
+    else
+        glDisable(GL_CULL_FACE);
 }
 
 
 
 void GModel::recursive_create(const aiScene *sc, const aiNode* nd, const glm::mat4 &inheritedTransformation)
 {
-	assert(nd && sc);
+    assert(nd && sc);
     unsigned int n = 0;
 
     // 相对于父节点的变换，aiMatrix4x4中是行优先存储的，
@@ -197,47 +188,47 @@ void GModel::recursive_create(const aiScene *sc, const aiNode* nd, const glm::ma
     glm::mat4 absoluteTransformation = inheritedTransformation * mTransformation;
     // 设置shader中的model view矩阵
 
-	for (; n < nd->mNumMeshes; ++n)
-	{
+    for (; n < nd->mNumMeshes; ++n)
+    {
         // 一个aiNode中存有其mesh的索引，
         // 在aiScene中可以用这个索引拿到真正的aiMesh
-		const struct aiMesh* mesh = sc->mMeshes[nd->mMeshes[n]];
+        const struct aiMesh* mesh = sc->mMeshes[nd->mMeshes[n]];
         meshEntries.push_back(new GModel::MeshEntry(mesh, absoluteTransformation, m_programID));
     }
 
 
     // create all children
-	for (n = 0; n < nd->mNumChildren; ++n)
-	{
+    for (n = 0; n < nd->mNumChildren; ++n)
+    {
         recursive_create(sc, nd->mChildren[n], absoluteTransformation);
     }
 }
 
 GModel::GModel()
 {
-	pImporter = NULL;
-	scene = NULL;
+    pImporter = NULL;
+    scene = NULL;
     textureIds = NULL;
     m_programID = 0;
 }
 
 bool GModel::load(const char *modelPath) {
-	cleanUp();
+    cleanUp();
 
-	pImporter = new Assimp::Importer();
-	scene = pImporter->ReadFile(modelPath, aiProcessPreset_TargetRealtime_Quality);
-	if (!scene) {
-		return 0;
-	}
+    pImporter = new Assimp::Importer();
+    scene = pImporter->ReadFile(modelPath, aiProcessPreset_TargetRealtime_Quality);
+    if (!scene) {
+        return 0;
+    }
 
-	// Generate Model Information
-	get_bounding_box(scene, &scene_min, &scene_max);
-	scene_center.x = (scene_min.x + scene_max.x) / 2.f;
-	scene_center.y = (scene_min.y + scene_max.y) / 2.f;
-	scene_center.z = (scene_min.z + scene_max.z) / 2.f;
-	basePath = getBasePath(modelPath);
+    // Generate Model Information
+    get_bounding_box(scene, &scene_min, &scene_max);
+    scene_center.x = (scene_min.x + scene_max.x) / 2.f;
+    scene_center.y = (scene_min.y + scene_max.y) / 2.f;
+    scene_center.z = (scene_min.z + scene_max.z) / 2.f;
+    basePath = getBasePath(modelPath);
 
-	return 1;
+    return 1;
 }
 
 void GModel::bindDataToGL() {
@@ -247,50 +238,50 @@ void GModel::bindDataToGL() {
 
     // 1.将纹理读取到显存
     // 2.递归创建meshEntry
-	textureIdMap.clear();
-	for (unsigned int m = 0; m<scene->mNumMaterials; m++)
-	{
-		int texIndex = 0;
-		aiReturn texFound;
-		aiString path;	// filename
-		while ((texFound = scene->mMaterials[m]->GetTexture(aiTextureType_DIFFUSE, texIndex, &path)) == AI_SUCCESS)
-		{
-			textureIdMap[path.data] = NULL;
-			texIndex++;
-		}
-	}
+    textureIdMap.clear();
+    for (unsigned int m = 0; m<scene->mNumMaterials; m++)
+    {
+        int texIndex = 0;
+        aiReturn texFound;
+        aiString path;	// filename
+        while ((texFound = scene->mMaterials[m]->GetTexture(aiTextureType_DIFFUSE, texIndex, &path)) == AI_SUCCESS)
+        {
+            textureIdMap[path.data] = NULL;
+            texIndex++;
+        }
+    }
 
-	size_t numTextures = textureIdMap.size();
-	textureIds = new GLuint[numTextures];
-	glGenTextures(numTextures, textureIds);
-	TextureIdMapType::iterator it;
-	int i;
-	for (i = 0, it = textureIdMap.begin(); it != textureIdMap.end(); it++, i++) {
-		std::string filename = basePath + it->first;
+    size_t numTextures = textureIdMap.size();
+    textureIds = new GLuint[numTextures];
+    glGenTextures(numTextures, textureIds);
+    TextureIdMapType::iterator it;
+    int i;
+    for (i = 0, it = textureIdMap.begin(); it != textureIdMap.end(); it++, i++) {
+        std::string filename = basePath + it->first;
 
-		glBindTexture(GL_TEXTURE_2D, textureIds[i]); /* Binding of texture name */
-		//redefine standard texture values
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); /* We will use linear
-																		  interpolation for magnification filter */
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); /* We will use linear
-																		  interpolation for minifying filter */
+        glBindTexture(GL_TEXTURE_2D, textureIds[i]); /* Binding of texture name */
+        //redefine standard texture values
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); /* We will use linear
+                                                                          interpolation for magnification filter */
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); /* We will use linear
+                                                                          interpolation for minifying filter */
 
-		int width, height;
+        int width, height;
         // 读入数据是b,g,r依次排列的
-		void *data = imgData(filename.c_str(), width, height);
-		if (data) {
-			glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+        void *data = imgData(filename.c_str(), width, height);
+        if (data) {
+            glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
             // https://www.opengl.org/sdk/docs/man/html/glTexImage2D.xhtml
             // 参数中的第一个GL_RGB表示，数据有三个通道
             // 第二个GL_BGR表示数据是b,g,r排列的，它会将bgr分别放在显存中的bgr分量上，方便shader使用
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width,
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width,
                 height, 0, GL_BGR, GL_UNSIGNED_BYTE,
-				data); /* Texture specification */
-			delete data;
+                data); /* Texture specification */
+            delete data;
 
-			it->second = &textureIds[i];
-		}
-	}
+            it->second = &textureIds[i];
+        }
+    }
 
     recursive_create(scene, scene->mRootNode, glm::mat4());
 }
@@ -312,6 +303,7 @@ void GModel::draw(const glm::mat4 &inheritModelView, const glm::mat4 &projection
     GLuint mvMatrixID = glGetUniformLocation(m_programID, "mvMatrix");
     GLuint normalMatrixID = glGetUniformLocation(m_programID, "normalMatrix");
     GLuint TextureID = glGetUniformLocation(m_programID, "myTextureSampler");
+    GLuint diffuseID = glGetUniformLocation(m_programID, "diffuse");
     glUniformMatrix4fv(projMatrixID, 1, GL_FALSE, glm::value_ptr(projection));
 
     std::vector<GModel::MeshEntry *>::iterator it;
@@ -327,24 +319,31 @@ void GModel::draw(const glm::mat4 &inheritModelView, const glm::mat4 &projection
         const aiMesh *mesh = (*it)->mesh;
         // 一个aiMesh拥有一致的纹理和材质
         glActiveTexture(GL_TEXTURE0);
-        apply_material(scene->mMaterials[mesh->mMaterialIndex]);
-        glUniform1i(TextureID, GL_TEXTURE0);
 
-        if (mesh->HasNormals())
+        // 应用材质或环境光
         {
-            glEnable(GL_LIGHTING);
-        }
-        else
-        {
-            glDisable(GL_LIGHTING);
-        }
-        if (mesh->mColors[0] != NULL)
-        {
-            glEnable(GL_COLOR_MATERIAL);
-        }
-        else
-        {
-            glDisable(GL_COLOR_MATERIAL);
+            auto mtl = scene->mMaterials[mesh->mMaterialIndex];
+
+            unsigned int texId = 0;
+            int texIndex = 0;
+            aiString texPath;	//contains filename of texture
+            if (AI_SUCCESS == mtl->GetTexture(aiTextureType_DIFFUSE, texIndex, &texPath) && textureIdMap[texPath.data])
+            {
+                //bind texture
+                texId = *textureIdMap[texPath.data];
+                glBindTexture(GL_TEXTURE_2D, texId);
+            }
+            glBindTexture(GL_TEXTURE_2D, texId);
+            glUniform1i(TextureID, GL_TEXTURE0);
+
+
+            glm::vec4 c(0.f);
+            if (texId == 0) { // 纹理不存在，则使用材质颜色
+                 aiColor4D diffuse;
+                 if (texId == 0 && AI_SUCCESS == aiGetMaterialColor(mtl, AI_MATKEY_COLOR_DIFFUSE, &diffuse))
+                     color4_to_float4(&diffuse, glm::value_ptr(c));
+            }
+            glUniform4fv(diffuseID, 1, glm::value_ptr(c));
         }
 
         // 计算最终的model view矩阵以及对应的法向变换矩阵
@@ -369,22 +368,22 @@ std::pair<GLfloat, glm::mat4> GModel::recommandScaleAndShift()
 }
 
 void GModel::cleanUp() {
-	if (pImporter) {
-		delete pImporter;
-		pImporter = NULL;
-	}
+    if (pImporter) {
+        delete pImporter;
+        pImporter = NULL;
+    }
 
-	if (textureIds) {
-		glDeleteTextures(textureIdMap.size(), textureIds);
-		delete textureIds;
-		textureIds = NULL;
-	}
+    if (textureIds) {
+        glDeleteTextures(textureIdMap.size(), textureIds);
+        delete textureIds;
+        textureIds = NULL;
+    }
     if (m_programID) {
         glDeleteProgram(m_programID);
         m_programID = 0;
     }
 
-	scene = NULL;
+    scene = NULL;
 
     std::vector<GModel::MeshEntry *>::iterator it;
     for (it = meshEntries.begin(); it != meshEntries.end(); it++) {
@@ -394,16 +393,16 @@ void GModel::cleanUp() {
 }
 
 bool GModel::hasModel() {
-	return scene != NULL;
+    return scene != NULL;
 }
 
 float GModel::drawScale() {
-	float tmp = -1e10;
-	tmp = aisgl_max(scene_max.x - scene_min.x, tmp);
-	tmp = aisgl_max(scene_max.y - scene_min.y, tmp);
-	tmp = aisgl_max(scene_max.z - scene_min.z, tmp);
-	float scale = 2.f / tmp;
-	return scale;
+    float tmp = -1e10;
+    tmp = aisgl_max(scene_max.x - scene_min.x, tmp);
+    tmp = aisgl_max(scene_max.y - scene_min.y, tmp);
+    tmp = aisgl_max(scene_max.z - scene_min.z, tmp);
+    float scale = 2.f / tmp;
+    return scale;
 }
 
 
@@ -460,14 +459,6 @@ GModel::MeshEntry::MeshEntry(const aiMesh *mesh, const glm::mat4 &transformation
             glVertexAttribPointer(vertexUVID, 2, GL_FLOAT, GL_FALSE, 0, NULL);
             glEnableVertexAttribArray (vertexUVID);
         }
-        else
-        {
-            std::cout << "mesh without texture coords 1" << std::endl;
-        }
-    }
-    else
-    {
-        std::cout << "mesh without texture coords 2" << std::endl;
     }
 
     if(mesh->HasNormals()) {
@@ -490,6 +481,9 @@ GModel::MeshEntry::MeshEntry(const aiMesh *mesh, const glm::mat4 &transformation
             glEnableVertexAttribArray (vertexNormal_modelspaceID);
         }
     }
+
+    if (mesh->HasVertexColors(0))
+        std::cout << "mesh->HasVertexColors(0)" << std::endl;
 
     if(mesh->HasFaces()) {
         std::vector<GLuint> indices;
@@ -601,17 +595,3 @@ void GModel::MeshEntry::render() {
 
     glBindVertexArray(0);
 }
-
-
-//glm::mat4 GModel::getInnerTransformation()
-//{
-//    float scale = drawScale();
-//    glm::mat4 transformation = glm::scale(glm::mat4(1.f), glm::vec3(scale, scale, scale));
-//    // 缩放矩阵 * 移中矩阵，表示先移中后缩放
-//    transformation = glm::translate(transformation, glm::vec3(-scene_center.x, -scene_center.y, -scene_center.z));
-////    std::cout << "getInnerTransformation scale " << std::endl;
-////    std::cout << scale << std::endl;
-////    std::cout << "getInnerTransformation scene_center" << std::endl;
-////    std::cout << -scene_center.x << " " << -scene_center.y << " " << -scene_center.z << std::endl;
-//    return transformation;
-//}

@@ -63,6 +63,7 @@ GLWidget::GLWidget(const QString &modelPath, QWidget *parent)
     std::pair<GLfloat, glm::mat4> scaleAndShift = model.recommandScaleAndShift();
     m_scaleBeforeRender = scaleAndShift.first;
     m_shiftBeforeRender = scaleAndShift.second;
+    cameraPos = glm::vec3(0.f,0.f,0.f);
 }
 
 GLWidget::~GLWidget()
@@ -118,7 +119,8 @@ void GLWidget::initializeGL()
     // the signal will be followed by an invocation of initializeGL() where we
     // can recreate all resources.
     initializeOpenGLFunctions();
-    glClearColor(0.368, 0.368, 0.733, m_transparent ? 0 : 1);
+//    glClearColor(0.368, 0.368, 0.733, m_transparent ? 0 : 1);
+    glClearColor(1.0, 1.0, 1.0, m_transparent ? 0 : 1);
 //    glEnable(GL_COLOR_MATERIAL);
 //    glColorMaterial(GL_FRONT,GL_AMBIENT);
 //    glColor3f(1.0,1.0,1.0);
@@ -182,6 +184,38 @@ glm::mat4 GLWidget::getModelViewMatrix()
 glm::mat4 GLWidget::getModelMatrix()
 {
     return DragableWidget::getModelMatrix() * glm::scale(glm::mat4(1.f), glm::vec3(m_scaleBeforeRender)) * m_shiftBeforeRender;
+}
+
+void GLWidget::keyPressEvent(QKeyEvent *e)
+{
+//    std::cout << "key Pressed "<< std::endl;
+//    Qt::Key_Left
+    if(e->key() == Qt::Key_Left)
+    {
+        cameraPos.r += 0.05;
+//        std::cout << "left arrow" << std::endl;
+    }
+    else if(e->key() == Qt::Key_Right)
+    {
+        cameraPos.r -= 0.05;
+//        std::cout << "right arrow" << std::endl;
+    }
+    else if(e->key() == Qt::Key_Up)
+    {
+        cameraPos.g -= 0.05;
+//        std::cout << "up arrow" << std::endl;
+    }
+    else if(e->key() == Qt::Key_Down)
+    {
+        cameraPos.g += 0.05;
+//        std::cout << "down arrow" << std::endl;
+    }
+//    if(cameraPos.g < 0)
+//        cameraPos.g = 0;
+//    if(cameraPos.r < 0)
+//        cameraPos.r = 0;
+    m_camera = glm::lookAt(glm::vec3(0.f, 0.f, 3.f) + cameraPos, glm::vec3(0.f) + cameraPos, glm::vec3(0.f, 1.f, 0.f));
+    update();
 }
 
 
