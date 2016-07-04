@@ -257,7 +257,7 @@ void GModel::bindDataToGL() {
 	TextureIdMapType::iterator it;
 	int i;
 	for (i = 0, it = textureIdMap.begin(); it != textureIdMap.end(); it++, i++) {
-		std::string filename = basePath + it->first;
+        std::string filename = basePath + it->first;
 
 		glBindTexture(GL_TEXTURE_2D, textureIds[i]); /* Binding of texture name */
 		//redefine standard texture values

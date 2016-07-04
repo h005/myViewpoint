@@ -36,6 +36,9 @@
 #define P_NEAR 0.5f
 #define P_FAR 100000.f
 
+//#define P_NEAR 0.01f
+//#define P_FAR 1000.f
+
 //#define USE_DEFAULT_PROJECTION
 
 MainEntryWindow::MainEntryWindow(QWidget *parent) :

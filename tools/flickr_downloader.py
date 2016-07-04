@@ -14,7 +14,7 @@ import socket
 import socks
 def getaddrinfo(*args):
     return [(socket.AF_INET, socket.SOCK_STREAM, 6, '', (args[0], args[1]))]
-socks.set_default_proxy(socks.SOCKS5, "localhost", 1080)
+socks.set_default_proxy(socks.SOCKS5, "localhost", 10080)
 socket.socket = socks.socksocket
 socket.getaddrinfo = getaddrinfo
 
@@ -53,6 +53,10 @@ if __name__ == '__main__':
             
             url = largest_size['source']
             print 'file url:', url
+
+            print photo['id']
+            print flickr.stats.getPhotoStats(date='2016-03-04', photo_id=photo['id'])
+            sys.exit(0)
 
             # download image file
             r = requests.get(url)

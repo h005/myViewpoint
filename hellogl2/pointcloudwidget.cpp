@@ -48,7 +48,7 @@ void PointCloudWidget::initializeGL()
     assert(err == GLEW_OK);
 
     initializeOpenGLFunctions();
-    glClearColor( 0.368, 0.368, 0.733, 1);
+    glClearColor( 1, 1, 1, 1);
 
     // Our camera never changes in this example.
     // Equal to:

@@ -70,7 +70,7 @@ void GLOffscreenRenderFramework::initializeGL()
     GLenum err = glewInit();
     assert(err == GLEW_OK);
     initializeOpenGLFunctions();
-    glClearColor( 0.368, 0.368, 0.733, 1);
+    glClearColor( 1, 1, 1, 1);
 }
 
 void GLOffscreenRenderFramework::createOrUpdateFrameBufferObject()

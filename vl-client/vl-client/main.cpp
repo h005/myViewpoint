@@ -169,7 +169,7 @@ int main()
 	/*char *queryImg = "1q.ppm", *trainImg = "1t.png";*/
 	/*char *queryImg = "et000.jpg", *trainImg = "et001.jpg";*/
 	/*char *queryImg = "et001.jpg", *trainImg = "et003.jpg";*/
-	char *queryImg = "joeshlabotnik_2103447222.rd.jpg", *trainImg = "traviscrawford_194751102.rd.jpg";
+	char *queryImg = "l1.jpg", *trainImg = "l2.jpg";
 	//char *queryImg = "et001.jpg", *trainImg = "et008.jpg";
 	Mat qImg = imread(queryImg), tImg = imread(trainImg);
 	int height = min(qImg.size().height, tImg.size().height);

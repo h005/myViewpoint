@@ -118,7 +118,7 @@ void GLWidget::initializeGL()
     // the signal will be followed by an invocation of initializeGL() where we
     // can recreate all resources.
     initializeOpenGLFunctions();
-    glClearColor( 0.368, 0.368, 0.733, m_transparent ? 0 : 1);
+    glClearColor( 1, 1, 1, m_transparent ? 0 : 1);
 
     // Our camera never changes in this example.
     // Equal to:
