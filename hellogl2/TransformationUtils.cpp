@@ -165,3 +165,13 @@ glm::mat4 projectionMatrixWithFocalLength(float f, float width, float height, fl
             projMatrix[j][i] = result.at<float>(i, j);
     return projMatrix;
 }
+
+glm::mat4 normalizedModelView(const glm::mat4 &mvMatrix)
+{
+    glm::mat3 R = glm::mat3(mvMatrix);
+    float c = glm::length(R[0]);
+    glm::mat4 normalizedModelView = mvMatrix;
+    normalizedModelView /= c;
+    normalizedModelView[3][3] = 1.f;
+    return normalizedModelView;
+}

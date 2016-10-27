@@ -64,6 +64,10 @@ GLWidget::GLWidget(const QString &modelPath, QWidget *parent)
     m_scaleBeforeRender = scaleAndShift.first;
     m_shiftBeforeRender = scaleAndShift.second;
     cameraPos = glm::vec3(0.f,0.f,0.f);
+    flag_move = false;
+//    camPosLength = 50000.f;
+    camPosLength = 30.f;
+    rate = 0.05;
 }
 
 GLWidget::~GLWidget()
@@ -127,7 +131,7 @@ void GLWidget::initializeGL()
     // Our camera never changes in this example.
     // Equal to:
     // m_camera = glm::translate(glm::mat4(), glm::vec3(0.f, 0.f, -3.f));
-    m_camera = glm::lookAt(glm::vec3(0.f, 0.f, 3.f), glm::vec3(0.f), glm::vec3(0.f, 1.f, 0.f));
+    m_camera = glm::lookAt(glm::vec3(0.f, 0.f, camPosLength), glm::vec3(0.f), glm::vec3(0.f, 1.f, 0.f));
 
     // load data for model rendering
     model.bindDataToGL();
@@ -173,7 +177,7 @@ void GLWidget::paintGL()
 
 void GLWidget::resizeGL(int w, int h)
 {
-    m_proj = glm::perspective(glm::pi<float>() / 3, GLfloat(w) / h, 0.01f, 1000000.0f);
+    m_proj = glm::perspective(glm::pi<float>() / 3, GLfloat(w) / h, 0.01f, 1000.0f);
 }
 
 glm::mat4 GLWidget::getModelViewMatrix()
@@ -192,31 +196,62 @@ void GLWidget::keyPressEvent(QKeyEvent *e)
 //    Qt::Key_Left
     if(e->key() == Qt::Key_Left)
     {
-        cameraPos.r += 0.05;
+        cameraPos.r += rate * camPosLength;
 //        std::cout << "left arrow" << std::endl;
     }
     else if(e->key() == Qt::Key_Right)
     {
-        cameraPos.r -= 0.05;
+        cameraPos.r -= rate * camPosLength;
 //        std::cout << "right arrow" << std::endl;
     }
     else if(e->key() == Qt::Key_Up)
     {
-        cameraPos.g -= 0.05;
+        cameraPos.g -= rate * camPosLength;
 //        std::cout << "up arrow" << std::endl;
     }
     else if(e->key() == Qt::Key_Down)
     {
-        cameraPos.g += 0.05;
+        cameraPos.g += rate * camPosLength;
 //        std::cout << "down arrow" << std::endl;
     }
 //    if(cameraPos.g < 0)
 //        cameraPos.g = 0;
 //    if(cameraPos.r < 0)
 //        cameraPos.r = 0;
-    m_camera = glm::lookAt(glm::vec3(0.f, 0.f, 3.f) + cameraPos, glm::vec3(0.f) + cameraPos, glm::vec3(0.f, 1.f, 0.f));
+    m_camera = glm::lookAt(glm::vec3(0.f, 0.f, camPosLength) + cameraPos, glm::vec3(0.f) + cameraPos, glm::vec3(0.f, 1.f, 0.f));
     update();
 }
+
+void GLWidget::mousePressEvent(QMouseEvent *e)
+{
+    DragableWidget::mousePressEvent(e);
+    if(e->button() ==  Qt::MiddleButton)
+    {
+        flag_move = true;
+        m_lastPos = e->pos();
+    }
+}
+
+void GLWidget::mouseReleaseEvent(QMouseEvent *e)
+{
+    DragableWidget::mouseReleaseEvent(e);
+    flag_move = false;
+}
+
+void GLWidget::mouseMoveEvent(QMouseEvent *e)
+{
+    DragableWidget::mouseMoveEvent(e);
+    if(flag_move)
+    {
+        QPointF pos = m_lastPos - e->pos();
+        cameraPos.r += pos.rx() * rate;
+        cameraPos.g -= pos.ry() * rate;
+        m_camera = glm::lookAt(glm::vec3(0.f, 0.f, camPosLength) + cameraPos, glm::vec3(0.f) + cameraPos, glm::vec3(0.f, 1.f, 0.f));
+        update();
+    }
+}
+
+
 
 
 int GLWidget::addPoint(const QPoint &p) {

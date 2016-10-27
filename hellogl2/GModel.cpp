@@ -304,6 +304,7 @@ void GModel::draw(const glm::mat4 &inheritModelView, const glm::mat4 &projection
     GLuint normalMatrixID = glGetUniformLocation(m_programID, "normalMatrix");
     GLuint TextureID = glGetUniformLocation(m_programID, "myTextureSampler");
     GLuint diffuseID = glGetUniformLocation(m_programID, "diffuse");
+//    GLuint vColorId = glGetUniformLocation(m_programID,"myVertexColor");
     glUniformMatrix4fv(projMatrixID, 1, GL_FALSE, glm::value_ptr(projection));
 
     std::vector<GModel::MeshEntry *>::iterator it;
@@ -345,6 +346,18 @@ void GModel::draw(const glm::mat4 &inheritModelView, const glm::mat4 &projection
             }
             glUniform4fv(diffuseID, 1, glm::value_ptr(c));
         }
+//        std::cout << "has vertex Color "<< mesh->HasVertexColors(55) << std::endl;
+        // 为每个顶点加入颜色
+//        GLfloat *vColor = new GLfloat[mesh->mNumVertices * 4];
+//        for(int i=0;i<mesh->mNumVertices;i++)
+//        {
+//            vColor[i * 0 + 0] = mesh->mColors[i]->r;
+//            vColor[i * 0 + 1] = mesh->mColors[i]->g;
+//            vColor[i * 0 + 2] = mesh->mColors[i]->b;
+//            vColor[i * 0 + 3] = mesh->mColors[i]->a;
+//            std::cout << "vertex color output " << std::endl;
+//        }
+//        glUniform4fv(vColorId, mesh->mNumVertices, vColor);
 
         // 计算最终的model view矩阵以及对应的法向变换矩阵
         glm::mat4 modelViewMatrix = transformation * (*it)->finalTransformation;
@@ -402,6 +415,7 @@ float GModel::drawScale() {
     tmp = aisgl_max(scene_max.y - scene_min.y, tmp);
     tmp = aisgl_max(scene_max.z - scene_min.z, tmp);
     float scale = 2.f / tmp;
+//    float scale = 100.f / tmp;
     return scale;
 }
 

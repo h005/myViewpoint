@@ -5,7 +5,11 @@
 #include <QString>
 
 using namespace std;
-
+///
+/// \brief ClusterManager::ClusterManager
+/// \param path
+/// 解析.cluster文件
+///
 ClusterManager::ClusterManager(std::string path)
 {
     qDebug() << QString::fromStdString(path) << endl;

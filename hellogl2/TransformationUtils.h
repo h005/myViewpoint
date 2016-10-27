@@ -30,6 +30,8 @@ void recoveryLookAtWithModelView(
         glm::vec3 &center,
         glm::vec3 &up);
 
+glm::mat4 normalizedModelView(const glm::mat4 &mvMatrix);
+
 glm::mat4 projectionMatrixWithFocalLength(
         float f,
         float width,

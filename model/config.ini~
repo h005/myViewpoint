@@ -1,5 +1,5 @@
 [model]
-path=/home/h005/Documents/QtProject/viewpoint/models/CCTV_headquaters/CCTV+Headquarters_modified.obj
+path=/home/h005/Documents/vpDataSet/cctv/model/tamFinal.obj
 testpath=/home/h005/Documents/QtProject/viewpoint/model/models/model.obj
 ptCloudPath=/home/h005/Documents/QtProject/viewpoint/model/kxm-01.15.ply
 
@@ -7,9 +7,9 @@ ptCloudPath=/home/h005/Documents/QtProject/viewpoint/model/kxm-01.15.ply
 path=/home/h005/Documents/QtProject/viewpoint/model/models/img0004.jpg
 
 [images]
-path=/home/h005/Documents/QtProject/viewpoint/model/list.txt
-dir=/home/h005/Documents/vpDataSet/kxm/imgs
-output0=/home/h005/Documents/QtProject/viewpoint/model/output.txt
+path=/home/h005/Documents/vpDataSet/cctv/imgs/cctv.list
+dir=/home/h005/Documents/vpDataSet/cctv/imgs
+output=/home/h005/Documents/vpDataSet/cctv/imgs/cctv.matrix
 
 [relation]
 path=/home/h005/Documents/QtProject/viewpoint/model

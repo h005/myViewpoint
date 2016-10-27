@@ -287,6 +287,7 @@
      <string>render MVP</string>
     </property>
    </widget>
+   <zorder>showClusterBtn</zorder>
    <zorder>cameraCalibration</zorder>
    <zorder>pushButton</zorder>
    <zorder>labelFirstImageBtn</zorder>
@@ -306,7 +307,6 @@
    <zorder>showAllViewpoints</zorder>
    <zorder>pushButton_2</zorder>
    <zorder>ccConfig</zorder>
-   <zorder>showClusterBtn</zorder>
    <zorder>pushButton_3</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">

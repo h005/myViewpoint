@@ -50,6 +50,7 @@ MainEntryWindow::MainEntryWindow(QWidget *parent) :
     ccManager = NULL;
     ui->pushButton->setShortcut(Qt::Key_L);
     ui->ccConfig->setShortcut(Qt::Key_C);
+    ui->showClusterBtn->setShortcut(Qt::Key_S);
 
 }
 
@@ -72,17 +73,17 @@ QSize MainEntryWindow::minimumSizeHint() const
 
 void MainEntryWindow::on_pushButton_clicked()
 {
-    QString selfilter = tr("Config (*.ini)");
-    QString fileName = QFileDialog::getOpenFileName(
-            this,
-            QString("打开配置文件"),
-            QString(),
-            tr("All files (*.*);;Config (*.ini)" ),
-            &selfilter
-    );
+//    QString selfilter = tr("Config (*.ini)");
+//    QString fileName = QFileDialog::getOpenFileName(
+//            this,
+//            QString("打开配置文件"),
+//            QString(),
+//            tr("All files (*.*);;Config (*.ini)" ),
+//            &selfilter
+//    );
 
 //    QString fileName = "/home/h005/Documents/QtProject/viewpoint/model/config.ini";
-//    QString fileName = "/home/h005/Documents/vpDataSet/villa7_1/model/config.ini";
+    QString fileName = "/home/h005/Documents/vpDataSet/kxm/register/config.ini";
 
     if (!fileName.isEmpty()) {
         QFileInfo file(fileName);
@@ -243,6 +244,7 @@ void MainEntryWindow::on_printMvPMatrixBtn_clicked()
             Entity want;
             Q_ASSERT(manager->getEntity(*it, want));
             glm::mat4 wantMVMatrix = want.mvMatrix * model2ptCloud;
+            wantMVMatrix = normalizedModelView(wantMVMatrix);
 
             matrixFile << it->toUtf8().constData() << std::endl;
             for (int i = 0; i < 4; i++) {
@@ -410,11 +412,17 @@ glm::mat4 MainEntryWindow::getModel2PtCloudTrans()
 {
     // 从文件中读取
     PointsMatchRelation relation(manager->registrationFile());
-    if (!relation.ccaLoadFromFile()) {
+
+    // attention! this is uesd for camera Calibration
+//    if (!relation.ccaLoadFromFile()) {
+//        std::cout << "read failed" << std::endl;
+//    }
+
+    if (!relation.loadFromFile()) {
         std::cout << "read failed" << std::endl;
     }
 
-    // 获得模型到点云的变换
+    // 获得模型到点云的变换3
     Q_ASSERT(relation.isPointsEqual());
     glm::mat3 R;
     glm::vec3 t;
@@ -424,6 +432,10 @@ glm::mat4 MainEntryWindow::getModel2PtCloudTrans()
     // 整理为mat4
     glm::mat4 model2ptCloud = glm::mat4(c*R);
     model2ptCloud[3] = glm::vec4(t, 1.f);
+
+    // T.T 尝试着修改一下
+//    glm::mat4 model2ptCloud = glm::mat4(R);
+//    model2ptCloud[3] = glm::vec4(t / c, 1.f);
 
     return model2ptCloud;
 }
@@ -507,14 +519,16 @@ void MainEntryWindow::on_ccConfig_clicked()
 
 void MainEntryWindow::on_showClusterBtn_clicked()
 {
-    QString selfilter = tr("Cluster Results (*.cluster)");
-    QString fileName = QFileDialog::getOpenFileName(
-            this,
-            QString("Open Cluster Results"),
-            QString(),
-            tr("All files (*.*);;Cluster Results (*.cluster)" ),
-            &selfilter
-    );
+//    QString selfilter = tr("Cluster Results (*.cluster)");
+//    QString fileName = QFileDialog::getOpenFileName(
+//            this,
+//            QString("Open Cluster Results"),
+//            QString(),
+//            tr("All files (*.*);;Cluster Results (*.cluster)" ),
+//            &selfilter
+//    );
+
+    QString fileName = "/home/h005/Documents/vpDataSet/kxm/model/kxmCluster.cluster";
 
     if (!fileName.isEmpty()) {
             ClusterManager cm(fileName.toStdString());
@@ -525,6 +539,8 @@ void MainEntryWindow::on_showClusterBtn_clicked()
             int showSetLen = 15;
 //            int* showSet = new int[showSetLen]{3,9,10,11,12,13,14};
             int* showSet = new int[showSetLen]{1,2,3,4,5,6,7,8,9,10,11,12,13,14,15};
+//            showSetLen = 10;
+//            int* showSet = new int[showSetLen]{1,2,3,4,5,8,9,11,12,14};
 //            int* showSet = new int[showSetLen]{19};
             for (int i=0;i<showSetLen;i++)
             {
@@ -538,15 +554,13 @@ void MainEntryWindow::on_showClusterBtn_clicked()
                 std::cout << "clusterIndices " << clusterIndices[i] << std::endl;
             }
 
+            std::vector<glm::mat4> cMvMatrixs;
+            for(int i=0;i<showSetLen;i++)
+            {
+                cMvMatrixs.push_back(cm.getCenter(i));
+            }
 
-//            for (int i = 1; i <= cm.getClusterNums(); i++) {
-//                mvMatrixs.insert(mvMatrixs.begin(), cm.getCluster(i).begin(), cm.getCluster(i).end());
-//                // insert cluster ID
-//                std::vector<int> dummy(cm.getCluster(i).size(), i);
-//                clusterIndices.insert(clusterIndices.end(), dummy.begin(), dummy.end());
-//            }
-
-            CameraShowWidget *w = new CameraShowWidget(manager->modelPath(), 1.f, mvMatrixs, clusterIndices);
+            CameraShowWidget *w = new CameraShowWidget(manager->modelPath(), 1.f, mvMatrixs, clusterIndices,cMvMatrixs);
             w->show();
     }
 }
@@ -556,16 +570,21 @@ void MainEntryWindow::on_pushButton_3_clicked()
 {
     if (offscreenRender != NULL && offscreenRender->isVisible()) {
     if (offscreenRender != NULL) {
-//            QString outputDir = QFileDialog::getExistingDirectory(
-//                    this,
-//                    QString("选定输出目录"),
-//                    QString()
-//            );
-        QString outputDir = "/home/h005/Documents/vpDataSet/villa7_1/imgs/model/";
+            QString outputDir = QFileDialog::getExistingDirectory(
+                    this,
+                    QString("选定输出目录"),
+                    QString()
+            );
+//        QString outputDir = "/home/h005/Documents/vpDataSet/njuSample/imgs/";
 //            QString matrixFile = "/home/h005/Documents/vpDataSet/gostHouse/model/gostHouse.matrix";
 //            QString matrixFile ="/home/h005/Documents/vpDataSet/villa2/model/villa.matrix";
-              QString matrixFile ="/home/h005/Documents/vpDataSet/villa7_1/model/villa.matrix";
+//             QString matrixFile ="/home/h005/Documents/vpDataSet/njuSample/model/njuSample.matrix";
 //            QString matrixFile = "/home/h005/Documents/vpDataSet/zwz/virtual/virtual.matrix";
+
+             QString matrixFile = QFileDialog::getOpenFileName(this,
+                               tr("选定matrix文件"),".",
+                               tr("config Files(*.matrix)"));
+
             QStringList fileName;
             std::vector<glm::mat4> m_modelList;
             std::vector<glm::mat4> m_viewList;
@@ -605,7 +624,7 @@ void MainEntryWindow::on_pushButton_3_clicked()
             qDebug() << "Selected Dir:" << outputDir;
             if(!outputDir.isEmpty())
             {
-                QSize imgSize(800,600);
+                QSize imgSize(1920,1080);
 
 
                 for(int i=0;i<fileName.size();i++)

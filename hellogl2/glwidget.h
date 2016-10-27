@@ -78,6 +78,9 @@ protected:
     virtual glm::mat4 getModelMatrix() override;
 
     void keyPressEvent(QKeyEvent *e);
+    void mousePressEvent(QMouseEvent *e);
+    void mouseReleaseEvent(QMouseEvent *e);
+    void mouseMoveEvent(QMouseEvent *e);
 
 protected:
     glm::mat4 m_camera;
@@ -88,7 +91,10 @@ protected:
     GLuint m_sphereProgramID = 0;
     Sphere sphere;
     glm::vec3 cameraPos;
-
+    QPointF m_lastPos;
+    bool flag_move;
+    float camPosLength;
+    float rate;
 private:
 
     bool m_transparent;
