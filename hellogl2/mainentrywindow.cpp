@@ -82,8 +82,8 @@ void MainEntryWindow::on_pushButton_clicked()
 //            &selfilter
 //    );
 
-//    QString fileName = "/home/h005/Documents/QtProject/viewpoint/model/config.ini";
-    QString fileName = "/home/h005/Documents/vpDataSet/kxm/register/config.ini";
+    QString fileName = "/home/h005/Documents/vpDataSet/pavilion9/model/config.ini";
+//    QString fileName = "/home/h005/Documents/vpDataSet/BuckinghamPalace/register/config.ini";
 
     if (!fileName.isEmpty()) {
         QFileInfo file(fileName);
@@ -528,7 +528,9 @@ void MainEntryWindow::on_showClusterBtn_clicked()
 //            &selfilter
 //    );
 
-    QString fileName = "/home/h005/Documents/vpDataSet/kxm/model/kxmCluster.cluster";
+    QString fileName = "/home/h005/Documents/vpDataSet/BuckinghamPalace/model/BuckinghamPalaceCluster.cluster";
+
+    CameraShowWidget *w = NULL;
 
     if (!fileName.isEmpty()) {
             ClusterManager cm(fileName.toStdString());
@@ -560,9 +562,17 @@ void MainEntryWindow::on_showClusterBtn_clicked()
                 cMvMatrixs.push_back(cm.getCenter(i));
             }
 
-            CameraShowWidget *w = new CameraShowWidget(manager->modelPath(), 1.f, mvMatrixs, clusterIndices,cMvMatrixs);
+            w = new CameraShowWidget(manager->modelPath(), 1.f, mvMatrixs, clusterIndices,cMvMatrixs);
             w->show();
     }
+
+//    if(w)
+//    {
+//        QString originlMap = "/home/h005/Documents/vpDataSet/BuckinghamPalace/register/BuckinghamPalace3.jpg";
+//        QString resultImg = "/home/h005/Documents/vpDataSet/BuckinghamPalace/register/BuckinghamPalace3Result.jpg";
+//        w->storeRenderResult(originlMap,resultImg);
+//    }
+
 }
 
 // render MVP matrix

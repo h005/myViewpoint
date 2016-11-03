@@ -6,6 +6,7 @@
 #include <glm/gtc/matrix_inverse.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/string_cast.hpp>
+#include <opencv.hpp>
 #include "TransformationUtils.h"
 #include "shader.hpp"
 #include "colormap.h"
@@ -184,6 +185,19 @@ void CameraShowWidget::paintGL()
 
     modelViewMatrix = glm::scale(modelViewMatrix,glm::vec3(10.f));
     // 绘制模型
+
+    float aaa[16] = {-4.37114e-08,1,0,0,
+                     0.242536,1.06016e-08,0.970142,-0.291043,
+                     0.970143,4.24063e-08,-0.242536,-1.16417,
+                     0,0,0,1};
+    modelViewMatrix = glm::make_mat4(aaa);
+    modelViewMatrix = glm::transpose(modelViewMatrix);
+    float bbb[16] = {1.29904,0,0,0,
+                     0,1.73205,0,0,
+                     0,0,-1.10526,-1.05263,
+                     0,0,-1,0};
+    m_proj = glm::make_mat4(bbb);
+    m_proj = glm::transpose(m_proj);
     model.draw(modelViewMatrix, m_proj);
 
     // 绘制坐标系
@@ -221,8 +235,10 @@ void CameraShowWidget::paintGL()
     // cctv3
 //    ScaleRate = 1000.f;
     // kxm
-    ScaleRate = 500.f;
+//    ScaleRate = 500.f;
     //    int lastClusterId = m_clusterIndices[0];
+    // house8
+    ScaleRate = 0.0f;
     for (int i = 0; i < m_estimatedMVMatrixs.size(); i++) {
             glm::mat4 axisMV = modelViewMatrix * (m_estimatedMVMatrixs[i]);            
             axisMV = glm::scale(axisMV, glm::vec3(ScaleRate));
@@ -263,4 +279,46 @@ glm::mat4 CameraShowWidget::getModelViewMatrix()
     // 缩放矩阵不能放在m_camera之前，否则是在相机坐标系下等比例缩放
     // 会得到一致的渲染结果（除了离相机更近以外）
     return glm::scale(m_camera, glm::vec3(0.3)) * getModelMatrix();
+}
+
+void CameraShowWidget::storeRenderResult(QString imageFile,QString ourImgFile)
+{
+    makeCurrent();
+
+    GLint viewport[4];
+    glGetIntegerv(GL_VIEWPORT, viewport);
+
+    GLubyte *img =
+                new GLubyte[(viewport[2] - viewport[0])
+    *(viewport[3] - viewport[1])*4];
+    glReadBuffer(GL_BACK_LEFT);
+    std::cout << "read pixel done 1" << std::endl;
+    std::cout << "viewport " << viewport[0] << " " << viewport[1] << " " << viewport[2] << " " << viewport[3] << std::endl;
+//    glReadPixels(0,0,viewport[2],viewport[3],GL_RGBA,GL_UNSIGNED_BYTE,img);
+
+    glReadPixels(0,
+                0,
+                viewport[2],
+                viewport[3],
+                GL_RGBA,
+                GL_UNSIGNED_BYTE,
+                img);
+
+    std::cout << "read pixel done 2" << std::endl;
+    cv::Mat originalImage = cv::imread(imageFile.toStdString().c_str());
+    cv::Mat rgbaImgFliped = cv::Mat(viewport[3],viewport[2],CV_8UC4,img);
+    cv::Mat rgbImg;
+    cv::flip(rgbaImgFliped,rgbImg,0);
+    cv::resize(rgbImg,rgbImg,cv::Size(originalImage.cols,originalImage.rows));
+    cv::cvtColor(rgbImg,rgbImg,CV_RGBA2BGR);
+    rgbImg.convertTo(rgbImg,CV_8UC3);
+    IplImage *saveImage = new IplImage(rgbImg);
+    cvSaveImage(ourImgFile.toStdString().c_str(),saveImage);
+
+    std::cout << "debug ...." << std::endl;
+
+    delete []img;
+    rgbaImgFliped.release();
+    originalImage.release();
+
 }

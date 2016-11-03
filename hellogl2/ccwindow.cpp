@@ -10,6 +10,7 @@
 #include <opencv.hpp>
 #include "opencv2/xfeatures2d.hpp"
 #include "lmdlt.h"
+#include "TransformationUtils.h"
 
 CCWindow::CCWindow()
 {
@@ -415,6 +416,7 @@ void CCWindow::calibrate()
                   int((double)imgHeight/scale),
                   cal_mv,
                   cal_proj);
+    cal_mv = normalizedModelView(cal_mv);
 }
 
 void CCWindow::clearpoints()

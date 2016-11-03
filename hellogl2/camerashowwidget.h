@@ -18,10 +18,13 @@ public:
     QSize minimumSizeHint() const Q_DECL_OVERRIDE;
     QSize sizeHint() const Q_DECL_OVERRIDE;
 
+    void storeRenderResult(QString imageFile, QString ourImgFile);
+
 protected:
     void initializeGL() Q_DECL_OVERRIDE;
     void paintGL() Q_DECL_OVERRIDE;
     glm::mat4 getModelViewMatrix();
+
 
 private:
     glm::vec3 m_eye, m_center, m_up;
