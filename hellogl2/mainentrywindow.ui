@@ -287,6 +287,32 @@
      <string>render MVP</string>
     </property>
    </widget>
+   <widget class="QPushButton" name="printPtMVP">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>410</y>
+      <width>131</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>print pt2pt MVP</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton_4">
+    <property name="geometry">
+     <rect>
+      <x>180</x>
+      <y>410</y>
+      <width>89</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>cluster pt</string>
+    </property>
+   </widget>
    <zorder>showClusterBtn</zorder>
    <zorder>cameraCalibration</zorder>
    <zorder>pushButton</zorder>
@@ -308,6 +334,8 @@
    <zorder>pushButton_2</zorder>
    <zorder>ccConfig</zorder>
    <zorder>pushButton_3</zorder>
+   <zorder>printPtMVP</zorder>
+   <zorder>pushButton_4</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">

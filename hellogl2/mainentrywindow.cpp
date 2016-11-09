@@ -33,6 +33,7 @@
 #include "LMModelMainComponent.h"
 #include "externalimporter.h"
 #include "clustermanager.h"
+#include "cameraptshowwidget.h"
 
 #include "ccwindow.h"
 
@@ -82,7 +83,9 @@ void MainEntryWindow::on_pushButton_clicked()
 //            &selfilter
 //    );
 
-    QString fileName = "/home/h005/Documents/vpDataSet/pavilion9/model/config.ini";
+    QString fileName = "/home/h005/Documents/vpDataSet/BuckinghamPalace/register/configCluster.ini";
+//    QString fileName = "/home/h005/Documents/vpDataSet/pavilion9/model/config.ini";
+//      QString fileName = "/home/h005/Documents/vpDataSet/castle/model/config.ini";
 //    QString fileName = "/home/h005/Documents/vpDataSet/BuckinghamPalace/register/config.ini";
 
     if (!fileName.isEmpty()) {
@@ -519,16 +522,16 @@ void MainEntryWindow::on_ccConfig_clicked()
 
 void MainEntryWindow::on_showClusterBtn_clicked()
 {
-//    QString selfilter = tr("Cluster Results (*.cluster)");
-//    QString fileName = QFileDialog::getOpenFileName(
-//            this,
-//            QString("Open Cluster Results"),
-//            QString(),
-//            tr("All files (*.*);;Cluster Results (*.cluster)" ),
-//            &selfilter
-//    );
+    QString selfilter = tr("Cluster Results (*.cluster)");
+    QString fileName = QFileDialog::getOpenFileName(
+            this,
+            QString("Open Cluster Results"),
+            QString(),
+            tr("All files (*.*);;Cluster Results (*.cluster)" ),
+            &selfilter
+    );
 
-    QString fileName = "/home/h005/Documents/vpDataSet/BuckinghamPalace/model/BuckinghamPalaceCluster.cluster";
+//    QString fileName = "/home/h005/Documents/vpDataSet/BuckinghamPalace/model/BuckinghamPalaceCluster.cluster";
 
     CameraShowWidget *w = NULL;
 
@@ -650,5 +653,107 @@ void MainEntryWindow::on_pushButton_3_clicked()
                 std::cout << "Please Open A Render Window First " << std::endl;
             }
     }
+    }
+}
+
+void MainEntryWindow::on_printPtMVP_clicked()
+{
+    // 输出MV和P
+    QString selfilter = tr("Model View Matrix File (*.matrix)");
+    QString fileName = QFileDialog::getSaveFileName(
+            this,
+            QString("打开配置文件"),
+            QString(),
+            tr("All files (*.*);;Model View Matrix File (*.matrix)" ),
+            &selfilter
+    );
+
+    // 获得模型到点云的变换
+    glm::mat4 model2ptCloud = glm::mat4();
+    if (!fileName.isEmpty()) {
+        qDebug() << fileName;
+        std::ofstream matrixFile;
+        matrixFile.open(fileName.toUtf8().constData());
+
+        std::vector<QString> list;
+        manager->getImageList(list);
+        std::vector<QString>::iterator it;
+        for (it = list.begin(); it != list.end(); it++) {
+
+            qDebug() << "********************* " << it - list.begin() << " ****************";
+
+            Entity want;
+            Q_ASSERT(manager->getEntity(*it, want));
+            glm::mat4 wantMVMatrix = want.mvMatrix * model2ptCloud;
+            wantMVMatrix = normalizedModelView(wantMVMatrix);
+
+            matrixFile << it->toUtf8().constData() << std::endl;
+            for (int i = 0; i < 4; i++) {
+                for (int j = 0; j < 4; j++)
+                    matrixFile << wantMVMatrix[j][i] << " ";
+                matrixFile << std::endl;
+            }
+
+            QSize imgSize = GetImageParamter(*it);
+            glm::mat4 wantProjMatrix = projectionMatrixWithFocalLength(want.f, imgSize.width(), imgSize.height(), P_NEAR, P_FAR);
+            for (int i = 0; i < 4; i++) {
+                for (int j = 0; j < 4; j++)
+                    matrixFile << wantProjMatrix[j][i] << " ";
+                matrixFile << std::endl;
+            }
+        }
+        qDebug() << "output finished";
+        matrixFile.close();
+    }
+}
+
+// show pt cluster
+void MainEntryWindow::on_pushButton_4_clicked()
+{
+//    QString selfilter = tr("Cluster Results (*.cluster)");
+//    QString fileName = QFileDialog::getOpenFileName(
+//            this,
+//            QString("Open Cluster Results"),
+//            QString(),
+//            tr("All files (*.*);;Cluster Results (*.cluster)" ),
+//            &selfilter
+//    );
+
+    QString fileName = "/home/h005/Documents/vpDataSet/BuckinghamPalace/model/BuckinghamPalacePt.cluster";
+
+    CameraPtShowWidget *w = NULL;
+
+    if (!fileName.isEmpty()) {
+            ClusterManager cm(fileName.toStdString());
+
+            std::vector<glm::mat4> mvMatrixs;
+            std::vector<int> clusterIndices;
+
+            int showSetLen = 15;
+//            int* showSet = new int[showSetLen]{3,9,10,11,12,13,14};
+            int* showSet = new int[showSetLen]{1,2,3,4,5,6,7,8,9,10,11,12,13,14,15};
+//            showSetLen = 10;
+//            int* showSet = new int[showSetLen]{1,2,3,4,5,8,9,11,12,14};
+//            int* showSet = new int[showSetLen]{19};
+            for (int i=0;i<showSetLen;i++)
+            {
+                mvMatrixs.insert(mvMatrixs.end(),cm.getCluster(showSet[i]).begin(), cm.getCluster(showSet[i]).end());
+                std::vector<int> dummy(cm.getCluster(showSet[i]).size(),showSet[i]);
+                clusterIndices.insert(clusterIndices.end(),dummy.begin(),dummy.end());
+            }
+
+            for(int i=0;i<clusterIndices.size();i++)
+            {
+                std::cout << "clusterIndices " << clusterIndices[i] << std::endl;
+            }
+
+            std::vector<glm::mat4> cMvMatrixs;
+            for(int i=0;i<showSetLen;i++)
+            {
+                cMvMatrixs.push_back(cm.getCenter(i));
+            }
+
+            w = new CameraPtShowWidget(manager->modelPath(), 1.f, mvMatrixs, clusterIndices,cMvMatrixs);
+            w->show();
     }
 }

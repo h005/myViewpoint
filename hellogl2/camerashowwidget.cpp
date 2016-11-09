@@ -77,6 +77,7 @@ CameraShowWidget::CameraShowWidget(const QString &modelPath,
                                    QWidget *parent)
     :GLWidget(modelPath, parent)
 {
+//    this->meshModel = meshModel;
     m_imgRatio = imgRatio;
     for (auto it = mvMatrixs.begin(); it != mvMatrixs.end(); it++)
         m_estimatedMVMatrixs.push_back(glm::inverse(*it));
@@ -183,21 +184,21 @@ void CameraShowWidget::paintGL()
     // 计算modelView矩阵
     glm::mat4 modelViewMatrix = getModelViewMatrix();
 
-    modelViewMatrix = glm::scale(modelViewMatrix,glm::vec3(10.f));
+//    modelViewMatrix = glm::scale(modelViewMatrix,glm::vec3(10.f));
     // 绘制模型
 
-    float aaa[16] = {-4.37114e-08,1,0,0,
-                     0.242536,1.06016e-08,0.970142,-0.291043,
-                     0.970143,4.24063e-08,-0.242536,-1.16417,
-                     0,0,0,1};
-    modelViewMatrix = glm::make_mat4(aaa);
-    modelViewMatrix = glm::transpose(modelViewMatrix);
-    float bbb[16] = {1.29904,0,0,0,
-                     0,1.73205,0,0,
-                     0,0,-1.10526,-1.05263,
-                     0,0,-1,0};
-    m_proj = glm::make_mat4(bbb);
-    m_proj = glm::transpose(m_proj);
+//    float aaa[16] = {-4.37114e-08,1,0,0,
+//                     0.242536,1.06016e-08,0.970142,-0.291043,
+//                     0.970143,4.24063e-08,-0.242536,-1.16417,
+//                     0,0,0,1};
+//    modelViewMatrix = glm::make_mat4(aaa);
+//    modelViewMatrix = glm::transpose(modelViewMatrix);
+//    float bbb[16] = {1.29904,0,0,0,
+//                     0,1.73205,0,0,
+//                     0,0,-1.10526,-1.05263,
+//                     0,0,-1,0};
+//    m_proj = glm::make_mat4(bbb);
+//    m_proj = glm::transpose(m_proj);
     model.draw(modelViewMatrix, m_proj);
 
     // 绘制坐标系
@@ -205,7 +206,7 @@ void CameraShowWidget::paintGL()
     GLuint projMatrixID = glGetUniformLocation(m_sphereProgramID, "projMatrix");
     GLuint mvMatrixID = glGetUniformLocation(m_sphereProgramID, "mvMatrix");
 
-    float ScaleRate;
+    float ScaleRate = 0.0f;
     // BrandenburgGate done
 //    ScaleRate = 0.1f;
     // BritishMuseum done but not good
@@ -238,7 +239,7 @@ void CameraShowWidget::paintGL()
 //    ScaleRate = 500.f;
     //    int lastClusterId = m_clusterIndices[0];
     // house8
-    ScaleRate = 0.0f;
+//    ScaleRate = 0.0f;
     for (int i = 0; i < m_estimatedMVMatrixs.size(); i++) {
             glm::mat4 axisMV = modelViewMatrix * (m_estimatedMVMatrixs[i]);            
             axisMV = glm::scale(axisMV, glm::vec3(ScaleRate));
@@ -250,7 +251,7 @@ void CameraShowWidget::paintGL()
             glColor3ub(color[0] * 255, color[1]  * 255, color[2] * 255);
 
             m_cameraModels[cameraID[m_clusterIndices[i]]].draw(axisMV,m_proj);
-//            std::cout << "render camera "<< i << std::endl;
+            std::cout << "render camera "<< i << std::endl;
 //            m_cameraModel.draw(axisMV,m_proj);
 //            m_axis.draw();
      }

@@ -6,6 +6,7 @@
 #include <glm/gtx/string_cast.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <qdebug.h>
+#include <QKeyEvent>
 #include "shader.hpp"
 #include "pointsmatchrelation.h"
 
@@ -19,6 +20,10 @@ PointCloudWidget::PointCloudWidget(const std::string &plyPath, QWidget *parent)
     auto scaleAndShift = m_renderObject.recommendScaleAndShift();
     m_scaleBeforeRender = scaleAndShift.first;
     m_shiftBeforeRender = scaleAndShift.second;
+
+    cameraPos = glm::vec3(0.f,0.f,0.f);
+    camPosLength = 30.f;
+    rate = 0.05;
 }
 
 PointCloudWidget::~PointCloudWidget()
@@ -48,7 +53,8 @@ void PointCloudWidget::initializeGL()
     assert(err == GLEW_OK);
 
     initializeOpenGLFunctions();
-    glClearColor( 0.368, 0.368, 0.733, 1);
+//    glClearColor( 0.368, 0.368, 0.733, 1);
+    glClearColor(1.0,1.0,1.0,1.0);
 
     // Our camera never changes in this example.
     // Equal to:
@@ -176,5 +182,27 @@ bool PointCloudWidget::removeLastPoint() {
         return true;
     } else
         return false;
+}
+
+void PointCloudWidget::keyPressEvent(QKeyEvent *e)
+{
+    if(e->key() == Qt::Key_Left)
+    {
+        cameraPos.r += rate * camPosLength;
+    }
+    else if(e->key() == Qt::Key_Right)
+    {
+        cameraPos.r -= rate * camPosLength;
+    }
+    else if(e->key() == Qt::Key_Up)
+    {
+        cameraPos.g -= rate * camPosLength;
+    }
+    else if(e->key() == Qt::Key_Down)
+    {
+        cameraPos.g += rate * camPosLength;
+    }
+    m_camera = glm::lookAt(glm::vec3(0.f, 0.f, camPosLength) + cameraPos, glm::vec3(0.f) + cameraPos, glm::vec3(0.f, 1.f, 0.f));
+    update();
 }
 

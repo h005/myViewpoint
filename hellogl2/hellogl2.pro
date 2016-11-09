@@ -36,7 +36,8 @@ HEADERS       = glwidget.h \
     ccsiftmatch.h \
     ccsiftmatchwindow.h \
     clustermanager.h \
-    colormap.h
+    colormap.h \
+    cameraptshowwidget.h
 
 SOURCES       = glwidget.cpp \
                 main.cpp \
@@ -77,7 +78,8 @@ SOURCES       = glwidget.cpp \
     ccsiftmatch.cpp \
     ccsiftmatchwindow.cpp \
     clustermanager.cpp \
-    colormap.cpp
+    colormap.cpp \
+    cameraptshowwidget.cpp
 
 OTHER_FILES += shader/*.vert shader/*.frag
 

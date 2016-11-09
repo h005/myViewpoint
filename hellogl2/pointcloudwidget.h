@@ -19,6 +19,7 @@ public:
     int addPoint(const QPoint &p);
     bool removeLastPoint();
     PointsMatchRelation *m_relation = NULL;
+    void keyPressEvent(QKeyEvent *e);
 
 protected:
     void initializeGL() Q_DECL_OVERRIDE;
@@ -33,6 +34,9 @@ protected:
     glm::mat4 m_shiftBeforeRender;
     PLYCloudObject m_renderObject;
     GLuint m_programID = 0;
+    glm::vec3 cameraPos;
+    float camPosLength;
+    float rate;
 
     Sphere m_sphereObject;
     GLuint m_sphereProgramID = 0;
