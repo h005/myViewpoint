@@ -9,7 +9,7 @@
 class EntityManager
 {
 public:
-    EntityManager(const QString &basedir);
+    EntityManager(const QString &basedir, const QString &configFile);
     ~EntityManager();
     bool load();
     bool getEntity(const QString &key, Entity &out);
@@ -32,6 +32,7 @@ private:
     QString m_modelPath;
     QString m_ptCloudPath;
     QString m_registrationFile;
+    QString m_configFile;
 };
 
 #endif // ENTITYMANAGER_H

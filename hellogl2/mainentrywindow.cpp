@@ -74,24 +74,25 @@ QSize MainEntryWindow::minimumSizeHint() const
 
 void MainEntryWindow::on_pushButton_clicked()
 {
-//    QString selfilter = tr("Config (*.ini)");
-//    QString fileName = QFileDialog::getOpenFileName(
-//            this,
-//            QString("打开配置文件"),
-//            QString(),
-//            tr("All files (*.*);;Config (*.ini)" ),
-//            &selfilter
-//    );
+    QString selfilter = tr("Config (*.ini)");
+    QString fileName = QFileDialog::getOpenFileName(
+            this,
+            QString("打开配置文件"),
+            QString(),
+            tr("All files (*.*);;Config (*.ini)" ),
+            &selfilter
+    );
 
-    QString fileName = "/home/h005/Documents/vpDataSet/BuckinghamPalace/register/configCluster.ini";
+//    QString fileName = "/home/h005/Documents/vpDataSet/BuckinghamPalace/register/configCluster.ini";
 //    QString fileName = "/home/h005/Documents/vpDataSet/pavilion9/model/config.ini";
 //      QString fileName = "/home/h005/Documents/vpDataSet/castle/model/config.ini";
 //    QString fileName = "/home/h005/Documents/vpDataSet/BuckinghamPalace/register/config.ini";
 
     if (!fileName.isEmpty()) {
         QFileInfo file(fileName);
-        qDebug() << file.absolutePath();
-        manager = new EntityManager(file.absolutePath());
+//        qDebug() << file.absolutePath();
+        qDebug() << file.absoluteFilePath();
+        manager = new EntityManager(file.absolutePath(),file.absoluteFilePath());
 
         if (!manager->load()) {
             QMessageBox::about(this, "提示", fileName + " 打开失败");
@@ -541,9 +542,10 @@ void MainEntryWindow::on_showClusterBtn_clicked()
             std::vector<glm::mat4> mvMatrixs;
             std::vector<int> clusterIndices;
 
-            int showSetLen = 15;
+            int showSetLen = 9;
 //            int* showSet = new int[showSetLen]{3,9,10,11,12,13,14};
-            int* showSet = new int[showSetLen]{1,2,3,4,5,6,7,8,9,10,11,12,13,14,15};
+            int* showSet = new int[showSetLen]{1,2,3,4,5,6,7,8,9};
+//            int* showSet = new int[showSetLen]{1,2,3,4,5,6,7,8,9,10,11,12,13,14,15};
 //            showSetLen = 10;
 //            int* showSet = new int[showSetLen]{1,2,3,4,5,8,9,11,12,14};
 //            int* showSet = new int[showSetLen]{19};
@@ -710,16 +712,16 @@ void MainEntryWindow::on_printPtMVP_clicked()
 // show pt cluster
 void MainEntryWindow::on_pushButton_4_clicked()
 {
-//    QString selfilter = tr("Cluster Results (*.cluster)");
-//    QString fileName = QFileDialog::getOpenFileName(
-//            this,
-//            QString("Open Cluster Results"),
-//            QString(),
-//            tr("All files (*.*);;Cluster Results (*.cluster)" ),
-//            &selfilter
-//    );
+    QString selfilter = tr("Cluster Results (*.cluster)");
+    QString fileName = QFileDialog::getOpenFileName(
+            this,
+            QString("Open Cluster Results"),
+            QString(),
+            tr("All files (*.*);;Cluster Results (*.cluster)" ),
+            &selfilter
+    );
 
-    QString fileName = "/home/h005/Documents/vpDataSet/BuckinghamPalace/model/BuckinghamPalacePt.cluster";
+//    QString fileName = "/home/h005/Documents/vpDataSet/BuckinghamPalace/model/BuckinghamPalacePt.cluster";
 
     CameraPtShowWidget *w = NULL;
 
@@ -729,9 +731,11 @@ void MainEntryWindow::on_pushButton_4_clicked()
             std::vector<glm::mat4> mvMatrixs;
             std::vector<int> clusterIndices;
 
-            int showSetLen = 15;
+//            int showSetLen = 15;
 //            int* showSet = new int[showSetLen]{3,9,10,11,12,13,14};
-            int* showSet = new int[showSetLen]{1,2,3,4,5,6,7,8,9,10,11,12,13,14,15};
+//            int* showSet = new int[showSetLen]{1,2,3,4,5,6,7,8,9,10,11,12,13,14,15};
+            int showSetLen = 9;
+            int *showSet = new int[showSetLen]{1,2,3,4,5,6,7,8,9};
 //            showSetLen = 10;
 //            int* showSet = new int[showSetLen]{1,2,3,4,5,8,9,11,12,14};
 //            int* showSet = new int[showSetLen]{19};

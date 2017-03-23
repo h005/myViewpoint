@@ -158,7 +158,10 @@ void CameraPtShowWidget::paintGL()
     // BrandenburgGate
 //    ScaleRate = 0.6f;
     // BuckinghamPalace
-    ScaleRate = 0.6f;
+//    ScaleRate = 0.6f;
+    // kxm
+    ScaleRate = .2f;
+
 
     for(int i=0;i<m_estimatedMVMatrixs.size();i++)
     {
@@ -173,14 +176,14 @@ void CameraPtShowWidget::paintGL()
 
 
     // draw location
-    for(int i=0;i<m_locationMVMatixs.size();i++)
-    {
-        glm::mat4 axisMV = modelViewMatrix * (m_locationMVMatixs[i]);
-        axisMV = glm::scale(axisMV, glm::vec3(ScaleRate/2.f));
-        glUniformMatrix4fv(projMatrixID,1,GL_FALSE,glm::value_ptr(m_proj));
-        glUniformMatrix4fv(mvMatrixID,1,GL_FALSE,glm::value_ptr(axisMV));
-        m_locationModel.draw(axisMV,m_proj);
-    }
+//    for(int i=0;i<m_locationMVMatixs.size();i++)
+//    {
+//        glm::mat4 axisMV = modelViewMatrix * (m_locationMVMatixs[i]);
+//        axisMV = glm::scale(axisMV, glm::vec3(ScaleRate/2.f));
+//        glUniformMatrix4fv(projMatrixID,1,GL_FALSE,glm::value_ptr(m_proj));
+//        glUniformMatrix4fv(mvMatrixID,1,GL_FALSE,glm::value_ptr(axisMV));
+//        m_locationModel.draw(axisMV,m_proj);
+//    }
 
 }
 

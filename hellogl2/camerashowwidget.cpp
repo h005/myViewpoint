@@ -236,7 +236,7 @@ void CameraShowWidget::paintGL()
     // cctv3
 //    ScaleRate = 1000.f;
     // kxm
-//    ScaleRate = 500.f;
+    ScaleRate = 500.f;
     //    int lastClusterId = m_clusterIndices[0];
     // house8
 //    ScaleRate = 0.0f;
@@ -257,14 +257,14 @@ void CameraShowWidget::paintGL()
      }
 
     // draw location
-    for(int i=0;i<m_locationMVMatrixs.size();i++)
-    {
-        glm::mat4 axisMV = modelViewMatrix * (m_locationMVMatrixs[i]);
-        axisMV = glm::scale(axisMV, glm::vec3(ScaleRate/2.f));
-        glUniformMatrix4fv(projMatrixID, 1, GL_FALSE, glm::value_ptr(m_proj));
-        glUniformMatrix4fv(mvMatrixID, 1, GL_FALSE, glm::value_ptr(axisMV));
-        m_locationModel.draw(axisMV,m_proj);
-    }
+//    for(int i=0;i<m_locationMVMatrixs.size();i++)
+//    {
+//        glm::mat4 axisMV = modelViewMatrix * (m_locationMVMatrixs[i]);
+//        axisMV = glm::scale(axisMV, glm::vec3(ScaleRate/2.f));
+//        glUniformMatrix4fv(projMatrixID, 1, GL_FALSE, glm::value_ptr(m_proj));
+//        glUniformMatrix4fv(mvMatrixID, 1, GL_FALSE, glm::value_ptr(axisMV));
+//        m_locationModel.draw(axisMV,m_proj);
+//    }
 
 //    std::cout << "rendering ....................." << std::endl;
 //    for (auto it = m_estimatedMVMatrixs.begin(); it != m_estimatedMVMatrixs.end(); it++) {

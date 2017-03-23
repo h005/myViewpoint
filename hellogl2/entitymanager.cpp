@@ -12,9 +12,10 @@
 #include <QSettings>
 #include <QDebug>
 
-EntityManager::EntityManager(const QString &basedir)
+EntityManager::EntityManager(const QString &basedir, const QString &configFile)
 {
     m_basedir = basedir;
+    m_configFile = configFile;
 }
 
 EntityManager::~EntityManager()
@@ -25,7 +26,8 @@ EntityManager::~EntityManager()
 bool EntityManager::load()
 {
 //    QSettings settings(QDir(m_basedir).filePath("config.ini"), QSettings::IniFormat);
-    QSettings settings(QDir(m_basedir).filePath("configCluster.ini"), QSettings::IniFormat);
+//    QSettings settings(QDir(m_basedir).filePath("configCluster.ini"), QSettings::IniFormat);
+    QSettings settings(m_configFile, QSettings::IniFormat);
     // 读取模型的信息
     m_modelPath = QDir::cleanPath(QDir(m_basedir).filePath(settings.value("model/path").toString()));
     m_ptCloudPath = QDir::cleanPath(QDir(m_basedir).filePath(settings.value("model/ptCloudPath").toString()));
